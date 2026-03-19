@@ -1,0 +1,37 @@
+[
+  {
+    "id": "Q-001",
+    "query": "What is the compressor surge margin requirement?",
+    "expected_top_section": "Section 33.23 - Surge Margin",
+    "expected_keywords": [
+      "surge margin",
+      "compressor"
+    ],
+    "expected_answer_type": "traceable_fact"
+  },
+  {
+    "id": "Q-002",
+    "query": "What compressor design requirements must be met?",
+    "expected_sections": [
+      "Section 33.21 - Compressor Design",
+      "Section 33.25 - Compressor Integrity"
+    ],
+    "expected_keywords": [
+      "compressor",
+      "design",
+      "integrity"
+    ],
+    "expected_answer_type": "traceable_fact"
+  },
+  {
+    "id": "Q-003",
+    "query": "What constraints apply to combustor exit temperature distribution?",
+    "expected_top_section": "Section 33.31 - Combustor Design",
+    "expected_keywords": [
+      "combustor",
+      "temperature distribution",
+      "OTDF"
+    ],
+    "expected_answer_type": "traceable_fact"
+  }
+]

@@ -1,0 +1,28 @@
+# Document processing and ingestion
+llama-parse
+unstructured[pdf]
+
+# Vector DB and Graph DB
+chromadb
+neo4j
+
+# LLM Framework and RAG
+llama-index
+llama-index-llms-openai
+llama-index-embeddings-openai
+
+# Anthropic Claude (Primary LLM)
+anthropic
+
+# Utilities
+python-dotenv
+requests
+beautifulsoup4
+pydantic
+fastapi
+uvicorn
+
+# Testing and development
+pytest
+black
+flake8

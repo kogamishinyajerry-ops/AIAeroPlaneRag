@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# IDE / editor
+.vscode/
+.idea/
+*.code-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Build / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Generated project artifacts
+data/processed/chroma_db/
+src/data/processed/chroma_db/
+data/processed/chroma_db_tmp/
+data/processed/chroma_db_tmp2/
+data/processed/chroma_db_tmp*/
+data/raw/*.pdf
+data/raw/*.docx
+data/raw/*.txt
+
+# Logs and temp files
+logs/
+*.log
+tmp/
+temp/
+
+# Node / frontend dependencies if introduced later
+node_modules/

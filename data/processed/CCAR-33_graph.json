@@ -1,0 +1,630 @@
+{
+  "entities": [
+    {
+      "id": "regulation_33.1",
+      "type": "Regulation",
+      "name": "第 33.1 条 适用范围",
+      "description": "规定了颁发航空发动机型号合格证的适航标准及其适用范围。"
+    },
+    {
+      "id": "regulation_33.3",
+      "type": "Regulation",
+      "name": "第 33.3 条 一般条款",
+      "description": "规定了发动机必须安装在按照适用适航标准进行型号合格审定的航空器上，以及安装和使用的相关要求。"
+    },
+    {
+      "id": "regulation_33.4",
+      "type": "Regulation",
+      "name": "第 33.4 条 说明书",
+      "description": "规定了发动机持证人必须准备的说明书内容，包括发动机型号、安装说明、操作说明和功率/推力限制。"
+    },
+    {
+      "id": "component_engine",
+      "type": "Component",
+      "name": "发动机",
+      "description": "航空器上的动力装置，包括涡轮喷气发动机、涡轮风扇发动机、涡轮螺旋桨发动机和涡轮轴发动机。"
+    },
+    {
+      "id": "material_fire_resistant",
+      "type": "Material",
+      "name": "耐火材料",
+      "description": "用于制造能够承受高温的材料。"
+    },
+    {
+      "id": "33.11",
+      "type": "Regulation",
+      "name": "第 33.11 条 适用范围",
+      "description": "规定了本节适用于所有类型涡轮发动机的设计与构造。"
+    },
+    {
+      "id": "33.13",
+      "type": "Regulation",
+      "name": "第 33.13 条 主要部件",
+      "description": "规定了发动机的关键旋转部件必须由经过验证的材料制造，并采用经过批准的工艺流程，以及关键件必须通过全寿命分析和试验。"
+    },
+    {
+      "id": "33.15",
+      "type": "Regulation",
+      "name": "第 33.15 条 材料与工艺",
+      "description": "规定了所使用的材料必须已经通过经验或试验确定其适于预期用途，并且其强度和其它性能能通过可靠数据来确认，以及制造工艺必须能够生产出始终具有符合型号设计的产品。"
+    },
+    {
+      "id": "33.17",
+      "type": "Regulation",
+      "name": "第 33.17 条 耐火性",
+      "description": "规定了所有处于指定防火区域内的部件必须使用耐火材料或屏蔽耐火材料，以及所有外露的发动机表面必须使用耐火或防火材料。"
+    },
+    {
+      "id": "33.19",
+      "type": "Regulation",
+      "name": "第 33.19 条 耐久性",
+      "description": "规定了发动机的活动部件和连接装置的设计必须能够减少磨损、蠕变和疲劳，以确保发动机的持续适航性。"
+    },
+    {
+      "id": "压气机盘",
+      "type": "Component",
+      "name": "压气机盘",
+      "description": "发动机的关键旋转部件之一。"
+    },
+    {
+      "id": "涡轮盘",
+      "type": "Component",
+      "name": "涡轮盘",
+      "description": "发动机的关键旋转部件之一。"
+    },
+    {
+      "id": "轴",
+      "type": "Component",
+      "name": "轴",
+      "description": "发动机的关键旋转部件之一。"
+    },
+    {
+      "id": "耐火材料",
+      "type": "Material",
+      "name": "耐火材料",
+      "description": "用于指定防火区域内的部件的材料。"
+    },
+    {
+      "id": "regulation_33.21",
+      "type": "Regulation",
+      "name": "第 33.21 条 压气机设计要求",
+      "description": "规定了压气机设计必须承受的气动力、离心力和热应力，以及叶片的抗外物损伤能力，以及转子必须能承受超转试验的要求。"
+    },
+    {
+      "id": "component_compressor",
+      "type": "Component",
+      "name": "压气机",
+      "description": "航空发动机的组成部分，负责压缩空气。"
+    },
+    {
+      "id": "parameter_surge_margin",
+      "type": "Parameter",
+      "name": "喘振裕度",
+      "description": "压气机在飞行条件和发动机瞬变工况下必须保持的裕度，以防止喘振。"
+    },
+    {
+      "id": "test_over_speed",
+      "type": "Test",
+      "name": "超转试验",
+      "description": "测试压气机转子能否承受超转试验要求的转速。"
+    },
+    {
+      "id": "regulation_33.23",
+      "type": "Regulation",
+      "name": "第 33.23 条 喘振裕度",
+      "description": "规定了压气机在飞行条件和发动机瞬变工况下必须保持的喘振裕度，以及不同状态下的建议裕度值。"
+    },
+    {
+      "id": "regulation_33.25",
+      "type": "Regulation",
+      "name": "第 33.25 条 压气机盘完整性",
+      "description": "规定了压气机盘的设计强度、低循环疲劳试验次数和超转试验速度。"
+    },
+    {
+      "id": "regulation_33.31",
+      "type": "Regulation",
+      "name": "第 33.31 条 燃烧室设计",
+      "description": "规定了燃烧室必须能够在所有规定的工作条件下，保证稳定、高效地燃烧，以及燃烧室出口温度分布因数（OTDF）必须在设计限值以内，以保护下游涡轮部件，同时燃烧效率在所有工作状态下不得低于 99%。"
+    },
+    {
+      "id": "regulation_33.33",
+      "type": "Regulation",
+      "name": "第 33.33 条 熄火与再点火",
+      "description": "规定了燃烧室必须在整个飞行包线内可靠地点火和再点火，以及高空再点火试验高度不低于设计巡航高度。"
+    },
+    {
+      "id": "regulation_33.35",
+      "type": "Regulation",
+      "name": "第 33.35 条 排放要求",
+      "description": "规定了发动机排放物必须符合国际民航组织（ICAO）附件 16 第二卷的排放标准，排放试验必须按照 ICAO 规定的 LTO（起飞-着陆）循环进行。"
+    },
+    {
+      "id": "component_burner",
+      "type": "Component",
+      "name": "燃烧室",
+      "description": "燃烧室是发动机的一个组成部分，负责燃烧燃料。"
+    },
+    {
+      "id": "parameter_otdf",
+      "type": "Parameter",
+      "name": "燃烧室出口温度分布因数（OTDF）",
+      "description": "燃烧室出口温度分布因数（OTDF）是衡量燃烧室性能的一个参数，必须在设计限值以内。"
+    },
+    {
+      "id": "parameter_burn_efficiency",
+      "type": "Parameter",
+      "name": "燃烧效率",
+      "description": "燃烧效率是衡量燃烧室燃烧效率的参数，在所有工作状态下不得低于 99%。"
+    },
+    {
+      "id": "test_reignition",
+      "type": "Test",
+      "name": "高空再点火试验",
+      "description": "高空再点火试验是确保燃烧室能够在高空可靠再点火的一种测试。"
+    },
+    {
+      "id": "regulation_33.41",
+      "type": "Regulation",
+      "name": "第 33.41 条 涡轮设计要求",
+      "description": "规定了涡轮叶片和涡轮盘必须能够承受所有正常和异常的温度、离心力和气动载荷，以及涡轮进口温度（TIT）不得超过经试验验证的材料允许温度。"
+    },
+    {
+      "id": "component_turbine_blade",
+      "type": "Component",
+      "name": "涡轮叶片",
+      "description": "涡轮的叶片部分，需要具备足够的抗蠕变和抗热疲劳性能。"
+    },
+    {
+      "id": "component_turbine_disk",
+      "type": "Component",
+      "name": "涡轮盘",
+      "description": "涡轮的盘部分，需要满足与压气机盘相同的完整性要求，并通过超转试验。"
+    },
+    {
+      "id": "parameter_turbine_import_temperature",
+      "type": "Parameter",
+      "name": "涡轮进口温度（TIT）",
+      "description": "涡轮进口温度不得超过经试验验证的材料允许温度。"
+    },
+    {
+      "id": "material_integrity",
+      "type": "Material",
+      "name": "耐火材料",
+      "description": "涡轮盘和压气机盘的完整性要求中可能涉及的材料。"
+    },
+    {
+      "id": "regulation_33.43",
+      "type": "Regulation",
+      "name": "第 33.43 条 涡轮盘完整性",
+      "description": "规定了涡轮盘必须满足与压气机盘相同的完整性要求，必须通过超转试验，并考虑蠕变和氧化对盘寿命的影响。"
+    },
+    {
+      "id": "regulation_33.45",
+      "type": "Regulation",
+      "name": "第 33.45 条 涡轮叶片",
+      "description": "规定了涡轮叶片必须具备足够的抗蠕变和抗热疲劳性能，叶片冷却系统必须经过严格的试验验证，叶片的高温氧化和热腐蚀防护涂层必须经过耐久性验证。"
+    },
+    {
+      "id": "regulation_33.51",
+      "type": "Regulation",
+      "name": "第 33.51 条 轴的设计",
+      "description": "规定了发动机旋转轴的设计要求，包括承受最大扭矩和弯矩的组合载荷以及临界转速的位置。"
+    },
+    {
+      "id": "regulation_33.53",
+      "type": "Regulation",
+      "name": "第 33.53 条 轴承与密封",
+      "description": "规定了发动机轴承的设计要求以及密封系统的功能。"
+    },
+    {
+      "id": "component_rotating_axis",
+      "type": "Component",
+      "name": "旋转轴",
+      "description": "发动机的旋转轴，必须能够承受最大扭矩和弯矩的组合载荷。"
+    },
+    {
+      "id": "component_bearing",
+      "type": "Component",
+      "name": "轴承",
+      "description": "发动机的轴承，必须设计为能够承受所有预期的载荷，并在规定的使用条件下具有足够的疲劳寿命。"
+    },
+    {
+      "id": "component_seal",
+      "type": "Component",
+      "name": "密封系统",
+      "description": "防止润滑油泄漏到气路中的系统。"
+    },
+    {
+      "id": "parameter_max_torque_bending_moment",
+      "type": "Parameter",
+      "name": "最大扭矩和弯矩的组合载荷",
+      "description": "轴必须能够承受的最大扭矩和弯矩的组合载荷。"
+    },
+    {
+      "id": "parameter_critical_speed",
+      "type": "Parameter",
+      "name": "临界转速",
+      "description": "轴的临界转速必须在工作转速范围之外。"
+    },
+    {
+      "id": "parameter_radial_axial_load",
+      "type": "Parameter",
+      "name": "径向和轴向载荷",
+      "description": "轴承必须能够承受的径向和轴向载荷。"
+    },
+    {
+      "id": "parameter_fatigue_life",
+      "type": "Parameter",
+      "name": "疲劳寿命",
+      "description": "轴承在规定的使用条件下具有的疲劳寿命。"
+    },
+    {
+      "id": "parameter_oil_leakage_prevention",
+      "type": "Parameter",
+      "name": "防止润滑油泄漏",
+      "description": "密封系统必须防止润滑油泄漏到气路中。"
+    },
+    {
+      "id": "test_bird_ingestion",
+      "type": "Test",
+      "name": "吞鸟试验",
+      "description": "测试发动机在吞鸟事件中的性能。"
+    },
+    {
+      "id": "regulation_33.61",
+      "type": "Regulation",
+      "name": "第 33.61 条 润滑系统",
+      "description": "规定了润滑系统必须提供充分的润滑，并配备低油压警告。"
+    },
+    {
+      "id": "regulation_33.63",
+      "type": "Regulation",
+      "name": "第 33.63 条 滑油冷却",
+      "description": "规定了滑油系统必须配备足够容量的冷却装置，确保滑油温度在任何运行条件下不超过经批准的限值。"
+    },
+    {
+      "id": "component_lubrication_system",
+      "type": "Component",
+      "name": "润滑系统",
+      "description": "发动机的一个组成部分，负责提供充分的润滑。"
+    },
+    {
+      "id": "component_cooling_device",
+      "type": "Component",
+      "name": "冷却装置",
+      "description": "滑油系统的一个组成部分，用于冷却滑油。"
+    },
+    {
+      "id": "parameter_oil_pressure",
+      "type": "Parameter",
+      "name": "油压",
+      "description": "润滑系统的一个参数，必须配备低油压警告。"
+    },
+    {
+      "id": "parameter_oil_temperature",
+      "type": "Parameter",
+      "name": "油温",
+      "description": "滑油系统的一个参数，必须保持在经批准的限值以下。"
+    },
+    {
+      "id": "regulation_33.81",
+      "type": "Regulation",
+      "name": "持久试验",
+      "description": "规定发动机必须完成规定时长的持久试验以证明其可靠性"
+    },
+    {
+      "id": "regulation_33.83",
+      "type": "Regulation",
+      "name": "超温试验",
+      "description": "规定发动机必须在超过最大允许涡轮进口温度条件下运行规定时间以验证其安全性"
+    },
+    {
+      "id": "regulation_33.85",
+      "type": "Regulation",
+      "name": "包容性试验",
+      "description": "规定发动机机匣必须能够包容至少一个涡轮叶片或风扇叶片的脱落，并在最大能量释放条件下进行试验"
+    },
+    {
+      "id": "regulation_33.87",
+      "type": "Regulation",
+      "name": "吞鸟试验",
+      "description": "规定发动机必须通过吞鸟试验，证明在吞入不同大小鸟类后仍能安全关车或继续运行"
+    },
+    {
+      "id": "regulation_33.89",
+      "type": "Regulation",
+      "name": "吞冰试验",
+      "description": "规定发动机必须通过吞冰试验，以验证吞入冰块后不会造成不可接受的推力损失或机械损伤"
+    }
+  ],
+  "relationships": [
+    {
+      "source": "regulation_33.1",
+      "target": "component_engine",
+      "type": "CONSTRAINS",
+      "description": "第 33.1 条规定了颁发航空发动机型号合格证的适航标准，这些标准限制了发动机的设计。"
+    },
+    {
+      "source": "regulation_33.3",
+      "target": "component_engine",
+      "type": "CONSTRAINS",
+      "description": "第 33.3 条规定了发动机的安装和使用必须符合经批准的手册和限制，这限制了发动机的设计和使用。"
+    },
+    {
+      "source": "regulation_33.4",
+      "target": "material_fire_resistant",
+      "type": "CONSTRAINS",
+      "description": "第 33.4 条规定了说明书必须包含的信息，其中可能包括对耐火材料的要求。"
+    },
+    {
+      "source": "regulation_33.3",
+      "target": "regulation_33.4",
+      "type": "REFERS_TO",
+      "description": "第 33.3 条提到了发动机使用限制，这些限制在说明书中有详细说明，因此第 33.4 条引用了第 33.3 条。"
+    },
+    {
+      "source": "33.13",
+      "target": "压气机盘",
+      "type": "CONSTRAINS",
+      "description": "第 33.13 条规定了压气机盘必须由经过验证的材料制造。"
+    },
+    {
+      "source": "33.13",
+      "target": "涡轮盘",
+      "type": "CONSTRAINS",
+      "description": "第 33.13 条规定了涡轮盘必须由经过验证的材料制造。"
+    },
+    {
+      "source": "33.13",
+      "target": "轴",
+      "type": "CONSTRAINS",
+      "description": "第 33.13 条规定了轴必须由经过验证的材料制造。"
+    },
+    {
+      "source": "33.17",
+      "target": "耐火材料",
+      "type": "CONSTRAINS",
+      "description": "第 33.17 条规定了所有处于指定防火区域内的部件必须使用耐火材料。"
+    },
+    {
+      "source": "33.19",
+      "target": "压气机盘",
+      "type": "CONSTRAINS",
+      "description": "第 33.19 条规定了压气机盘的设计必须能够减少磨损、蠕变和疲劳。"
+    },
+    {
+      "source": "33.19",
+      "target": "涡轮盘",
+      "type": "CONSTRAINS",
+      "description": "第 33.19 条规定了涡轮盘的设计必须能够减少磨损、蠕变和疲劳。"
+    },
+    {
+      "source": "33.19",
+      "target": "轴",
+      "type": "CONSTRAINS",
+      "description": "第 33.19 条规定了轴的设计必须能够减少磨损、蠕变和疲劳。"
+    },
+    {
+      "source": "regulation_33.21",
+      "target": "component_compressor",
+      "type": "CONSTRAINS",
+      "description": "第 33.21 条规定了压气机必须承受的气动力、离心力和热应力，对压气机的设计提出了约束。"
+    },
+    {
+      "source": "regulation_33.21",
+      "target": "component_compressor",
+      "type": "CONSTRAINS",
+      "description": "第 33.21 条规定了压气机叶片必须具有足够的抗外物损伤能力，对压气机的设计提出了约束。"
+    },
+    {
+      "source": "regulation_33.21",
+      "target": "component_compressor",
+      "type": "CONSTRAINS",
+      "description": "第 33.21 条规定了压气机转子必须能承受超转试验的要求，对压气机的设计提出了约束。"
+    },
+    {
+      "source": "regulation_33.23",
+      "target": "parameter_surge_margin",
+      "type": "REQUIRES_PARAMETER",
+      "description": "第 33.23 条规定了压气机必须保持足够的喘振裕度，对喘振裕度参数提出了要求。"
+    },
+    {
+      "source": "regulation_33.23",
+      "target": "test_over_speed",
+      "type": "REQUIRES_TEST",
+      "description": "第 33.23 条规定了喘振裕度需通过进气畸变试验验证，对超转试验提出了要求。"
+    },
+    {
+      "source": "regulation_33.25",
+      "target": "component_compressor",
+      "type": "CONSTRAINS",
+      "description": "第 33.25 条规定了压气机盘的设计强度和低循环疲劳试验次数，对压气机盘的设计提出了约束。"
+    },
+    {
+      "source": "regulation_33.25",
+      "target": "component_compressor",
+      "type": "CONSTRAINS",
+      "description": "第 33.25 条规定了盘的超转试验速度，对压气机盘的设计提出了约束。"
+    },
+    {
+      "source": "regulation_33.25",
+      "target": "material_fire_resistant",
+      "type": "CONSTRAINS",
+      "description": "第 33.25 条规定了压气机盘必须使用耐火材料，对材料提出了要求。"
+    },
+    {
+      "source": "regulation_33.31",
+      "target": "component_burner",
+      "type": "CONSTRAINS",
+      "description": "第 33.31 条规定了燃烧室的设计要求，对燃烧室组件的设计进行了约束。"
+    },
+    {
+      "source": "regulation_33.31",
+      "target": "parameter_otdf",
+      "type": "REQUIRES_PARAMETER",
+      "description": "第 33.31 条要求燃烧室出口温度分布因数（OTDF）必须在设计限值以内。"
+    },
+    {
+      "source": "regulation_33.31",
+      "target": "parameter_burn_efficiency",
+      "type": "REQUIRES_PARAMETER",
+      "description": "第 33.31 条要求燃烧效率在所有工作状态下不得低于 99%。"
+    },
+    {
+      "source": "regulation_33.33",
+      "target": "component_burner",
+      "type": "REQUIRES_TEST",
+      "description": "第 33.33 条要求燃烧室必须在整个飞行包线内可靠地点火和再点火，需要进行高空再点火试验。"
+    },
+    {
+      "source": "regulation_33.35",
+      "target": "material_fire_resistant",
+      "type": "CONSTRAINS",
+      "description": "第 33.35 条规定了发动机排放物必须符合国际民航组织（ICAO）附件 16 第二卷的排放标准，对制造燃烧室等部件的材料提出了耐火要求。"
+    },
+    {
+      "source": "regulation_33.41",
+      "target": "component_turbine_blade",
+      "type": "CONSTRAINS",
+      "description": "第 33.41 条规定了涡轮叶片必须能够承受所有正常和异常的温度、离心力和气动载荷。"
+    },
+    {
+      "source": "regulation_33.41",
+      "target": "component_turbine_disk",
+      "type": "CONSTRAINS",
+      "description": "第 33.41 条规定了涡轮盘必须能够承受所有正常和异常的温度、离心力和气动载荷。"
+    },
+    {
+      "source": "regulation_33.41",
+      "target": "parameter_turbine_import_temperature",
+      "type": "REQUIRES_PARAMETER",
+      "description": "第 33.41 条规定了涡轮进口温度（TIT）不得超过经试验验证的材料允许温度。"
+    },
+    {
+      "source": "regulation_33.43",
+      "target": "component_turbine_disk",
+      "type": "CONSTRAINS",
+      "description": "第 33.43 条规定了涡轮盘必须满足与压气机盘相同的完整性要求。"
+    },
+    {
+      "source": "regulation_33.43",
+      "target": "test_over_speed",
+      "type": "REQUIRES_TEST",
+      "description": "第 33.43 条规定了涡轮盘必须通过超转试验。"
+    },
+    {
+      "source": "regulation_33.45",
+      "target": "component_turbine_blade",
+      "type": "CONSTRAINS",
+      "description": "第 33.45 条规定了涡轮叶片必须具备足够的抗蠕变和抗热疲劳性能。"
+    },
+    {
+      "source": "regulation_33.45",
+      "target": "material_integrity",
+      "type": "CONSTRAINS",
+      "description": "第 33.45 条可能涉及涡轮叶片的高温氧化和热腐蚀防护涂层，这些涂层需要是耐火材料。"
+    },
+    {
+      "source": "regulation_33.51",
+      "target": "component_rotating_axis",
+      "type": "CONSTRAINS",
+      "description": "第 33.51 条规定了旋转轴的设计要求。"
+    },
+    {
+      "source": "regulation_33.51",
+      "target": "parameter_max_torque_bending_moment",
+      "type": "REQUIRES_PARAMETER",
+      "description": "第 33.51 条要求轴能够承受最大扭矩和弯矩的组合载荷。"
+    },
+    {
+      "source": "regulation_33.51",
+      "target": "parameter_critical_speed",
+      "type": "REQUIRES_PARAMETER",
+      "description": "第 33.51 条要求轴的临界转速必须在工作转速范围之外。"
+    },
+    {
+      "source": "regulation_33.53",
+      "target": "component_bearing",
+      "type": "CONSTRAINS",
+      "description": "第 33.53 条规定了轴承的设计要求。"
+    },
+    {
+      "source": "regulation_33.53",
+      "target": "parameter_radial_axial_load",
+      "type": "REQUIRES_PARAMETER",
+      "description": "第 33.53 条要求轴承能够承受径向和轴向载荷。"
+    },
+    {
+      "source": "regulation_33.53",
+      "target": "parameter_fatigue_life",
+      "type": "REQUIRES_PARAMETER",
+      "description": "第 33.53 条要求轴承在规定的使用条件下具有足够的疲劳寿命。"
+    },
+    {
+      "source": "regulation_33.53",
+      "target": "component_seal",
+      "type": "CONSTRAINS",
+      "description": "第 33.53 条规定了密封系统的功能。"
+    },
+    {
+      "source": "regulation_33.53",
+      "target": "parameter_oil_leakage_prevention",
+      "type": "REQUIRES_PARAMETER",
+      "description": "第 33.53 条要求密封系统必须防止润滑油泄漏到气路中。"
+    },
+    {
+      "source": "regulation_33.61",
+      "target": "component_lubrication_system",
+      "type": "CONSTRAINS",
+      "description": "第 33.61 条规定了润滑系统必须提供充分的润滑。"
+    },
+    {
+      "source": "regulation_33.61",
+      "target": "parameter_oil_pressure",
+      "type": "REQUIRES_PARAMETER",
+      "description": "第 33.61 条规定了润滑系统必须配备低油压警告。"
+    },
+    {
+      "source": "regulation_33.63",
+      "target": "component_cooling_device",
+      "type": "CONSTRAINS",
+      "description": "第 33.63 条规定了滑油系统必须配备足够容量的冷却装置。"
+    },
+    {
+      "source": "regulation_33.63",
+      "target": "parameter_oil_temperature",
+      "type": "REQUIRES_PARAMETER",
+      "description": "第 33.63 条规定了滑油温度必须保持在经批准的限值以下。"
+    },
+    {
+      "source": "regulation_33.81",
+      "target": "持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "持久试验是第 33.81 条规定的测试"
+    },
+    {
+      "source": "regulation_33.83",
+      "target": "超温试验",
+      "type": "REQUIRES_TEST",
+      "description": "超温试验是第 33.83 条规定的测试"
+    },
+    {
+      "source": "regulation_33.85",
+      "target": "包容性试验",
+      "type": "REQUIRES_TEST",
+      "description": "包容性试验是第 33.85 条规定的测试"
+    },
+    {
+      "source": "regulation_33.87",
+      "target": "吞鸟试验",
+      "type": "REQUIRES_TEST",
+      "description": "吞鸟试验是第 33.87 条规定的测试"
+    },
+    {
+      "source": "regulation_33.89",
+      "target": "吞冰试验",
+      "type": "REQUIRES_TEST",
+      "description": "吞冰试验是第 33.89 条规定的测试"
+    }
+  ]
+}
