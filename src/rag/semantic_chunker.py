@@ -19,12 +19,19 @@ class StructuralChunker:
 
     def __init__(self, processed_dir: str = "./data/processed"):
         self.processed_dir = Path(processed_dir)
+        self._chunk_cache: dict[str, list[Dict]] = {}
+        self._meta_cache: dict[str, Dict] = {}
 
     def chunk_markdown(self, filename: str) -> List[Dict]:
         filepath = self.processed_dir / filename
         if not filepath.exists():
             logger.error("File not found: %s", filepath)
             return []
+
+        cache_key = f"{filepath}:{filepath.stat().st_mtime_ns}"
+        cached = self._chunk_cache.get(cache_key)
+        if cached is not None:
+            return [dict(chunk) for chunk in cached]
 
         logger.info("Chunking %s based on document structure...", filename)
         content = filepath.read_text(encoding="utf-8")
@@ -83,13 +90,20 @@ class StructuralChunker:
             )
 
         logger.info("Generated %s structural chunks for %s.", len(chunks), filename)
+        self._chunk_cache = {cache_key: chunks}
         return chunks
 
     def _load_document_metadata(self, filepath: Path) -> Dict:
         sidecar = filepath.with_suffix(".meta.json")
+        cache_key = f"{sidecar}:{sidecar.stat().st_mtime_ns}" if sidecar.exists() else str(filepath)
+        if cache_key in self._meta_cache:
+            return dict(self._meta_cache[cache_key])
+
         if sidecar.exists():
             try:
-                return json.loads(sidecar.read_text(encoding="utf-8"))
+                metadata = json.loads(sidecar.read_text(encoding="utf-8"))
+                self._meta_cache[cache_key] = metadata
+                return dict(metadata)
             except Exception as exc:
                 logger.warning("Failed to read metadata file %s: %s", sidecar, exc)
 
@@ -100,12 +114,14 @@ class StructuralChunker:
             first_line = ""
 
         inferred_mode = "mock" if "Mock Extraction" in first_line else "real"
-        return {
+        metadata = {
             "document_id": filepath.stem,
             "document_version": DOCUMENT_VERSION,
             "content_mode": inferred_mode,
             "markdown_path": str(filepath.resolve()),
         }
+        self._meta_cache[cache_key] = metadata
+        return dict(metadata)
 
     def _create_chunk_dict(
         self,
@@ -120,6 +136,7 @@ class StructuralChunker:
         contextualized_text = f"[{h1} > {h2} > {h3}]\n{text}"
         return {
             "text": contextualized_text,
+            "original_text": text,  # Preserve original text without context prefix
             "metadata": {
                 "source": source,
                 "document": h1,

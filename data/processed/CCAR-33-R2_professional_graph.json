@@ -1,0 +1,3663 @@
+{
+  "entities": [
+    {
+      "id": "ch_A",
+      "type": "Chapter",
+      "name": "CCAR-33-R2 A章 总则",
+      "description": "CCAR-33条款: CCAR-33-R2 A章 总则"
+    },
+    {
+      "id": "comp_隔圈",
+      "type": "Component",
+      "name": "隔圈",
+      "description": "发动机部件: 隔圈",
+      "chinese_name": "隔圈"
+    },
+    {
+      "id": "comp_转子轴",
+      "type": "RotorPart",
+      "name": "转子轴",
+      "description": "发动机部件: 转子轴",
+      "chinese_name": "转子轴"
+    },
+    {
+      "id": "comp_轴",
+      "type": "Component",
+      "name": "轴",
+      "description": "发动机部件: 轴",
+      "chinese_name": "轴"
+    },
+    {
+      "id": "comp_整流罩",
+      "type": "Component",
+      "name": "整流罩",
+      "description": "发动机部件: 整流罩",
+      "chinese_name": "整流罩"
+    },
+    {
+      "id": "comp_安装构件",
+      "type": "Component",
+      "name": "安装构件",
+      "description": "发动机部件: 安装构件",
+      "chinese_name": "安装构件"
+    },
+    {
+      "id": "comp_附件传动",
+      "type": "Accessory",
+      "name": "附件传动",
+      "description": "发动机部件: 附件传动",
+      "chinese_name": "附件传动"
+    },
+    {
+      "id": "comp_发动机",
+      "type": "Component",
+      "name": "发动机",
+      "description": "发动机部件: 发动机",
+      "chinese_name": "发动机"
+    },
+    {
+      "id": "comp_涡轮发动机",
+      "type": "Component",
+      "name": "涡轮发动机",
+      "description": "发动机部件: 涡轮发动机",
+      "chinese_name": "涡轮发动机"
+    },
+    {
+      "id": "param_569480",
+      "type": "Parameter",
+      "name": "参数: 30分钟",
+      "description": "- 30分钟OEI",
+      "value": "30分钟",
+      "context": "- 30分钟OEI"
+    },
+    {
+      "id": "param_182601",
+      "type": "Parameter",
+      "name": "参数: 2分钟",
+      "description": "- 2分钟OEI",
+      "value": "2分钟",
+      "context": "- 2分钟OEI"
+    },
+    {
+      "id": "param_619149",
+      "type": "Parameter",
+      "name": "参数: OEI",
+      "description": "4. OEI额定功率发动机的性能数据和功率保证程序",
+      "value": "OEI",
+      "context": "4. OEI额定功率发动机的性能数据和功率保证程序"
+    },
+    {
+      "id": "param_741150",
+      "type": "Parameter",
+      "name": "参数: 最大连续",
+      "description": "- 额定最大连续功率",
+      "value": "最大连续",
+      "context": "- 额定最大连续功率"
+    },
+    {
+      "id": "param_231957",
+      "type": "Parameter",
+      "name": "参数: 起飞",
+      "description": "- 额定起飞功率",
+      "value": "起飞",
+      "context": "- 额定起飞功率"
+    },
+    {
+      "id": "ch_B",
+      "type": "Chapter",
+      "name": "CCAR-33-R2 B章 设计与构造：总则",
+      "description": "CCAR-33条款: CCAR-33-R2 B章 设计与构造：总则"
+    },
+    {
+      "id": "comp_涡轮转子",
+      "type": "RotorPart",
+      "name": "涡轮转子",
+      "description": "发动机部件: 涡轮转子",
+      "chinese_name": "涡轮转子"
+    },
+    {
+      "id": "comp_转子叶片",
+      "type": "RotorPart",
+      "name": "转子叶片",
+      "description": "发动机部件: 转子叶片",
+      "chinese_name": "转子叶片"
+    },
+    {
+      "id": "comp_机匣",
+      "type": "StatorPart",
+      "name": "机匣",
+      "description": "发动机部件: 机匣",
+      "chinese_name": "机匣"
+    },
+    {
+      "id": "comp_螺旋桨",
+      "type": "Component",
+      "name": "螺旋桨",
+      "description": "发动机部件: 螺旋桨",
+      "chinese_name": "螺旋桨"
+    },
+    {
+      "id": "test_超转试验",
+      "type": "Test",
+      "name": "超转试验",
+      "description": "试验: 超转试验",
+      "chinese_name": "超转试验"
+    },
+    {
+      "id": "param_795070",
+      "type": "Parameter",
+      "name": "参数: 5分钟",
+      "description": "### （c）转子部件超转试验（5分钟）",
+      "value": "5分钟",
+      "context": "### （c）转子部件超转试验（5分钟）"
+    },
+    {
+      "id": "param_672004",
+      "type": "Parameter",
+      "name": "参数: 120%",
+      "description": "叶片/配重块） | 最大允许转速的 **120%** |",
+      "value": "120%",
+      "context": "叶片/配重块） | 最大允许转速的 **120%** |"
+    },
+    {
+      "id": "param_171228",
+      "type": "Parameter",
+      "name": "参数: 115%",
+      "description": "动机上进行试验 | 最大允许转速的 **115%** |",
+      "value": "115%",
+      "context": "动机上进行试验 | 最大允许转速的 **115%** |"
+    },
+    {
+      "id": "param_767867",
+      "type": "Parameter",
+      "name": "参数: 105%",
+      "description": "| 致命部件/系统失效时 | **105%** 最高转速 |",
+      "value": "105%",
+      "context": "| 致命部件/系统失效时 | **105%** 最高转速 |"
+    },
+    {
+      "id": "fail_喘振",
+      "type": "FailureMode",
+      "name": "喘振",
+      "description": "失效模式: 喘振"
+    },
+    {
+      "id": "fail_失速",
+      "type": "FailureMode",
+      "name": "失速",
+      "description": "失效模式: 失速"
+    },
+    {
+      "id": "fail_着火",
+      "type": "FailureMode",
+      "name": "着火",
+      "description": "失效模式: 着火"
+    },
+    {
+      "id": "fail_LOTC",
+      "type": "FailureMode",
+      "name": "LOTC",
+      "description": "失效模式: LOTC"
+    },
+    {
+      "id": "fail_LOPC",
+      "type": "FailureMode",
+      "name": "LOPC",
+      "description": "失效模式: LOPC"
+    },
+    {
+      "id": "fail_转子不平",
+      "type": "FailureMode",
+      "name": "转子不平衡",
+      "description": "失效模式: 转子不平衡"
+    },
+    {
+      "id": "ch_C",
+      "type": "Chapter",
+      "name": "CCAR-33-R2 C章 设计与构造：活塞式航空发动机",
+      "description": "CCAR-33条款: CCAR-33-R2 C章 设计与构造：活塞式航空发动机"
+    },
+    {
+      "id": "comp_点火系统",
+      "type": "Component",
+      "name": "点火系统",
+      "description": "发动机部件: 点火系统",
+      "chinese_name": "点火系统"
+    },
+    {
+      "id": "fail_振动",
+      "type": "FailureMode",
+      "name": "振动",
+      "description": "失效模式: 振动"
+    },
+    {
+      "id": "ch_D",
+      "type": "Chapter",
+      "name": "CCAR-33-R2 D章 台架试验：活塞式航空发动机",
+      "description": "CCAR-33条款: CCAR-33-R2 D章 台架试验：活塞式航空发动机"
+    },
+    {
+      "id": "test_持久试验",
+      "type": "Test",
+      "name": "持久试验",
+      "description": "试验: 持久试验",
+      "chinese_name": "持久试验"
+    },
+    {
+      "id": "test_振动试验",
+      "type": "Test",
+      "name": "振动试验",
+      "description": "试验: 振动试验",
+      "chinese_name": "振动试验"
+    },
+    {
+      "id": "test_校准试验",
+      "type": "Test",
+      "name": "校准试验",
+      "description": "试验: 校准试验",
+      "chinese_name": "校准试验"
+    },
+    {
+      "id": "test_工作试验",
+      "type": "Test",
+      "name": "工作试验",
+      "description": "试验: 工作试验",
+      "chinese_name": "工作试验"
+    },
+    {
+      "id": "test_分解检查",
+      "type": "Test",
+      "name": "分解检查",
+      "description": "试验: 分解检查",
+      "chinese_name": "分解检查"
+    },
+    {
+      "id": "param_724281",
+      "type": "Parameter",
+      "name": "参数: 150小时",
+      "description": "发动机必须进行持久试验，包括总时数为**150小时**的试车，并根据发动机型号和预期工作情",
+      "value": "150小时",
+      "context": "发动机必须进行持久试验，包括总时数为**150小时**的试车，并根据发动机型号和预期工作情"
+    },
+    {
+      "id": "param_865048",
+      "type": "Parameter",
+      "name": "参数: 35小时",
+      "description": "- 在以额定起飞功率和至少35小时额定最大连续功率运转期间，滑油进口温度必",
+      "value": "35小时",
+      "context": "- 在以额定起飞功率和至少35小时额定最大连续功率运转期间，滑油进口温度必"
+    },
+    {
+      "id": "param_864399",
+      "type": "Parameter",
+      "name": "参数: 30小时",
+      "description": "1. **30小时试验**：5分钟起飞转速下额定起飞功率和",
+      "value": "30小时",
+      "context": "1. **30小时试验**：5分钟起飞转速下额定起飞功率和"
+    },
+    {
+      "id": "param_869088",
+      "type": "Parameter",
+      "name": "参数: 20小时",
+      "description": "2. **20小时试验**：1½小时最大连续转速下额定最大",
+      "value": "20小时",
+      "context": "2. **20小时试验**：1½小时最大连续转速下额定最大"
+    },
+    {
+      "id": "param_270245",
+      "type": "Parameter",
+      "name": "参数: 5.5°C",
+      "description": "间，滑油进口温度必须保持在限制温度**±5.5°C（10°F）**范围内",
+      "value": "5.5°C",
+      "context": "间，滑油进口温度必须保持在限制温度**±5.5°C（10°F）**范围内"
+    },
+    {
+      "id": "param_441908",
+      "type": "Parameter",
+      "name": "参数: 10°F",
+      "description": "温度必须保持在限制温度**±5.5°C（10°F）**范围内",
+      "value": "10°F",
+      "context": "温度必须保持在限制温度**±5.5°C（10°F）**范围内"
+    },
+    {
+      "id": "param_762611",
+      "type": "Parameter",
+      "name": "参数: 103%",
+      "description": "- 或到所要求的最大起飞转速额定值的**103%**（两者中取较大者）",
+      "value": "103%",
+      "context": "- 或到所要求的最大起飞转速额定值的**103%**（两者中取较大者）"
+    },
+    {
+      "id": "param_896997",
+      "type": "Parameter",
+      "name": "参数: 75%",
+      "description": "最大连续转速下额定最大连续功率的和½小时75%的额定最大连续功率及91%最大连续转速交",
+      "value": "75%",
+      "context": "最大连续转速下额定最大连续功率的和½小时75%的额定最大连续功率及91%最大连续转速交"
+    },
+    {
+      "id": "param_821836",
+      "type": "Parameter",
+      "name": "参数: 限制温度",
+      "description": "连续功率运转期间，滑油进口温度必须保持在限制温度**±5.5°C（10°F）**范围内",
+      "value": "限制温度",
+      "context": "连续功率运转期间，滑油进口温度必须保持在限制温度**±5.5°C（10°F）**范围内"
+    },
+    {
+      "id": "ch_E",
+      "type": "Chapter",
+      "name": "CCAR-33-R2 E章 设计与构造：航空涡轮发动机",
+      "description": "CCAR-33条款: CCAR-33-R2 E章 设计与构造：航空涡轮发动机"
+    },
+    {
+      "id": "comp_轮毂",
+      "type": "Component",
+      "name": "轮毂",
+      "description": "发动机部件: 轮毂",
+      "chinese_name": "轮毂"
+    },
+    {
+      "id": "comp_进气道",
+      "type": "Component",
+      "name": "进气道",
+      "description": "发动机部件: 进气道",
+      "chinese_name": "进气道"
+    },
+    {
+      "id": "comp_点火器",
+      "type": "Component",
+      "name": "点火器",
+      "description": "发动机部件: 点火器",
+      "chinese_name": "点火器"
+    },
+    {
+      "id": "comp_密封件",
+      "type": "Component",
+      "name": "密封件",
+      "description": "发动机部件: 密封件",
+      "chinese_name": "密封件"
+    },
+    {
+      "id": "test_吸鸟试验",
+      "type": "Test",
+      "name": "吸鸟试验",
+      "description": "试验: 吸鸟试验",
+      "chinese_name": "吸鸟试验"
+    },
+    {
+      "id": "test_吸冰试验",
+      "type": "Test",
+      "name": "吸冰试验",
+      "description": "试验: 吸冰试验",
+      "chinese_name": "吸冰试验"
+    },
+    {
+      "id": "param_520180",
+      "type": "Parameter",
+      "name": "参数: 3分钟",
+      "description": "发动机在任何连续**3分钟**的降雨周期内，和任何连续**30秒*",
+      "value": "3分钟",
+      "context": "发动机在任何连续**3分钟**的降雨周期内，和任何连续**30秒*"
+    },
+    {
+      "id": "param_22487",
+      "type": "Parameter",
+      "name": "参数: 9°C",
+      "description": "- 大气温度：**-9°C ~ -1°C**（15°F ~ 30°",
+      "value": "9°C",
+      "context": "- 大气温度：**-9°C ~ -1°C**（15°F ~ 30°"
+    },
+    {
+      "id": "param_719006",
+      "type": "Parameter",
+      "name": "参数: 1°C",
+      "description": "- 大气温度：**-9°C ~ -1°C**（15°F ~ 30°F之间）",
+      "value": "1°C",
+      "context": "- 大气温度：**-9°C ~ -1°C**（15°F ~ 30°F之间）"
+    },
+    {
+      "id": "param_311369",
+      "type": "Parameter",
+      "name": "参数: 15°F",
+      "description": "气温度：**-9°C ~ -1°C**（15°F ~ 30°F之间）",
+      "value": "15°F",
+      "context": "气温度：**-9°C ~ -1°C**（15°F ~ 30°F之间）"
+    },
+    {
+      "id": "param_959810",
+      "type": "Parameter",
+      "name": "参数: 30°F",
+      "description": "9°C ~ -1°C**（15°F ~ 30°F之间）",
+      "value": "30°F",
+      "context": "9°C ~ -1°C**（15°F ~ 30°F之间）"
+    },
+    {
+      "id": "param_599148",
+      "type": "Parameter",
+      "name": "参数: 4°C",
+      "description": "4. 吸冰试验应能模拟在**-4°C（25°F）**时遇到的最大连续结冰条件",
+      "value": "4°C",
+      "context": "4. 吸冰试验应能模拟在**-4°C（25°F）**时遇到的最大连续结冰条件"
+    },
+    {
+      "id": "param_736965",
+      "type": "Parameter",
+      "name": "参数: 25°F",
+      "description": "4. 吸冰试验应能模拟在**-4°C（25°F）**时遇到的最大连续结冰条件",
+      "value": "25°F",
+      "context": "4. 吸冰试验应能模拟在**-4°C（25°F）**时遇到的最大连续结冰条件"
+    },
+    {
+      "id": "param_252969",
+      "type": "Parameter",
+      "name": "参数: 35kPa",
+      "description": "3. 大于正常工作压力**35kPa（5p.s.i.）**",
+      "value": "35kPa",
+      "context": "3. 大于正常工作压力**35kPa（5p.s.i.）**"
+    },
+    {
+      "id": "param_258965",
+      "type": "Parameter",
+      "name": "参数: 5p.s.i.",
+      "description": "3. 大于正常工作压力**35kPa（5p.s.i.）**",
+      "value": "5p.s.i.",
+      "context": "3. 大于正常工作压力**35kPa（5p.s.i.）**"
+    },
+    {
+      "id": "param_516974",
+      "type": "Parameter",
+      "name": "参数: 100%",
+      "description": "1. 吸鸟试验应在发动机稳定在**不小于100%的起飞功率或推力**状态下进行",
+      "value": "100%",
+      "context": "1. 吸鸟试验应在发动机稳定在**不小于100%的起飞功率或推力**状态下进行"
+    },
+    {
+      "id": "param_237272",
+      "type": "Parameter",
+      "name": "参数: 90%",
+      "description": "- 发动机转速：能产生**90%最大额定起飞功率或推力**",
+      "value": "90%",
+      "context": "- 发动机转速：能产生**90%最大额定起飞功率或推力**"
+    },
+    {
+      "id": "failure_非包容的",
+      "type": "HazardousEngineEffect",
+      "name": "非包容的高能碎片",
+      "description": "危害性发动机后果: 非包容的高能碎片"
+    },
+    {
+      "id": "failure_不可控火",
+      "type": "HazardousEngineEffect",
+      "name": "不可控火情",
+      "description": "危害性发动机后果: 不可控火情"
+    },
+    {
+      "id": "failure_发动机安",
+      "type": "HazardousEngineEffect",
+      "name": "发动机安装系统失效",
+      "description": "危害性发动机后果: 发动机安装系统失效"
+    },
+    {
+      "id": "failure_螺旋桨脱",
+      "type": "HazardousEngineEffect",
+      "name": "螺旋桨脱开",
+      "description": "危害性发动机后果: 螺旋桨脱开"
+    },
+    {
+      "id": "fail_非包容的",
+      "type": "FailureMode",
+      "name": "非包容的高能碎片",
+      "description": "失效模式: 非包容的高能碎片"
+    },
+    {
+      "id": "fail_不可控火",
+      "type": "FailureMode",
+      "name": "不可控火情",
+      "description": "失效模式: 不可控火情"
+    },
+    {
+      "id": "ch_F",
+      "type": "Chapter",
+      "name": "CCAR-33-R2 F章 台架试验：航空涡轮发动机",
+      "description": "CCAR-33条款: CCAR-33-R2 F章 台架试验：航空涡轮发动机"
+    },
+    {
+      "id": "comp_整体叶盘",
+      "type": "LifeLimitedPart",
+      "name": "整体叶盘",
+      "description": "发动机部件: 整体叶盘",
+      "chinese_name": "整体叶盘"
+    },
+    {
+      "id": "comp_静子叶片",
+      "type": "RotorPart",
+      "name": "静子叶片",
+      "description": "发动机部件: 静子叶片",
+      "chinese_name": "静子叶片"
+    },
+    {
+      "id": "comp_涡轮叶片",
+      "type": "RotorPart",
+      "name": "涡轮叶片",
+      "description": "发动机部件: 涡轮叶片",
+      "chinese_name": "涡轮叶片"
+    },
+    {
+      "id": "comp_燃油喷嘴",
+      "type": "Component",
+      "name": "燃油喷嘴",
+      "description": "发动机部件: 燃油喷嘴",
+      "chinese_name": "燃油喷嘴"
+    },
+    {
+      "id": "test_超扭试验",
+      "type": "Test",
+      "name": "超扭试验",
+      "description": "试验: 超扭试验",
+      "chinese_name": "超扭试验"
+    },
+    {
+      "id": "test_超温试验",
+      "type": "Test",
+      "name": "超温试验",
+      "description": "试验: 超温试验",
+      "chinese_name": "超温试验"
+    },
+    {
+      "id": "test_叶片包容性试验",
+      "type": "Test",
+      "name": "叶片包容性试验",
+      "description": "试验: 叶片包容性试验",
+      "chinese_name": "叶片包容性试验"
+    },
+    {
+      "id": "test_起动试验",
+      "type": "Test",
+      "name": "起动试验",
+      "description": "试验: 起动试验",
+      "chinese_name": "起动试验"
+    },
+    {
+      "id": "test_初始维修检查",
+      "type": "Test",
+      "name": "初始维修检查",
+      "description": "试验: 初始维修检查",
+      "chinese_name": "初始维修检查"
+    },
+    {
+      "id": "test_转子锁定试验",
+      "type": "Test",
+      "name": "转子锁定试验",
+      "description": "试验: 转子锁定试验",
+      "chinese_name": "转子锁定试验"
+    },
+    {
+      "id": "test_假起动",
+      "type": "Test",
+      "name": "假起动",
+      "description": "试验: 假起动",
+      "chinese_name": "假起动"
+    },
+    {
+      "id": "param_321784",
+      "type": "Parameter",
+      "name": "参数: 15分钟",
+      "description": "申请批准的发动机最大超扭下，总计工作**15分钟**（可分段，每段至少2.5分钟）",
+      "value": "15分钟",
+      "context": "申请批准的发动机最大超扭下，总计工作**15分钟**（可分段，每段至少2.5分钟）"
+    },
+    {
+      "id": "param_916058",
+      "type": "Parameter",
+      "name": "参数: 25次",
+      "description": "对于按本条进行试验的发动机，必须进行**25次规定的6小时试验程序**，以完成要求的总",
+      "value": "25次",
+      "context": "对于按本条进行试验的发动机，必须进行**25次规定的6小时试验程序**，以完成要求的总"
+    },
+    {
+      "id": "param_165372",
+      "type": "Parameter",
+      "name": "参数: 6小时",
+      "description": "行试验的发动机，必须进行**25次规定的6小时试验程序**，以完成要求的总时数为150",
+      "value": "6小时",
+      "context": "行试验的发动机，必须进行**25次规定的6小时试验程序**，以完成要求的总时数为150"
+    },
+    {
+      "id": "param_954334",
+      "type": "Parameter",
+      "name": "参数: 1小时",
+      "description": "1小时试验，由**5分钟额定起飞功率或推力**",
+      "value": "1小时",
+      "context": "1小时试验，由**5分钟额定起飞功率或推力**"
+    },
+    {
+      "id": "param_876688",
+      "type": "Parameter",
+      "name": "参数: 15次",
+      "description": "- 在25次6小时持久试验循环中的**15次**期间，应在额定最大连续功率或推力下进",
+      "value": "15次",
+      "context": "- 在25次6小时持久试验循环中的**15次**期间，应在额定最大连续功率或推力下进"
+    },
+    {
+      "id": "param_389415",
+      "type": "Parameter",
+      "name": "参数: 10次",
+      "description": "- 在25次6小时持久试验循环中的**10次**期间，应在额定起飞功率或推力下进行运",
+      "value": "10次",
+      "context": "- 在25次6小时持久试验循环中的**10次**期间，应在额定起飞功率或推力下进行运"
+    },
+    {
+      "id": "param_822019",
+      "type": "Parameter",
+      "name": "参数: 2小时",
+      "description": "*大致相同的转速和时间增量，连续进行**2小时30分钟**的试验。",
+      "value": "2小时",
+      "context": "*大致相同的转速和时间增量，连续进行**2小时30分钟**的试验。"
+    },
+    {
+      "id": "param_76291",
+      "type": "Parameter",
+      "name": "参数: 100次",
+      "description": "必须进行**100次起动试验**：",
+      "value": "100次",
+      "context": "必须进行**100次起动试验**："
+    },
+    {
+      "id": "param_234016",
+      "type": "Parameter",
+      "name": "参数: 4次",
+      "description": "的试验后，申请人必须进行下列试验程序**4次**，总时数**不低于120分钟**：",
+      "value": "4次",
+      "context": "的试验后，申请人必须进行下列试验程序**4次**，总时数**不低于120分钟**："
+    },
+    {
+      "id": "param_755525",
+      "type": "Parameter",
+      "name": "参数: 120分钟",
+      "description": "列试验程序**4次**，总时数**不低于120分钟**：",
+      "value": "120分钟",
+      "context": "列试验程序**4次**，总时数**不低于120分钟**："
+    },
+    {
+      "id": "param_424603",
+      "type": "Parameter",
+      "name": "参数: 65分钟",
+      "description": "I/最大连续功率：**5分钟**（第一次65分钟例外）",
+      "value": "65分钟",
+      "context": "I/最大连续功率：**5分钟**（第一次65分钟例外）"
+    },
+    {
+      "id": "param_851985",
+      "type": "Parameter",
+      "name": "参数: 1分钟",
+      "description": "5. 50%起飞功率：**1分钟**",
+      "value": "1分钟",
+      "context": "5. 50%起飞功率：**1分钟**"
+    },
+    {
+      "id": "param_594847",
+      "type": "Parameter",
+      "name": "参数: 4分钟",
+      "description": "°F）**时，以接通最大功率转速运转**4分钟**。",
+      "value": "4分钟",
+      "context": "°F）**时，以接通最大功率转速运转**4分钟**。"
+    },
+    {
+      "id": "param_537453",
+      "type": "Parameter",
+      "name": "参数: 175次",
+      "description": "- 从飞行慢车位置到全负拉力**175次循环**",
+      "value": "175次",
+      "context": "- 从飞行慢车位置到全负拉力**175次循环**"
+    },
+    {
+      "id": "param_299720",
+      "type": "Parameter",
+      "name": "参数: 45小时",
+      "description": "面锁定：螺旋桨制动器以某种方式耦合共**45小时**",
+      "value": "45小时",
+      "context": "面锁定：螺旋桨制动器以某种方式耦合共**45小时**"
+    },
+    {
+      "id": "param_350921",
+      "type": "Parameter",
+      "name": "参数: 42°C",
+      "description": "大额定功率下的稳态工作限制温度高至少**42°C（75°F）**的燃气温度下，以最大允许",
+      "value": "42°C",
+      "context": "大额定功率下的稳态工作限制温度高至少**42°C（75°F）**的燃气温度下，以最大允许"
+    },
+    {
+      "id": "param_998685",
+      "type": "Parameter",
+      "name": "参数: 75°F",
+      "description": "下的稳态工作限制温度高至少**42°C（75°F）**的燃气温度下，以最大允许转速运转*",
+      "value": "75°F",
+      "context": "下的稳态工作限制温度高至少**42°C（75°F）**的燃气温度下，以最大允许转速运转*"
+    },
+    {
+      "id": "param_522010",
+      "type": "Parameter",
+      "name": "参数: 19°C",
+      "description": "OEI功率额定值至少超过工作限制温度**19°C（35°F）**时，以接通最大功率转速运",
+      "value": "19°C",
+      "context": "OEI功率额定值至少超过工作限制温度**19°C（35°F）**时，以接通最大功率转速运"
+    },
+    {
+      "id": "param_723741",
+      "type": "Parameter",
+      "name": "参数: 35°F",
+      "description": "额定值至少超过工作限制温度**19°C（35°F）**时，以接通最大功率转速运转**4分",
+      "value": "35°F",
+      "context": "额定值至少超过工作限制温度**19°C（35°F）**时，以接通最大功率转速运转**4分"
+    },
+    {
+      "id": "param_190906",
+      "type": "Parameter",
+      "name": "参数: 80%",
+      "description": "；对于整体叶盘转子，叶片必须至少缺损**80%**）",
+      "value": "80%",
+      "context": "；对于整体叶盘转子，叶片必须至少缺损**80%**）"
+    },
+    {
+      "id": "ch_G",
+      "type": "Chapter",
+      "name": "CCAR-33-R2 G章 专用要求：航空涡轮发动机",
+      "description": "CCAR-33条款: CCAR-33-R2 G章 专用要求：航空涡轮发动机"
+    },
+    {
+      "id": "comp_高压转子",
+      "type": "RotorPart",
+      "name": "高压转子",
+      "description": "发动机部件: 高压转子",
+      "chinese_name": "高压转子"
+    },
+    {
+      "id": "comp_低压转子",
+      "type": "RotorPart",
+      "name": "低压转子",
+      "description": "发动机部件: 低压转子",
+      "chinese_name": "低压转子"
+    },
+    {
+      "id": "comp_中压转子",
+      "type": "RotorPart",
+      "name": "中压转子",
+      "description": "发动机部件: 中压转子",
+      "chinese_name": "中压转子"
+    },
+    {
+      "id": "param_299630",
+      "type": "Parameter",
+      "name": "参数: 3000次",
+      "description": "1. 包括至少**3000次**代表使用中起动—停车任务循环",
+      "value": "3000次",
+      "context": "1. 包括至少**3000次**代表使用中起动—停车任务循环"
+    },
+    {
+      "id": "param_78167",
+      "type": "Parameter",
+      "name": "参数: 3次",
+      "description": "2. 进行**3次**以最大连续功率或推力进行的**模拟改",
+      "value": "3次",
+      "context": "2. 进行**3次**以最大连续功率或推力进行的**模拟改"
+    },
+    {
+      "id": "fail_失去推力",
+      "type": "FailureMode",
+      "name": "失去推力控制",
+      "description": "失效模式: 失去推力控制"
+    },
+    {
+      "id": "fail_空中停车",
+      "type": "FailureMode",
+      "name": "空中停车",
+      "description": "失效模式: 空中停车"
+    }
+  ],
+  "relationships": [
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_涡轮发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 涡轮发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_安装构件",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 安装构件 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_安装构件",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 安装构件 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_整流罩",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 整流罩 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_附件传动",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 附件传动 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_涡轮发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 涡轮发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_附件传动",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 附件传动 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_隔圈",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 隔圈 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_转子轴",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 转子轴 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_轴",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 轴 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_A",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_A 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_涡轮发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 涡轮发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_涡轮发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 涡轮发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_涡轮转子",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 涡轮转子 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_转子叶片",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 转子叶片 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_机匣",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 机匣 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_涡轮转子",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 涡轮转子 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_转子叶片",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 转子叶片 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_转子叶片",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 转子叶片 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_机匣",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 机匣 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_螺旋桨",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 螺旋桨 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_螺旋桨",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 螺旋桨 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_安装构件",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 安装构件 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_安装构件",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 安装构件 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_安装构件",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 安装构件 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_附件传动",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 附件传动 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_安装构件",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 安装构件 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_附件传动",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 附件传动 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_安装构件",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 安装构件 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_轴",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 轴 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "test_超转试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_B 要求 超转试验"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_涡轮发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 涡轮发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_涡轮发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 涡轮发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_B",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_B 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_轴",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 轴 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_涡轮转子",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 涡轮转子 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_机匣",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 机匣 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_点火系统",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 点火系统 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_点火系统",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 点火系统 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_点火系统",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 点火系统 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_轴",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 轴 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_机匣",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 机匣 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_轴",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 轴 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_轴",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 轴 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_机匣",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 机匣 的设计"
+    },
+    {
+      "source": "ch_C",
+      "target": "comp_机匣",
+      "type": "CONSTRAINS",
+      "description": "ch_C 约束 机匣 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_D 要求 持久试验"
+    },
+    {
+      "source": "ch_D",
+      "target": "test_振动试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_D 要求 振动试验"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_轴",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 轴 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_轴",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 轴 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_轴",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 轴 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_轴",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 轴 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_螺旋桨",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 螺旋桨 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_轴",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 轴 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_轴",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 轴 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_轴",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 轴 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_轴",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 轴 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_螺旋桨",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 螺旋桨 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_轴",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 轴 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_附件传动",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 附件传动 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_附件传动",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 附件传动 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_安装构件",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 安装构件 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "test_校准试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_D 要求 校准试验"
+    },
+    {
+      "source": "ch_D",
+      "target": "test_校准试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_D 要求 校准试验"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_D 要求 持久试验"
+    },
+    {
+      "source": "ch_D",
+      "target": "test_校准试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_D 要求 校准试验"
+    },
+    {
+      "source": "ch_D",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_D 要求 持久试验"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_D 要求 持久试验"
+    },
+    {
+      "source": "ch_D",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_D 要求 持久试验"
+    },
+    {
+      "source": "ch_D",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_D 要求 持久试验"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_D 要求 持久试验"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_D 要求 持久试验"
+    },
+    {
+      "source": "ch_D",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_D 要求 持久试验"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_轴",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 轴 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "test_工作试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_D 要求 工作试验"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_螺旋桨",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 螺旋桨 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "test_工作试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_D 要求 工作试验"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_D 要求 持久试验"
+    },
+    {
+      "source": "ch_D",
+      "target": "test_分解检查",
+      "type": "REQUIRES_TEST",
+      "description": "ch_D 要求 分解检查"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_D",
+      "target": "test_工作试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_D 要求 工作试验"
+    },
+    {
+      "source": "ch_D",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_D 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_涡轮发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 涡轮发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_隔圈",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 隔圈 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_转子轴",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 转子轴 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_涡轮发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 涡轮发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_涡轮发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 涡轮发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_点火系统",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 点火系统 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_点火系统",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 点火系统 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_点火器",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 点火器 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_点火系统",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 点火系统 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_点火器",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 点火器 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_隔圈",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 隔圈 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_轮毂",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 轮毂 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_轴",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 轴 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_机匣",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 机匣 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_密封件",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 密封件 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_螺旋桨",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 螺旋桨 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_螺旋桨",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 螺旋桨 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_螺旋桨",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 螺旋桨 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_螺旋桨",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 螺旋桨 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "test_吸鸟试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_E 要求 吸鸟试验"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_进气道",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 进气道 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_进气道",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 进气道 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_进气道",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 进气道 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_进气道",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 进气道 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_进气道",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 进气道 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "test_吸冰试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_E 要求 吸冰试验"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_进气道",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 进气道 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_整流罩",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 整流罩 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_进气道",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 进气道 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "test_吸冰试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_E 要求 吸冰试验"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_进气道",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 进气道 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_进气道",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 进气道 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_E",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_E 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_涡轮发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 涡轮发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 持久试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_振动试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 振动试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_转子叶片",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 转子叶片 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_静子叶片",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 静子叶片 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_隔圈",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 隔圈 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_转子轴",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 转子轴 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_静子叶片",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 静子叶片 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_进气道",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 进气道 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_静子叶片",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 静子叶片 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_燃油喷嘴",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 燃油喷嘴 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_超扭试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 超扭试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_校准试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 校准试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_校准试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 校准试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 持久试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_校准试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 校准试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 持久试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 持久试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 持久试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 持久试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 持久试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 持久试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_转子轴",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 转子轴 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_转子轴",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 转子轴 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 持久试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 持久试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_起动试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 起动试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_假起动",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 假起动"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_超温试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 超温试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_超温试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 超温试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_超温试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 超温试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_工作试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 工作试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_工作试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 工作试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_工作试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 工作试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_螺旋桨",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 螺旋桨 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_初始维修检查",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 初始维修检查"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_转子锁定试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 转子锁定试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_分解检查",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 分解检查"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 持久试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 持久试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 持久试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 持久试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_叶片包容性试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 叶片包容性试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_整体叶盘",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 整体叶盘 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_整体叶盘",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 整体叶盘 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_涡轮叶片",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 涡轮叶片 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_螺旋桨",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 螺旋桨 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_螺旋桨",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 螺旋桨 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_螺旋桨",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 螺旋桨 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_螺旋桨",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 螺旋桨 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_螺旋桨",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 螺旋桨 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_螺旋桨",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 螺旋桨 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_F 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 持久试验"
+    },
+    {
+      "source": "ch_F",
+      "target": "test_振动试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_F 要求 振动试验"
+    },
+    {
+      "source": "ch_G",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_G 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_G",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_G 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_G",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_G 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_G",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_G 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_G",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_G 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_G",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_G 要求 持久试验"
+    },
+    {
+      "source": "ch_G",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_G 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_G",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_G 要求 持久试验"
+    },
+    {
+      "source": "ch_G",
+      "target": "comp_高压转子",
+      "type": "CONSTRAINS",
+      "description": "ch_G 约束 高压转子 的设计"
+    },
+    {
+      "source": "ch_G",
+      "target": "comp_低压转子",
+      "type": "CONSTRAINS",
+      "description": "ch_G 约束 低压转子 的设计"
+    },
+    {
+      "source": "ch_G",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_G 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_G",
+      "target": "comp_中压转子",
+      "type": "CONSTRAINS",
+      "description": "ch_G 约束 中压转子 的设计"
+    },
+    {
+      "source": "ch_G",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_G 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_G",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_G 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_G",
+      "target": "comp_高压转子",
+      "type": "CONSTRAINS",
+      "description": "ch_G 约束 高压转子 的设计"
+    },
+    {
+      "source": "ch_G",
+      "target": "comp_高压转子",
+      "type": "CONSTRAINS",
+      "description": "ch_G 约束 高压转子 的设计"
+    },
+    {
+      "source": "ch_G",
+      "target": "comp_高压转子",
+      "type": "CONSTRAINS",
+      "description": "ch_G 约束 高压转子 的设计"
+    },
+    {
+      "source": "ch_G",
+      "target": "test_校准试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_G 要求 校准试验"
+    },
+    {
+      "source": "ch_G",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_G 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_G",
+      "target": "test_校准试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_G 要求 校准试验"
+    },
+    {
+      "source": "ch_G",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_G 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_G",
+      "target": "test_校准试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_G 要求 校准试验"
+    },
+    {
+      "source": "ch_G",
+      "target": "test_校准试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_G 要求 校准试验"
+    },
+    {
+      "source": "ch_G",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_G 要求 持久试验"
+    },
+    {
+      "source": "ch_G",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_G 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_G",
+      "target": "test_持久试验",
+      "type": "REQUIRES_TEST",
+      "description": "ch_G 要求 持久试验"
+    },
+    {
+      "source": "ch_G",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_G 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_G",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_G 约束 发动机 的设计"
+    },
+    {
+      "source": "ch_G",
+      "target": "comp_发动机",
+      "type": "CONSTRAINS",
+      "description": "ch_G 约束 发动机 的设计"
+    }
+  ]
+}

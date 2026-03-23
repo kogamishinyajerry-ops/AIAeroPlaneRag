@@ -30,7 +30,17 @@ def summarize_golden_set(path: Path) -> None:
 
 
 def main() -> int:
-    run_step("py_compile", [PYTHON, "-m", "py_compile", "src/main.py", "src/ontology/graph_store.py"])
+    run_step(
+        "py_compile",
+        [
+            PYTHON,
+            "-m",
+            "py_compile",
+            "src/main.py",
+            "src/ontology/graph_store.py",
+            "src/knowledge_base/source_catalog.py",
+        ],
+    )
     run_step("pytest", [PYTHON, "-m", "pytest", "tests", "-q"])
     summarize_golden_set(ROOT_DIR / "evaluation" / "golden_set_sample.json")
     print("[quality-gate] All checks passed.")

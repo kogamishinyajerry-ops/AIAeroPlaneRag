@@ -1,0 +1,70 @@
+ccar_section,ccar_title,faa_14_cfr_part_33_section,faa_title,alignment_status,notes
+33.1,适用范围,33.1,Scope,完全一致,内容基本一致
+33.3,概述,33.3,General,完全一致,申请人表明符合要求
+33.4,持续适航文件,33.4,Continuing airworthiness,完全一致,根据附件A编制
+33.5,发动机安装和使用说明手册,33.5,Installation and operating instructions,基本一致,CCAR增加了安全分析假设条款
+33.7,发动机额定值和使用限制,33.7,Engine ratings and operating limitations,基本一致,CCAR增加了更多OEI额定值类型(30秒、2分钟等)
+33.8,发动机功率和推力额定值的选定,33.8,Selection of engine power and thrust ratings,完全一致,内容一致
+33.11,适用范围,33.11,General,完全一致,设计与构造总则
+33.15,材料,33.15,Materials,完全一致,材料适用性和耐久性要求
+33.17,防火,33.17,Fire protection,基本一致,CCAR增加了静电放电要求(g款)
+33.19,耐用性,33.19,Durability,完全一致,不安全状态最小化和包容性要求
+33.21,发动机冷却,33.21,Engine cooling,完全一致,提供必要冷却
+33.22,发动机的安装构件和结构,33.22,Engine mounting and structural structure,完全一致,限制载荷和极限载荷要求
+33.23,附件连接装置,33.23,Accessory attachment,完全一致,密封和更换要求
+33.27,涡轮、压气机、风扇和涡轮增压器转子,33.27,Rotors,完全一致,120%/115%超转试验要求一致
+33.28,发动机控制系统,33.28,Engine control system,基本一致,CCAR增加了30秒OEI自动控制要求(k款)
+33.29,仪表连接,33.29,Instrument connections,基本一致,CCAR增加了OEI功率记录要求(c款)
+33.31,适用范围,33.31,General,完全一致,活塞发动机设计与构造
+33.33,振动,33.33,Vibration,完全一致,振动应力要求
+33.34,涡轮增压器转子,33.34,Turbocharger rotors,完全一致,包容性要求
+33.35,燃油和进气系统,33.35,Fuel and induction system,完全一致,燃油、进气、防冰要求
+33.37,点火系统,33.37,Ignition system,完全一致,双点火系统要求
+33.39,润滑系统,33.39,Lubrication system,完全一致,润滑系统工作条件
+33.41,适用范围,33.41,General,完全一致,活塞发动机台架试验
+33.42,概述,33.42,General,完全一致,确定调整位置
+33.43,振动试验,33.43,Vibration test,完全一致,振动测试要求
+33.45,校准试验,33.45,Calibration test,完全一致,功率特性确定
+33.47,爆震试验,33.47,Detonation test,完全一致,无爆震工作范围
+33.49,持久试验,33.49,Endurance test,完全一致,150小时持久试验
+33.51,工作试验,33.51,Operating test,完全一致,工作特性验证
+33.53,发动机系统和部件试验,33.53,Engine system and component test,完全一致,系统部件验证
+33.55,分解检查,33.55,Teardown inspection,完全一致,试验后检查
+33.57,台架试验的一般实施,33.57,General bench test provisions,完全一致,多台试验和维护
+33.61,适用范围,33.61,General,完全一致,涡轮发动机设计与构造
+33.62,应力分析,33.62,Stress analysis,完全一致,转子安全裕度
+33.63,振动,33.63,Vibration,完全一致,振动要求
+33.64,发动机静承压件,33.64,Static pressure parts,完全一致,压力试验要求
+33.65,喘振和失速特性,33.65,Surge and stall characteristics,完全一致,不得导致危害性后果
+33.66,引气系统,33.66,Bleed air system,完全一致,引气不得有不利影响
+33.67,燃油系统,33.67,Fuel system,完全一致,燃油供给和过滤
+33.68,进气系统的结冰,33.68,Icing of induction system,完全一致,结冰条件试验
+33.69,点火系统,33.69,Ignition system,完全一致,至少二个点火器
+33.70,发动机限寿件,33.70,Engine life-limited parts,完全一致,限寿件定义和管理
+33.71,润滑系统,33.71,Lubrication system,完全一致,润滑系统详细要求
+33.72,液压作动系统,33.72,Hydraulic actuation system,完全一致,液压系统要求
+33.73,功率或推力响应,33.73,Power or thrust response,完全一致,1秒/5秒响应
+33.74,持续转动,33.74,Sustained rotation,完全一致,持续转动不得导致危害
+33.75,安全分析,33.75,Safety analysis,完全一致,失效分析和概率要求
+33.76,吸鸟,33.76,Bird ingestion,完全一致,大鸟/中鸟/群鸟试验要求一致
+33.77,外物吸入-冰,33.77,Foreign object ingestion - Ice,完全一致,吸冰试验
+33.78,吸雨和吸雹,33.78,Rain and hail ingestion,完全一致,吸雨吸雹试验
+33.79,燃烧燃料加力装置,33.79,Afterburner,完全一致,加力装置要求
+33.81,适用范围,33.81,General,完全一致,涡轮发动机台架试验
+33.82,概述,33.82,General,完全一致,确定调整位置
+33.83,振动试验,33.83,Vibration test,完全一致,振动特性确定
+33.84,发动机超扭试验,33.84,Engine overspeed torque test,完全一致,15分钟超扭试验
+33.85,校准试验,33.85,Calibration test,完全一致,功率特性确定
+33.87,持久试验,33.87,Endurance test,完全一致,150小时持久试验
+33.88,发动机超温试验,33.88,Engine overtemperature test,完全一致,5分钟超温试验
+33.89,工作试验,33.89,Operating test,完全一致,工作特性验证
+33.90,初始维修检查,33.90,Initial maintenance inspection,完全一致,维修时限确定
+33.91,发动机系统和部件试验,33.91,Engine system and component test,完全一致,系统部件验证
+33.92,转子锁定试验,33.92,Rotor lock test,完全一致,锁定装置试验
+33.93,分解检查,33.93,Teardown inspection,完全一致,试验后检查
+33.94,叶片包容性和转子不平衡试验,33.94,Blade containment and rotor unbalance test,完全一致,包容性试验
+33.95,发动机-螺旋桨系统试验,33.95,Engine-propeller system test,完全一致,螺旋桨系统试验
+33.96,以辅助动力装置方式工作的发动机试验,33.96,Engine test as an auxiliary power unit,完全一致,APU方式试验
+33.97,反推力装置,33.97,Thrust reverser,完全一致,反推力试验
+33.201,早期ETOPS资格的设计和试验要求,33.201,Design and test requirements for early ETOPS,完全一致,3000次循环要求一致
+附件A,持续适航文件,Appendix A,Instructions for Continued Airworthiness,完全一致,持续适航文件要求

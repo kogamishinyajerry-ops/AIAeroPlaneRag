@@ -1,312 +1,411 @@
-/* ============================================
-   AeroPower-RAG — Live Backend Integration
-   Palantir-grade Traceability UI
-   ============================================ */
+const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:8000`;
 
-// ==================== CONFIG ====================
-const API_BASE_URL = "http://localhost:8000";
-
-// ==================== DOM ====================
-const chatContainer = document.getElementById("chatContainer");
 const userInput = document.getElementById("userInput");
-const drawerOverlay = document.getElementById("drawerOverlay");
-const citationDrawer = document.getElementById("citationDrawer");
-const drawerContent = document.getElementById("drawerContent");
+const answerBlock = document.getElementById("answerBlock");
+const evidencePanel = document.getElementById("evidencePanel");
+const graphViz = document.getElementById("graphViz");
+const graphInspector = document.getElementById("graphInspector");
+const graphSummary = document.getElementById("graphSummary");
+const guardrailChip = document.getElementById("guardrailChip");
+const sourcesTableBody = document.getElementById("sourcesTableBody");
 
 let currentCitations = [];
+let currentGraphState = null;
+let graphHistory = [];
+let graphIncludeParameters = false;
+let latestQuery = "";
 
-// ==================== NAVIGATION ====================
-document.querySelectorAll(".nav-item").forEach(item => {
-    item.addEventListener("click", (e) => {
-        e.preventDefault();
-        const panel = item.dataset.panel;
-        document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
-        item.classList.add("active");
-        document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
-        const target = document.getElementById("panel" + panel.charAt(0).toUpperCase() + panel.slice(1));
-        if (target) target.classList.add("active");
+document.getElementById("sendBtn").addEventListener("click", sendMessage);
+document.getElementById("refreshGraphBtn").addEventListener("click", () => loadGraphSubgraph(latestQuery));
+document.getElementById("graphBackBtn").addEventListener("click", stepBackGraph);
+document.getElementById("includeParametersToggle").addEventListener("change", event => {
+    graphIncludeParameters = event.target.checked;
+    loadGraphSubgraph(latestQuery, { resetHistory: true });
+});
+document.getElementById("layerFilter").addEventListener("change", () => loadSourceCatalog());
+document.getElementById("jurisdictionFilter").addEventListener("change", () => loadSourceCatalog());
 
-        const titles = { chat: "智能问答 · 适航规范检索", graph: "知识图谱 · 本体关系探索", docs: "文档库 · 数据源管理" };
-        document.querySelector(".topbar-title").textContent = titles[panel] || "";
-        if (panel === "graph") loadGraphFromNeo4j();
+document.querySelectorAll(".quick").forEach(button => {
+    button.addEventListener("click", () => {
+        userInput.value = button.dataset.prompt || "";
+        sendMessage();
     });
 });
 
-document.getElementById("menuBtn").addEventListener("click", () => {
-    document.getElementById("sidebar").classList.toggle("open");
+userInput.addEventListener("keydown", event => {
+    if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+    }
 });
 
-// ==================== CHAT — LIVE BACKEND ====================
-function sendQuickPrompt(btn) {
-    userInput.value = btn.textContent;
-    sendMessage();
+window.openCitation = openCitation;
+
+bootstrap();
+
+async function bootstrap() {
+    await Promise.all([loadHealth(), loadSourceCatalog(), loadGraphSubgraph("", { resetHistory: true })]);
 }
 
-function handleKeyDown(e) {
-    if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
+async function loadHealth() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/v1/health`);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        const health = await response.json();
+        document.getElementById("metricVersion").textContent = health.app_version || "-";
+        document.getElementById("metricKbVersion").textContent = health.knowledge_base_version || "-";
+        document.getElementById("graphModeLabel").textContent = health.graph_db || "unknown";
+
+        document.getElementById("systemStatus").innerHTML = `
+            <div class="status-row"><span>后端</span><strong>${health.app_mode || "unknown"}</strong></div>
+            <div class="status-row"><span>知识库</span><strong>${health.vector_db || "unknown"} / ${health.vector_db_count ?? 0}</strong></div>
+            <div class="status-row"><span>图谱</span><strong>${health.graph_db || "unknown"}</strong></div>
+            <div class="status-row"><span>Guardrail</span><strong>${health.guardrail || "unknown"}</strong></div>
+        `;
+    } catch (error) {
+        document.getElementById("systemStatus").innerHTML = `
+            <div class="status-row error"><span>连接失败</span><strong>${error.message}</strong></div>
+        `;
     }
 }
 
 async function sendMessage() {
-    const text = userInput.value.trim();
-    if (!text) return;
+    const query = userInput.value.trim();
+    if (!query) {
+        return;
+    }
 
-    const welcome = document.querySelector(".welcome-card");
-    if (welcome) welcome.remove();
-
-    appendMessage("user", text);
-    userInput.value = "";
-    autoResize();
-
-    const loadingId = showLoading();
+    latestQuery = query;
+    document.getElementById("currentQueryLabel").textContent = query;
+    answerBlock.innerHTML = `<div class="loading-state">正在检索法规、生成结论并准备证据面板...</div>`;
+    evidencePanel.innerHTML = `<div class="loading-state">正在装载证据...</div>`;
 
     try {
         const response = await fetch(`${API_BASE_URL}/api/v1/query`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ query: text, top_k: 5, use_guardrail: true })
+            body: JSON.stringify({
+                query,
+                top_k: 5,
+                use_guardrail: true,
+                include_graph_subgraph: false,
+            }),
         });
-
-        removeLoading(loadingId);
-
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-        const data = await response.json();
-        handleResponse(data);
-    } catch (err) {
-        removeLoading(loadingId);
-        appendMessage("assistant", `<div style="color:#ef4444;">⚠️ 后端连接失败: ${err.message}<br><small>请确认 FastAPI 正在 localhost:8000 运行</small></div>`);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        const payload = await response.json();
+        handleResponse(payload);
+        await loadGraphSubgraph(query, { resetHistory: true });
+    } catch (error) {
+        answerBlock.innerHTML = `<div class="error-state">后端连接失败：${error.message}<br>请确认 FastAPI 正在 ${API_BASE_URL} 运行。</div>`;
+        evidencePanel.innerHTML = `<div class="empty-state">本次没有可展示的证据。</div>`;
     }
 }
 
-function appendMessage(role, content) {
-    const msg = document.createElement("div");
-    msg.className = `message ${role}`;
-    const avatarText = role === "user" ? "👤" : "✦";
-    msg.innerHTML = `
-        <div class="msg-avatar">${avatarText}</div>
-        <div class="msg-body">${content}</div>
-    `;
-    chatContainer.appendChild(msg);
-    scrollToBottom();
-}
+function handleResponse(payload) {
+    currentCitations = payload.citations || [];
+    document.getElementById("retrievalCountLabel").textContent = String(payload.retrievalCount || 0);
+    guardrailChip.textContent = `${payload.guardrail?.status || "UNKNOWN"} · ${payload.responseMode || "unknown"}`;
+    guardrailChip.className = `guardrail-chip ${guardrailClass(payload.guardrail?.status)}`;
 
-function handleResponse(data) {
-    currentCitations = data.citations || [];
-
-    // Inject clickable citation refs into the answer text
-    let answer = data.answer || "";
-    // Replace [1], [2], etc. with clickable spans
-    answer = answer.replace(/\[(\d+)\]/g, (match, num) => {
-        return `<span class="citation-ref" onclick="openCitation(${num})">${num}</span>`;
+    const answerHtml = (payload.answer || "暂无回答").replace(/\[(\d+)\]/g, (_, num) => {
+        return `<button class="citation-ref" onclick="openCitation(${Number(num)})">${num}</button>`;
     });
 
-    // Add graph insight pills if present
-    let graphHtml = "";
-    if (data.graphInsights && data.graphInsights.length > 0) {
-        graphHtml = '<div style="margin-top:12px">';
-        data.graphInsights.slice(0, 5).forEach(g => {
-            graphHtml += `<span class="graph-pill">🔗 ${g.regulation || '?'} → ${g.relationship || 'CONSTRAINS'} → ${g.component || '?'}</span> `;
-        });
-        graphHtml += '</div>';
-    }
+    const insightHtml = (payload.graphInsights || [])
+        .slice(0, 6)
+        .map(item => `<span class="insight-pill">${item.regulation || "?"} → ${item.relationship || "关联"} → ${item.component || "?"}</span>`)
+        .join("");
 
-    const guardrail = data.guardrail || { status: "UNKNOWN", reasoning: "" };
-    const guardrailClass = guardrail.status === "PASS" ? "pass" : "fail";
-    const guardrailIcon = guardrail.status === "PASS" ? "🛡️" : "⚠️";
-    const guardrailLabel = guardrail.status === "PASS" ? "Guardrail 验证通过" : `Guardrail: ${guardrail.status}`;
-
-    const msg = document.createElement("div");
-    msg.className = "message assistant";
-    msg.innerHTML = `
-        <div class="msg-avatar">✦</div>
-        <div class="msg-body">
-            <div class="answer-text">${answer}</div>
-            ${graphHtml}
-            <div class="msg-guardrail ${guardrailClass}">
-                ${guardrailIcon} ${guardrailLabel} — ${guardrail.reasoning || ''}
-            </div>
+    answerBlock.innerHTML = `
+        <div class="answer-text">${answerHtml}</div>
+        <div class="answer-meta">
+            <div><span>Guardrail 说明</span><strong>${payload.guardrail?.reasoning || "无"}</strong></div>
+            <div><span>检索命中</span><strong>${payload.retrievalCount || 0}</strong></div>
+            <div><span>知识库版本</span><strong>${payload.knowledgeBaseVersion || "-"}</strong></div>
         </div>
+        <div class="insight-strip">${insightHtml || '<span class="muted-inline">当前未返回图谱洞察。</span>'}</div>
     `;
-    chatContainer.appendChild(msg);
-    scrollToBottom();
+
+    renderEvidenceList(currentCitations);
 }
 
-function showLoading() {
-    const id = "loading-" + Date.now();
-    const msg = document.createElement("div");
-    msg.className = "message assistant";
-    msg.id = id;
-    msg.innerHTML = `
-        <div class="msg-avatar">✦</div>
-        <div class="msg-body">
-            <div class="loading-dots"><span></span><span></span><span></span></div>
-            <div style="font-size:12px;color:#9ca3af;margin-top:8px;">正在检索向量库 + 遍历知识图谱 + GLM 生成中...</div>
-        </div>
-    `;
-    chatContainer.appendChild(msg);
-    scrollToBottom();
-    return id;
-}
-
-function removeLoading(id) {
-    const el = document.getElementById(id);
-    if (el) el.remove();
-}
-
-function scrollToBottom() {
-    chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: "smooth" });
-}
-
-// ==================== CITATION DRAWER ====================
-function openCitation(num) {
-    const citation = currentCitations.find(c => c.num === num);
-    if (!citation) return;
-
-    drawerContent.innerHTML = "";
-
-    const block = document.createElement("div");
-    block.className = "citation-block";
-    block.innerHTML = `
-        <div class="citation-block-header">
-            <span class="citation-num">${citation.num}</span>
-            <span class="citation-source">${citation.source}</span>
-        </div>
-        <div class="citation-path">${citation.chapter} > ${citation.section}</div>
-        <div class="citation-text">
-            ${citation.snippet.replace(citation.highlight, `<span class="highlight">${citation.highlight}</span>`)}
-        </div>
-    `;
-    drawerContent.appendChild(block);
-
-    drawerOverlay.classList.add("open");
-    citationDrawer.classList.add("open");
-}
-
-function closeDrawer() {
-    drawerOverlay.classList.remove("open");
-    citationDrawer.classList.remove("open");
-}
-
-// ==================== TEXTAREA AUTO RESIZE ====================
-userInput.addEventListener("input", autoResize);
-function autoResize() {
-    userInput.style.height = "auto";
-    userInput.style.height = Math.min(userInput.scrollHeight, 120) + "px";
-}
-
-// ==================== GRAPH VISUALIZATION — LIVE NEO4J ====================
-async function loadGraphFromNeo4j() {
-    const viz = document.getElementById("graphViz");
-    viz.innerHTML = '<div style="text-align:center;padding:40px;color:#9ca3af;">加载知识图谱中...</div>';
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/graph/nodes`);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const data = await response.json();
-        renderLiveGraph(data.nodes, data.edges);
-    } catch (err) {
-        viz.innerHTML = `<div style="text-align:center;padding:40px;color:#ef4444;">加载图谱失败: ${err.message}</div>`;
-    }
-}
-
-function renderLiveGraph(nodes, edges) {
-    const viz = document.getElementById("graphViz");
-    viz.innerHTML = "";
-
-    if (!nodes.length) {
-        viz.innerHTML = '<div style="text-align:center;padding:40px;color:#9ca3af;">图谱为空</div>';
+function renderEvidenceList(citations) {
+    if (!citations.length) {
+        evidencePanel.innerHTML = `<div class="empty-state">本次回答没有返回可展示的证据条目。</div>`;
         return;
     }
 
-    const width = viz.clientWidth || 500;
-    const height = viz.clientHeight || 400;
+    evidencePanel.innerHTML = citations
+        .map(
+            item => `
+                <article class="evidence-card" data-citation="${item.num}">
+                    <div class="evidence-head">
+                        <span class="evidence-index">[${item.num}]</span>
+                        <button class="link-btn" onclick="openCitation(${item.num})">查看全文</button>
+                    </div>
+                    <h3>${escapeHtml(item.section || "未知条款")}</h3>
+                    <div class="evidence-path">${escapeHtml(item.chapter || "")} · ${escapeHtml(item.source || "")}</div>
+                    <p>${escapeHtml(item.snippet || "")}</p>
+                </article>
+            `,
+        )
+        .join("");
+}
 
-    // Force-directed layout simulation (simple)
-    const positions = {};
-    const typeGroups = {};
-    nodes.forEach((n, i) => {
-        const type = n.type || "unknown";
-        if (!typeGroups[type]) typeGroups[type] = [];
-        typeGroups[type].push(n);
+function openCitation(num) {
+    const citation = currentCitations.find(item => item.num === num);
+    if (!citation) {
+        return;
+    }
+
+    evidencePanel.innerHTML = `
+        <article class="evidence-card active">
+            <div class="evidence-head">
+                <span class="evidence-index">[${citation.num}]</span>
+                <span class="evidence-tag">${escapeHtml(citation.documentVersion || "unknown")}</span>
+            </div>
+            <h3>${escapeHtml(citation.section || "未知条款")}</h3>
+            <div class="evidence-path">${escapeHtml(citation.chapter || "")} · ${escapeHtml(citation.source || "")}</div>
+            <p>${escapeHtml(citation.fullText || citation.snippet || "").replace(/\n/g, "<br>")}</p>
+            <div class="evidence-foot">${escapeHtml(citation.sourcePath || "")}</div>
+        </article>
+    `;
+}
+
+async function loadSourceCatalog() {
+    const layer = document.getElementById("layerFilter").value;
+    const jurisdiction = document.getElementById("jurisdictionFilter").value;
+    const params = new URLSearchParams();
+    if (layer) {
+        params.set("layer", layer);
+    }
+    if (jurisdiction) {
+        params.set("jurisdiction", jurisdiction);
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/v1/sources?${params.toString()}`);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        const payload = await response.json();
+        const sources = payload.sources || [];
+        if (!sources.length) {
+            sourcesTableBody.innerHTML = `<tr><td colspan="4" class="table-empty">没有匹配到知识源。</td></tr>`;
+            return;
+        }
+
+        sourcesTableBody.innerHTML = sources
+            .map(
+                source => `
+                    <tr>
+                        <td>
+                            <div class="source-title">${escapeHtml(source.title)}</div>
+                            <div class="source-summary">${escapeHtml(source.summary || "")}</div>
+                        </td>
+                        <td>${escapeHtml(source.jurisdiction)} / ${escapeHtml(source.authority)}</td>
+                        <td>${layerLabel(source.layer)}</td>
+                        <td><span class="status-badge">${escapeHtml(source.status)}</span></td>
+                    </tr>
+                `,
+            )
+            .join("");
+    } catch (error) {
+        sourcesTableBody.innerHTML = `<tr><td colspan="4" class="table-empty error">知识源加载失败：${escapeHtml(error.message)}</td></tr>`;
+    }
+}
+
+async function loadGraphSubgraph(query = "", options = {}) {
+    const { nodeId = null, resetHistory = false } = options;
+    const params = new URLSearchParams();
+    if (query) {
+        params.set("query", query);
+    }
+    if (nodeId) {
+        params.set("node_id", nodeId);
+    }
+    params.set("max_nodes", "16");
+    params.set("include_parameters", graphIncludeParameters ? "true" : "false");
+
+    graphViz.innerHTML = `<div class="loading-state">正在生成局部解释子图...</div>`;
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/v1/graph/subgraph?${params.toString()}`);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        const payload = await response.json();
+        if (resetHistory) {
+            graphHistory = [];
+        }
+        renderGraphSubgraph(payload, { pushHistory: true });
+    } catch (error) {
+        graphViz.innerHTML = `<div class="error-state">子图加载失败：${escapeHtml(error.message)}</div>`;
+    }
+}
+
+function renderGraphSubgraph(payload, options = {}) {
+    const { pushHistory = false } = options;
+    currentGraphState = payload;
+    document.getElementById("graphModeLabel").textContent = payload.mode || "fallback";
+    graphSummary.textContent = payload.summary || "当前没有图谱摘要。";
+
+    if (pushHistory) {
+        const last = graphHistory[graphHistory.length - 1];
+        if (!last || JSON.stringify(last) !== JSON.stringify(payload)) {
+            graphHistory.push(payload);
+        }
+    }
+
+    if (!payload.nodes || !payload.nodes.length) {
+        graphViz.innerHTML = `<div class="empty-state">当前没有可展示的图谱节点。</div>`;
+        return;
+    }
+
+    const lanes = {
+        regulation: [],
+        component: [],
+        support: [],
+    };
+    payload.nodes.forEach(node => {
+        if (lanes[node.type]) {
+            lanes[node.type].push(node);
+        } else {
+            lanes.support.push(node);
+        }
     });
 
-    // Arrange nodes by type in clusters
-    const types = Object.keys(typeGroups);
-    types.forEach((type, ti) => {
-        const group = typeGroups[type];
-        const cx = (width / (types.length + 1)) * (ti + 1);
-        group.forEach((n, ni) => {
-            const angle = (2 * Math.PI * ni) / group.length;
-            const radius = Math.min(80, 30 + group.length * 10);
-            positions[n.id] = {
-                x: cx + radius * Math.cos(angle) - 40,
-                y: 40 + (height - 80) * (ni / Math.max(group.length - 1, 1))
-            };
+    const columns = [
+        { key: "regulation", title: "法规 / 条款" },
+        { key: "component", title: "部件 / 子系统" },
+        { key: "support", title: "支撑节点" },
+    ];
+
+    graphViz.innerHTML = columns
+        .map(
+            column => `
+                <section class="graph-lane">
+                    <header>${column.title}</header>
+                    <div class="graph-node-stack">
+                        ${
+                            lanes[column.key].length
+                                ? lanes[column.key]
+                                      .map(node => renderNodeCard(node, payload.edges || []))
+                                      .join("")
+                                : '<div class="graph-empty-mini">无节点</div>'
+                        }
+                    </div>
+                </section>
+            `,
+        )
+        .join("");
+
+    graphViz.querySelectorAll(".graph-node").forEach(node => {
+        node.addEventListener("click", () => {
+            const nodeId = node.dataset.nodeId;
+            const detail = payload.nodes.find(item => item.id === nodeId);
+            if (!detail) {
+                return;
+            }
+            renderNodeInspector(detail, payload.edges || [], payload.nodes || []);
         });
     });
 
-    // Draw edges
-    edges.forEach(edge => {
-        const from = positions[edge.source];
-        const to = positions[edge.target];
-        if (!from || !to) return;
-
-        const line = document.createElement("div");
-        line.className = "graph-edge";
-        const dx = to.x - from.x;
-        const dy = to.y - from.y;
-        const length = Math.sqrt(dx * dx + dy * dy);
-        const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-
-        line.style.left = (from.x + 40) + "px";
-        line.style.top = (from.y + 14) + "px";
-        line.style.width = length + "px";
-        line.style.transform = `rotate(${angle}deg)`;
-        line.title = `${edge.type}: ${edge.description || ''}`;
-        viz.appendChild(line);
-    });
-
-    // Draw nodes
-    nodes.forEach(node => {
-        const pos = positions[node.id];
-        if (!pos) return;
-
-        const el = document.createElement("div");
-        el.className = `graph-node ${node.type}`;
-        el.textContent = node.label || node.id;
-        el.style.left = pos.x + "px";
-        el.style.top = pos.y + "px";
-        el.title = node.description || node.label;
-        viz.appendChild(el);
+    graphViz.querySelectorAll(".graph-expand").forEach(button => {
+        button.addEventListener("click", event => {
+            event.stopPropagation();
+            loadGraphSubgraph(latestQuery, { nodeId: button.dataset.nodeId, resetHistory: false });
+        });
     });
 }
 
-// ==================== HEALTH CHECK ON LOAD ====================
-document.addEventListener("DOMContentLoaded", async () => {
-    userInput.focus();
+function renderNodeCard(node, edges) {
+    const edgeCount = edges.filter(edge => edge.source === node.id || edge.target === node.id).length;
+    return `
+        <article class="graph-node ${node.type}" data-node-id="${escapeHtml(node.id)}">
+            <div class="graph-node-head">
+                <span class="node-type">${typeLabel(node.type)}</span>
+                <button class="graph-expand" data-node-id="${escapeHtml(node.id)}">展开</button>
+            </div>
+            <h3>${escapeHtml(node.label)}</h3>
+            <p>${escapeHtml(node.description || "暂无描述")}</p>
+            <div class="node-meta">${edgeCount} 条关系</div>
+        </article>
+    `;
+}
 
-    // Check backend health
-    try {
-        const resp = await fetch(`${API_BASE_URL}/api/v1/health`);
-        if (resp.ok) {
-            const health = await resp.json();
-            const dot = document.querySelector(".status-dot");
-            const text = document.querySelector(".status-text");
-            dot.style.background = "#22c55e";
-            dot.style.boxShadow = "0 0 6px #22c55e";
-            const parts = [];
-            if (health.vector_db === "connected") parts.push("向量库");
-            if (health.graph_db === "connected") parts.push("图谱库");
-            if (health.llm === "connected") parts.push("GLM");
-            text.textContent = parts.length ? `已连接: ${parts.join(" · ")}` : "系统就绪";
-        }
-    } catch (e) {
-        const dot = document.querySelector(".status-dot");
-        const text = document.querySelector(".status-text");
-        dot.style.background = "#ef4444";
-        text.textContent = "后端离线";
+function renderNodeInspector(node, edges, nodes) {
+    const related = edges
+        .filter(edge => edge.source === node.id || edge.target === node.id)
+        .slice(0, 8)
+        .map(edge => {
+            const peerId = edge.source === node.id ? edge.target : edge.source;
+            const peer = nodes.find(item => item.id === peerId);
+            return `
+                <li>
+                    <strong>${escapeHtml(edge.type)}</strong>
+                    <span>${escapeHtml(peer?.label || peerId)}</span>
+                </li>
+            `;
+        })
+        .join("");
+
+    graphInspector.innerHTML = `
+        <div class="inspector-node-type">${typeLabel(node.type)}</div>
+        <h3>${escapeHtml(node.label)}</h3>
+        <p>${escapeHtml(node.description || "暂无描述")}</p>
+        <div class="inspector-subtitle">相邻关系</div>
+        <ul class="relation-list">
+            ${related || "<li>当前节点没有可展示的相邻关系。</li>"}
+        </ul>
+    `;
+}
+
+function stepBackGraph() {
+    if (graphHistory.length <= 1) {
+        return;
     }
-});
+    graphHistory.pop();
+    const previous = graphHistory[graphHistory.length - 1];
+    renderGraphSubgraph(previous, { pushHistory: false });
+}
+
+function guardrailClass(status) {
+    if (status === "PASS") {
+        return "ok";
+    }
+    if (status === "PARTIAL" || status === "UNVERIFIED") {
+        return "warn";
+    }
+    return "risk";
+}
+
+function layerLabel(layer) {
+    const mapping = {
+        core_regulations: "核心法规",
+        certification_guidance: "审定指导",
+        environment_and_lifecycle: "环境与全生命周期",
+    };
+    return mapping[layer] || layer || "-";
+}
+
+function typeLabel(type) {
+    const mapping = {
+        regulation: "法规",
+        component: "部件",
+        support: "支撑",
+    };
+    return mapping[type] || type || "节点";
+}
+
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}

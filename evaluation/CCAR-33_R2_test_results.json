@@ -1,0 +1,753 @@
+{
+  "timestamp": "2026-03-23T08:23:22.290714",
+  "tests": {
+    "chromadb": {
+      "status": "success",
+      "total_collections": 1,
+      "collections": [
+        {
+          "name": "regulations",
+          "count": 245,
+          "metadata": null
+        }
+      ],
+      "total_chunks": 245,
+      "chapter_coverage": {
+        "第33.1条 适用范围": 1,
+        "第33.3条 概述": 1,
+        "第33.4条 持续适航文件": 1,
+        "第33.5条 发动机安装和使用说明手册": 4,
+        "第33.7条 发动机额定值和使用限制": 3
+      },
+      "section_coverage": {
+        "General Section": 4,
+        "（a）安装说明": 1,
+        "（b）使用说明": 1,
+        "（c）安全分析假设": 1,
+        "（a）总则": 1,
+        "（b）活塞式发动机额定值因素": 1,
+        "（c）涡轮发动机额定值因素": 1
+      },
+      "sample_chunks": [
+        {
+          "content": "[CCAR-33-R2 A章 总则 > 第33.1条 适用范围 > General Section]\n**（a）** 本规定规定颁发和更改航空发动机型号合格证用的适航标准。\n**（b）** 按照中国民用航空规章《民用航空产品和零部件合格审定规定》（CCAR-21）的规定申请航空发动机型号合格证或申请对该合格证进行更改的法人，必须表明符合本规定中适用的要求，并且必须表明符合中国民用航空规章《涡轮发动...",
+          "metadata": {
+            "source_path": "D:\\AIAeroPlaneRag\\data\\processed\\CCAR-33-R2_chapters\\A-总则.md",
+            "document": "CCAR-33-R2 A章 总则",
+            "source": "CCAR-33-R2_chapters/A-总则.md",
+            "section": "General Section",
+            "chapter": "第33.1条 适用范围",
+            "document_version": "CCAR-33-R2-2016",
+            "content_mode": "real"
+          }
+        },
+        {
+          "content": "[CCAR-33-R2 A章 总则 > 第33.3条 概述 > General Section]\n每一个申请人必须表明该型航空发动机符合本规定中适用的要求。\n---",
+          "metadata": {
+            "document_version": "CCAR-33-R2-2016",
+            "content_mode": "real",
+            "source_path": "D:\\AIAeroPlaneRag\\data\\processed\\CCAR-33-R2_chapters\\A-总则.md",
+            "section": "General Section",
+            "chapter": "第33.3条 概述",
+            "source": "CCAR-33-R2_chapters/A-总则.md",
+            "document": "CCAR-33-R2 A章 总则"
+          }
+        },
+        {
+          "content": "[CCAR-33-R2 A章 总则 > 第33.4条 持续适航文件 > General Section]\n申请人必须根据本规定附件A编制中国民用航空局可接受的持续适航文件。如果有计划保证在交付第一架装有该发动机的航空器之前或者在为装有该发动机的航空器颁发适航证之前完成这些文件，则这些文件在型号合格审定时可以是不完备的。\n---",
+          "metadata": {
+            "content_mode": "real",
+            "document": "CCAR-33-R2 A章 总则",
+            "source_path": "D:\\AIAeroPlaneRag\\data\\processed\\CCAR-33-R2_chapters\\A-总则.md",
+            "section": "General Section",
+            "document_version": "CCAR-33-R2-2016",
+            "chapter": "第33.4条 持续适航文件",
+            "source": "CCAR-33-R2_chapters/A-总则.md"
+          }
+        }
+      ]
+    },
+    "neo4j": {
+      "status": "error",
+      "message": "{neo4j_code: Neo.ClientError.Security.Unauthorized} {message: The client is unauthorized due to authentication failure.} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Unexpected error has occurred. See debug log for details.}"
+    },
+    "api": {
+      "status": "success",
+      "endpoints": {
+        "health": {
+          "status_code": 200,
+          "response": {
+            "app_mode": "mock",
+            "app_version": "0.2.0",
+            "knowledge_base_version": "ccar33-enriched-mock-v1",
+            "prompt_version": "rag-prompt-v2",
+            "embedding_version": "simple-hash-v1",
+            "graph_version": "query-subgraph-v2",
+            "source_catalog_version": "official-sources-v1",
+            "source_catalog_path": "D:\\AIAeroPlaneRag\\data\\catalog\\official_sources.json",
+            "vector_db": "connected",
+            "vector_db_count": 245,
+            "vector_db_path": "D:\\AIAeroPlaneRag\\data\\processed\\chroma_db",
+            "graph_db": "connected",
+            "graph_node_count": 112,
+            "llm": "mock",
+            "guardrail": "conservative",
+            "processed_data_dir": "D:\\AIAeroPlaneRag\\data\\processed",
+            "errors": {}
+          }
+        },
+        "sources": {
+          "status_code": 200,
+          "response": {
+            "version": "official-sources-v1",
+            "total": 10,
+            "groups": [
+              {
+                "layer": "core_regulations",
+                "title": "Layer 1 - Core Regulations",
+                "count": 4,
+                "sources": [
+                  {
+                    "id": "caac-ccar-33-r2",
+                    "title": "航空发动机适航规定（CCAR-33-R2）",
+                    "authority": "CAAC",
+                    "jurisdiction": "CN",
+                    "layer": "core_regulations",
+                    "document_type": "regulation",
+                    "language": "zh-CN",
+                    "status": "ingested",
+                    "official_url": "https://www.caac.gov.cn/PHONE/XXGK_17/XXGK/MHGZ/201606/t20160622_38639.html",
+                    "document_url": "https://www.caac.gov.cn/PHONE/XXGK_17/XXGK/MHGZ/201511/P020151103350111233011.pdf",
+                    "local_path": "data/processed/CCAR-33.md",
+                    "summary": "CAAC 航空发动机适航核心法规，现有样例知识库主要围绕该规章构建。",
+                    "tags": [
+                      "CAAC",
+                      "CCAR-33",
+                      "engine",
+                      "airworthiness"
+                    ]
+                  },
+                  {
+                    "id": "caac-ccar-21-r5",
+                    "title": "民用航空产品和零部件合格审定规定（CCAR-21-R5）",
+                    "authority": "CAAC",
+                    "jurisdiction": "CN",
+                    "layer": "core_regulations",
+                    "document_type": "regulation",
+                    "language": "zh-CN",
+                    "status": "cataloged",
+                    "official_url": "https://www.caac.gov.cn/PHONE/XXGK_17/XXGK/MHGZ/202403/t20240313_223201.html",
+                    "document_url": null,
+                    "local_path": null,
+                    "summary": "定义产品和零部件合格审定的基本程序，与发动机型号合格审定强相关。",
+                    "tags": [
+                      "CAAC",
+                      "CCAR-21",
+                      "type-certification"
+                    ]
+                  },
+                  {
+                    "id": "faa-part-33",
+                    "title": "14 CFR Part 33 - Airworthiness Standards: Aircraft Engines",
+                    "authority": "FAA",
+                    "jurisdiction": "US",
+                    "layer": "core_regulations",
+                    "document_type": "regulation",
+                    "language": "en-US",
+                    "status": "cataloged",
+                    "official_url": "https://www.faa.gov/aircraft/air_cert/design_approvals/engine_prop/engine_prop_regs/regs",
+                    "document_url": null,
+                    "local_path": null,
+                    "summary": "FAA 发动机适航核心法规，可作为 CCAR-33 的跨法规对照基础。",
+                    "tags": [
+                      "FAA",
+                      "Part 33",
+                      "engine",
+                      "airworthiness"
+                    ]
+                  },
+                  {
+                    "id": "easa-cs-e-amd6",
+                    "title": "CS-E Amendment 6 - Certification Specifications for Engines",
+                    "authority": "EASA",
+                    "jurisdiction": "EU",
+                    "layer": "core_regulations",
+                    "document_type": "certification_specification",
+                    "language": "en",
+                    "status": "cataloged",
+                    "official_url": "https://www.easa.europa.eu/en/cs-e-amendment-6",
+                    "document_url": null,
+                    "local_path": null,
+                    "summary": "EASA 发动机审定规范，可用于中欧美法规映射和条款对照。",
+                    "tags": [
+                      "EASA",
+                      "CS-E",
+                      "engine",
+                      "certification"
+                    ]
+                  }
+                ]
+              },
+              {
+                "layer": "certification_guidance",
+                "title": "Layer 2 - Certification Guidance",
+                "count": 3,
+                "sources": [
+                  {
+                    "id": "caac-ap-21",
+                    "title": "AP-21 系列管理程序",
+                    "authority": "CAAC",
+                    "jurisdiction": "CN",
+                    "layer": "certification_guidance",
+                    "document_type": "procedure",
+                    "language": "zh-CN",
+                    "status": "cataloged",
+                    "official_url": "https://www.caac.gov.cn/XXGK/XXGK/GFXWJ/201511/P020151103347341090106.pdf",
+                    "document_url": null,
+                    "local_path": null,
+                    "summary": "CAAC 适航审定程序文件集合，是法规条款落地到审定流程的重要桥梁。",
+                    "tags": [
+                      "CAAC",
+                      "AP-21",
+                      "procedure",
+                      "certification"
+                    ]
+                  },
+                  {
+                    "id": "caac-ac-33-engine-certification",
+                    "title": "咨询通告《航空发动机审定》（修订征求意见稿）",
+                    "authority": "CAAC",
+                    "jurisdiction": "CN",
+                    "layer": "certification_guidance",
+                    "document_type": "advisory_circular",
+                    "language": "zh-CN",
+                    "status": "cataloged",
+                    "official_url": "https://www.caac.gov.cn/PHONE/HDJL/YJZJ/202312/t20231229_222525.html",
+                    "document_url": "https://www.caac.gov.cn/HDJL/YJZJ/202312/P020231229507018784407.pdf",
+                    "local_path": null,
+                    "summary": "为 CCAR-33 条款提供可接受符合性方法，是发动机审定知识图谱的重要补充。",
+                    "tags": [
+                      "CAAC",
+                      "AC-33",
+                      "engine",
+                      "guidance"
+                    ]
+                  },
+                  {
+                    "id": "faa-ac-33-70-1",
+                    "title": "AC 33.70-1 Change 1 - Guidance Material for Aircraft Engine Life-Limited Parts Requirements",
+                    "authority": "FAA",
+                    "jurisdiction": "US",
+                    "layer": "certification_guidance",
+                    "document_type": "advisory_circular",
+                    "language": "en-US",
+                    "status": "cataloged",
+                    "official_url": "https://www.faa.gov/documentLibrary/media/Advisory_Circular/AC_33_70-1_Chg_1.pdf",
+                    "document_url": null,
+                    "local_path": null,
+                    "summary": "FAA 关于发动机寿命件要求的指导材料，可显著增强结构完整性与寿命管理问答。",
+                    "tags": [
+                      "FAA",
+                      "AC 33.70-1",
+                      "life-limited-parts"
+                    ]
+                  }
+                ]
+              },
+              {
+                "layer": "environment_and_lifecycle",
+                "title": "Layer 3 - Environment & Lifecycle",
+                "count": 3,
+                "sources": [
+                  {
+                    "id": "faa-part-34",
+                    "title": "14 CFR Part 34 - Fuel Venting and Exhaust Emission Requirements",
+                    "authority": "FAA",
+                    "jurisdiction": "US",
+                    "layer": "environment_and_lifecycle",
+                    "document_type": "regulation",
+                    "language": "en-US",
+                    "status": "cataloged",
+                    "official_url": "https://www.faa.gov/aircraft/air_cert/design_approvals/engine_prop/engine_prop_regs/regs",
+                    "document_url": null,
+                    "local_path": null,
+                    "summary": "FAA 涡轮发动机燃油排泄和排放要求，可补足发动机环境合规知识。",
+                    "tags": [
+                      "FAA",
+                      "Part 34",
+                      "emissions"
+                    ]
+                  },
+                  {
+                    "id": "faa-ac-34-1c",
+                    "title": "AC 34-1C - Fuel Venting and Exhaust Emission Requirements for Turbine Engine Powered Airplanes",
+                    "authority": "FAA",
+                    "jurisdiction": "US",
+                    "layer": "environment_and_lifecycle",
+                    "document_type": "advisory_circular",
+                    "language": "en-US",
+                    "status": "cataloged",
+                    "official_url": "https://www.faa.gov/regulations_policies/advisory_circulars/index.cfm/go/document.information/documentID/1043756",
+                    "document_url": null,
+                    "local_path": null,
+                    "summary": "FAA 排放要求指导材料，可为发动机排放审定提供可检索的解释性语料。",
+                    "tags": [
+                      "FAA",
+                      "AC 34-1C",
+                      "emissions",
+                      "guidance"
+                    ]
+                  },
+                  {
+                    "id": "caac-ccar-36",
+                    "title": "航空器型号和适航合格审定噪声规定（CCAR-36）",
+                    "authority": "CAAC",
+                    "jurisdiction": "CN",
+                    "layer": "environment_and_lifecycle",
+                    "document_type": "regulation",
+                    "language": "zh-CN",
+                    "status": "cataloged",
+                    "official_url": "https://www.caac.gov.cn/PHONE/HDJL/YJZJ/202201/t20220117_211008.html",
+                    "document_url": null,
+                    "local_path": null,
+                    "summary": "CAAC 噪声要求入口，可为后续环境与持续适航知识层提供基础。",
+                    "tags": [
+                      "CAAC",
+                      "CCAR-36",
+                      "noise"
+                    ]
+                  }
+                ]
+              }
+            ],
+            "sources": [
+              {
+                "id": "caac-ccar-33-r2",
+                "title": "航空发动机适航规定（CCAR-33-R2）",
+                "authority": "CAAC",
+                "jurisdiction": "CN",
+                "layer": "core_regulations",
+                "document_type": "regulation",
+                "language": "zh-CN",
+                "status": "ingested",
+                "official_url": "https://www.caac.gov.cn/PHONE/XXGK_17/XXGK/MHGZ/201606/t20160622_38639.html",
+                "document_url": "https://www.caac.gov.cn/PHONE/XXGK_17/XXGK/MHGZ/201511/P020151103350111233011.pdf",
+                "local_path": "data/processed/CCAR-33.md",
+                "summary": "CAAC 航空发动机适航核心法规，现有样例知识库主要围绕该规章构建。",
+                "tags": [
+                  "CAAC",
+                  "CCAR-33",
+                  "engine",
+                  "airworthiness"
+                ]
+              },
+              {
+                "id": "caac-ccar-21-r5",
+                "title": "民用航空产品和零部件合格审定规定（CCAR-21-R5）",
+                "authority": "CAAC",
+                "jurisdiction": "CN",
+                "layer": "core_regulations",
+                "document_type": "regulation",
+                "language": "zh-CN",
+                "status": "cataloged",
+                "official_url": "https://www.caac.gov.cn/PHONE/XXGK_17/XXGK/MHGZ/202403/t20240313_223201.html",
+                "document_url": null,
+                "local_path": null,
+                "summary": "定义产品和零部件合格审定的基本程序，与发动机型号合格审定强相关。",
+                "tags": [
+                  "CAAC",
+                  "CCAR-21",
+                  "type-certification"
+                ]
+              },
+              {
+                "id": "faa-part-33",
+                "title": "14 CFR Part 33 - Airworthiness Standards: Aircraft Engines",
+                "authority": "FAA",
+                "jurisdiction": "US",
+                "layer": "core_regulations",
+                "document_type": "regulation",
+                "language": "en-US",
+                "status": "cataloged",
+                "official_url": "https://www.faa.gov/aircraft/air_cert/design_approvals/engine_prop/engine_prop_regs/regs",
+                "document_url": null,
+                "local_path": null,
+                "summary": "FAA 发动机适航核心法规，可作为 CCAR-33 的跨法规对照基础。",
+                "tags": [
+                  "FAA",
+                  "Part 33",
+                  "engine",
+                  "airworthiness"
+                ]
+              },
+              {
+                "id": "easa-cs-e-amd6",
+                "title": "CS-E Amendment 6 - Certification Specifications for Engines",
+                "authority": "EASA",
+                "jurisdiction": "EU",
+                "layer": "core_regulations",
+                "document_type": "certification_specification",
+                "language": "en",
+                "status": "cataloged",
+                "official_url": "https://www.easa.europa.eu/en/cs-e-amendment-6",
+                "document_url": null,
+                "local_path": null,
+                "summary": "EASA 发动机审定规范，可用于中欧美法规映射和条款对照。",
+                "tags": [
+                  "EASA",
+                  "CS-E",
+                  "engine",
+                  "certification"
+                ]
+              },
+              {
+                "id": "caac-ap-21",
+                "title": "AP-21 系列管理程序",
+                "authority": "CAAC",
+                "jurisdiction": "CN",
+                "layer": "certification_guidance",
+                "document_type": "procedure",
+                "language": "zh-CN",
+                "status": "cataloged",
+                "official_url": "https://www.caac.gov.cn/XXGK/XXGK/GFXWJ/201511/P020151103347341090106.pdf",
+                "document_url": null,
+                "local_path": null,
+                "summary": "CAAC 适航审定程序文件集合，是法规条款落地到审定流程的重要桥梁。",
+                "tags": [
+                  "CAAC",
+                  "AP-21",
+                  "procedure",
+                  "certification"
+                ]
+              },
+              {
+                "id": "caac-ac-33-engine-certification",
+                "title": "咨询通告《航空发动机审定》（修订征求意见稿）",
+                "authority": "CAAC",
+                "jurisdiction": "CN",
+                "layer": "certification_guidance",
+                "document_type": "advisory_circular",
+                "language": "zh-CN",
+                "status": "cataloged",
+                "official_url": "https://www.caac.gov.cn/PHONE/HDJL/YJZJ/202312/t20231229_222525.html",
+                "document_url": "https://www.caac.gov.cn/HDJL/YJZJ/202312/P020231229507018784407.pdf",
+                "local_path": null,
+                "summary": "为 CCAR-33 条款提供可接受符合性方法，是发动机审定知识图谱的重要补充。",
+                "tags": [
+                  "CAAC",
+                  "AC-33",
+                  "engine",
+                  "guidance"
+                ]
+              },
+              {
+                "id": "faa-ac-33-70-1",
+                "title": "AC 33.70-1 Change 1 - Guidance Material for Aircraft Engine Life-Limited Parts Requirements",
+                "authority": "FAA",
+                "jurisdiction": "US",
+                "layer": "certification_guidance",
+                "document_type": "advisory_circular",
+                "language": "en-US",
+                "status": "cataloged",
+                "official_url": "https://www.faa.gov/documentLibrary/media/Advisory_Circular/AC_33_70-1_Chg_1.pdf",
+                "document_url": null,
+                "local_path": null,
+                "summary": "FAA 关于发动机寿命件要求的指导材料，可显著增强结构完整性与寿命管理问答。",
+                "tags": [
+                  "FAA",
+                  "AC 33.70-1",
+                  "life-limited-parts"
+                ]
+              },
+              {
+                "id": "faa-part-34",
+                "title": "14 CFR Part 34 - Fuel Venting and Exhaust Emission Requirements",
+                "authority": "FAA",
+                "jurisdiction": "US",
+                "layer": "environment_and_lifecycle",
+                "document_type": "regulation",
+                "language": "en-US",
+                "status": "cataloged",
+                "official_url": "https://www.faa.gov/aircraft/air_cert/design_approvals/engine_prop/engine_prop_regs/regs",
+                "document_url": null,
+                "local_path": null,
+                "summary": "FAA 涡轮发动机燃油排泄和排放要求，可补足发动机环境合规知识。",
+                "tags": [
+                  "FAA",
+                  "Part 34",
+                  "emissions"
+                ]
+              },
+              {
+                "id": "faa-ac-34-1c",
+                "title": "AC 34-1C - Fuel Venting and Exhaust Emission Requirements for Turbine Engine Powered Airplanes",
+                "authority": "FAA",
+                "jurisdiction": "US",
+                "layer": "environment_and_lifecycle",
+                "document_type": "advisory_circular",
+                "language": "en-US",
+                "status": "cataloged",
+                "official_url": "https://www.faa.gov/regulations_policies/advisory_circulars/index.cfm/go/document.information/documentID/1043756",
+                "document_url": null,
+                "local_path": null,
+                "summary": "FAA 排放要求指导材料，可为发动机排放审定提供可检索的解释性语料。",
+                "tags": [
+                  "FAA",
+                  "AC 34-1C",
+                  "emissions",
+                  "guidance"
+                ]
+              },
+              {
+                "id": "caac-ccar-36",
+                "title": "航空器型号和适航合格审定噪声规定（CCAR-36）",
+                "authority": "CAAC",
+                "jurisdiction": "CN",
+                "layer": "environment_and_lifecycle",
+                "document_type": "regulation",
+                "language": "zh-CN",
+                "status": "cataloged",
+                "official_url": "https://www.caac.gov.cn/PHONE/HDJL/YJZJ/202201/t20220117_211008.html",
+                "document_url": null,
+                "local_path": null,
+                "summary": "CAAC 噪声要求入口，可为后续环境与持续适航知识层提供基础。",
+                "tags": [
+                  "CAAC",
+                  "CCAR-36",
+                  "noise"
+                ]
+              }
+            ]
+          }
+        },
+        "graph_nodes": {
+          "status_code": 200,
+          "response": {
+            "nodes": [],
+            "edges": [],
+            "mode": "neo4j",
+            "summary": null,
+            "stats": {}
+          }
+        }
+      },
+      "query_tests": []
+    },
+    "retrieval": {
+      "status": "success",
+      "total_tests": 15,
+      "passed": 2,
+      "failed": 13,
+      "tests": [
+        {
+          "query": "第33.27条转子超转试验",
+          "category": "条款检索",
+          "passed": false,
+          "answer": "系统当前无法完成外部事实校验，以下仅返回检索证据中的保守摘要：\n[1] 第33.88条 发动机超温试验 / （b）OEI功率状态超温试验: 对要求30秒和2分钟OEI功率状态的发动机，必须在30秒OEI功率额定值至少超过工作限制温度**19°C（35°F）**时，以接通最大功率转速运转**4分钟**。\n---\n[2] 第33.92条 转子锁定试验 / General Section: 如果采用锁定转子装置以阻止发动机持续转动，则发动机必须在以下条件下进行包括该装置工作**25次**的试验：\n1. 发动机必须从额定最大连续推力或功率状态停车\n2. 必须在承受在该状态下持续飞行可能引起的最大扭矩的...",
+          "citations_count": 5,
+          "expected_keywords": [
+            "超转",
+            "120%",
+            "转子"
+          ],
+          "found_keywords": [
+            "转子"
+          ]
+        },
+        {
+          "query": "第33.28条叶片包容性试验",
+          "category": "条款检索",
+          "passed": false,
+          "answer": "系统当前无法完成外部事实校验，以下仅返回检索证据中的保守摘要：\n[1] 第33.95条 发动机—螺旋桨系统试验 / General Section: 如果设计的发动机是带螺旋桨工作的，则必须在装有一个有代表性的螺旋桨的情况下，进行下列试验：\n1. 顺桨试验：**25次循环**\n2. 负扭矩和推力系统试验：以额定最大连续功率作**25次循环**\n3. 自动退耦装置试验：以额定最大连续功率作**25次循环**（如适用）\n4. 负拉\n[2] 第33.97条 反推力装置 / （b）反推力试验要求: 1. 必须进行从飞行慢车的向前推力到最大反推力的试验**175次**\n2. 必须从额定起飞推力到最大反推...",
+          "citations_count": 5,
+          "expected_keywords": [
+            "包容性",
+            "叶片",
+            "断裂"
+          ],
+          "found_keywords": []
+        },
+        {
+          "query": "第33.29条持久试验",
+          "category": "条款检索",
+          "passed": true,
+          "answer": "系统当前无法完成外部事实校验，以下仅返回检索证据中的保守摘要：\n[1] 第33.201条 早期ETOPS资格的设计和试验要求 / （c）ETOPS任务循环持久试验: #### （1）试验循环要求\n必须按照批准的试验计划，在基本符合最终型号设计的一台发动机上进行一次**模拟ETOPS任务循环的持久试验**，该试验必须：\n1. 包括至少**3000次**代表使用中起动—停车任务循环\n2. 进行**3次**以最大连续功率或推力进行的**模拟改航飞行\n[2] 第33.49条 持久试验 / （a）概述: 每型发动机必须进行持久试验，包括总时数为**150小时**的试车，并根据发动机型号和预期工作情况由本...",
+          "citations_count": 5,
+          "expected_keywords": [
+            "持久",
+            "150小时",
+            "试验"
+          ],
+          "found_keywords": [
+            "持久",
+            "150小时",
+            "试验"
+          ]
+        },
+        {
+          "query": "超转试验转速要求",
+          "category": "参数检索",
+          "passed": false,
+          "answer": "系统当前无法完成外部事实校验，以下仅返回检索证据中的保守摘要：\n[1] 第33.27条 涡轮、压气机、风扇和涡轮增压器转子 / （c）转子部件超转试验（5分钟）: **适用范围**：每个涡轮、压气机和风扇中经受最关键应力的转子部件（除叶片外）\n**试验条件**：\n1. 以其最大工作温度进行\n2. 以下列适用的最高转速进行：\n| 试验条件 | 转速要求 |\n|---------|---------|\n| 试验台试验（带叶片/配重块） | 最大\n[2] 第33.88条 发动机超温试验 / （b）OEI功率状态超温试验: 对要求30秒和2分钟OEI功率状态的发动机，必须在30秒OEI功率额定值至少超...",
+          "citations_count": 5,
+          "expected_keywords": [
+            "120%",
+            "最大允许转速"
+          ],
+          "found_keywords": []
+        },
+        {
+          "query": "持久试验持续时间",
+          "category": "参数检索",
+          "passed": false,
+          "answer": "系统当前无法完成外部事实校验，以下仅返回检索证据中的保守摘要：\n[1] 第33.201条 早期ETOPS资格的设计和试验要求 / （c）ETOPS任务循环持久试验: #### （1）试验循环要求\n必须按照批准的试验计划，在基本符合最终型号设计的一台发动机上进行一次**模拟ETOPS任务循环的持久试验**，该试验必须：\n1. 包括至少**3000次**代表使用中起动—停车任务循环\n2. 进行**3次**以最大连续功率或推力进行的**模拟改航飞行\n[2] 第33.76条 吸鸟 / （d）大型群鸟: | 进气道面积 | 鸟的数量和重量 |\n|-----------|---------------|\n...",
+          "citations_count": 5,
+          "expected_keywords": [
+            "150小时"
+          ],
+          "found_keywords": []
+        },
+        {
+          "query": "吸鸟试验的鸟重",
+          "category": "参数检索",
+          "passed": false,
+          "answer": "系统当前无法完成外部事实校验，以下仅返回检索证据中的保守摘要：\n[1] 第33.43条 振动试验 / （d）气缸不点火测试: 本条规定的振动测试必须在最不利振动效应的那只气缸不点火的情况下重复进行。\n---\n[2] 第33.15条 材料 / General Section: 发动机所用材料的适用性和耐久性必须满足下列要求：\n**（a）** 建立在经验或试验的基础上\n**（b）** 符合经批准的规范（如工业或军用规范），保证这些材料具有设计资料中采用的强度和其他性能\n---\n[3] 第33.97条 反推力装置 / （b）反推力试验要求: 1. 必须进行从飞行慢车的向前推力到最大反推力的试验**1...",
+          "citations_count": 5,
+          "expected_keywords": [
+            "1.15公斤",
+            "2.5公斤",
+            "鸟"
+          ],
+          "found_keywords": []
+        },
+        {
+          "query": "150小时持久试验的具体要求",
+          "category": "试验条件",
+          "passed": true,
+          "answer": "系统当前无法完成外部事实校验，以下仅返回检索证据中的保守摘要：\n[1] 第33.201条 早期ETOPS资格的设计和试验要求 / （c）ETOPS任务循环持久试验: #### （1）试验循环要求\n必须按照批准的试验计划，在基本符合最终型号设计的一台发动机上进行一次**模拟ETOPS任务循环的持久试验**，该试验必须：\n1. 包括至少**3000次**代表使用中起动—停车任务循环\n2. 进行**3次**以最大连续功率或推力进行的**模拟改航飞行\n[2] 第33.87条 持久试验 / （a）试验要求: 1. 各项运转须按中国民用航空局认为合适的顺序进行\n2. 除了须由手动控制的发动机工作状态外，发...",
+          "citations_count": 5,
+          "expected_keywords": [
+            "150小时",
+            "循环",
+            "温度"
+          ],
+          "found_keywords": [
+            "循环",
+            "温度"
+          ]
+        },
+        {
+          "query": "吸鸟试验如何进行",
+          "category": "试验条件",
+          "passed": false,
+          "answer": "系统当前无法完成外部事实校验，以下仅返回检索证据中的保守摘要：\n[1] 第33.201条 早期ETOPS资格的设计和试验要求 / （c）ETOPS任务循环持久试验: #### （1）试验循环要求\n必须按照批准的试验计划，在基本符合最终型号设计的一台发动机上进行一次**模拟ETOPS任务循环的持久试验**，该试验必须：\n1. 包括至少**3000次**代表使用中起动—停车任务循环\n2. 进行**3次**以最大连续功率或推力进行的**模拟改航飞行\n[2] 第33.95条 发动机—螺旋桨系统试验 / General Section: 如果设计的发动机是带螺旋桨工作的，则必须在装有一个有代表性的螺旋桨...",
+          "citations_count": 5,
+          "expected_keywords": [
+            "吸入",
+            "鸟",
+            "速度",
+            "高度"
+          ],
+          "found_keywords": []
+        },
+        {
+          "query": "燃油系统防火试验",
+          "category": "试验条件",
+          "passed": false,
+          "answer": "系统当前无法完成外部事实校验，以下仅返回检索证据中的保守摘要：\n[1] 第33.53条 发动机系统和部件试验 / （a）系统和部件试验: 对于不能按第33.49条持久试验方法进行充分验证的每型发动机系统和部件，申请人必须进行附加的试验。\n[2] 第33.91条 发动机系统和部件试验 / （a）系统和部件试验: 对不能按照第33.87条进行持久试车予以充分验证的系统或部件，申请人必须进行附加的试验。\n[3] 第33.28条 发动机控制系统 / （f）保护系统: 1. 发动机控制设备、系统和仪表的设计和功能必须合理保证影响转子结构完整性的发动机使用限制在工作中不会被超出\n2. **电子式超转保护系...",
+          "citations_count": 5,
+          "expected_keywords": [
+            "防火",
+            "火焰",
+            "1500度"
+          ],
+          "found_keywords": []
+        },
+        {
+          "query": "什么是限寿件",
+          "category": "定义",
+          "passed": false,
+          "answer": "系统当前无法完成外部事实校验，以下仅返回检索证据中的保守摘要：\n[1] 第33.84条 发动机超扭试验 / 验收标准: 试验结束，每个发动机零件分解后，必须能够满足：\n1. 不论是否安装在发动机上即可确定其调整位置和功能特性的每个部件的调整位置和功能特性保持在试验开始时确定和记录的限制范围内\n2. 按第33.4条提交的资料，发动机每个部件必须符合型号设计要求\n---\n[2] 第33.93条 分解检查 / （b）30秒和2分钟OEI持久试验后: 在完成第33.87条的持久试验后，每台发动机必须完全分解：\n1. 每个部件的调整位置和功能特性必须保持在试验开始时确定和记录的限制范围内\n2. 每型发动...",
+          "citations_count": 5,
+          "expected_keywords": [
+            "限寿件",
+            "寿命",
+            "安全"
+          ],
+          "found_keywords": []
+        },
+        {
+          "query": "危害性后果包括哪些",
+          "category": "定义",
+          "passed": false,
+          "answer": "系统当前无法完成外部事实校验，以下仅返回检索证据中的保守摘要：\n[1] 第33.76条 吸鸟 / （b）大鸟: | 进气道面积 | 大鸟重量 |\n|-----------|---------|\n| ≤ 0.645 m² (1000 in²) | 1.15 kg (2.5 lb) |\n| > 0.645 m² 且 ≤ 1.29 m² (2000 in²) | 2.27 kg (5.0 lb)\n[2] 第33.79条 燃烧燃料加力装置 / General Section: 包括喷口的每个燃烧燃料加力装置，必须满足下列规定：\n1. 设有燃烧燃料加力装置的**切断装置**\n2. 允许开—关交替进行\n3...",
+          "citations_count": 5,
+          "expected_keywords": [
+            "危害性",
+            "后果",
+            "火灾",
+            "爆炸"
+          ],
+          "found_keywords": []
+        },
+        {
+          "query": "压气机喘振裕度的要求是什么",
+          "category": "综合查询",
+          "passed": false,
+          "answer": "系统当前无法完成外部事实校验，以下仅返回检索证据中的保守摘要：\n[1] 第33.27条 涡轮、压气机、风扇和涡轮增压器转子 / （c）转子部件超转试验（5分钟）: **适用范围**：每个涡轮、压气机和风扇中经受最关键应力的转子部件（除叶片外）\n**试验条件**：\n1. 以其最大工作温度进行\n2. 以下列适用的最高转速进行：\n| 试验条件 | 转速要求 |\n|---------|---------|\n| 试验台试验（带叶片/配重块） | 最大\n[2] 第33.27条 涡轮、压气机、风扇和涡轮增压器转子 / （b）使用限制保证: 除第33.28条要求之外的发动机系统、仪表和其它方法的设计和功能必须...",
+          "citations_count": 5,
+          "expected_keywords": [
+            "喘振",
+            "裕度",
+            "压气机"
+          ],
+          "found_keywords": [
+            "压气机"
+          ]
+        },
+        {
+          "query": "涡轮盘的包容性试验如何进行",
+          "category": "综合查询",
+          "passed": false,
+          "answer": "系统当前无法完成外部事实校验，以下仅返回检索证据中的保守摘要：\n[1] 第33.95条 发动机—螺旋桨系统试验 / General Section: 如果设计的发动机是带螺旋桨工作的，则必须在装有一个有代表性的螺旋桨的情况下，进行下列试验：\n1. 顺桨试验：**25次循环**\n2. 负扭矩和推力系统试验：以额定最大连续功率作**25次循环**\n3. 自动退耦装置试验：以额定最大连续功率作**25次循环**（如适用）\n4. 负拉\n[2] 第33.97条 反推力装置 / （b）反推力试验要求: 1. 必须进行从飞行慢车的向前推力到最大反推力的试验**175次**\n2. 必须从额定起飞推力到最大反推...",
+          "citations_count": 5,
+          "expected_keywords": [
+            "涡轮盘",
+            "包容性",
+            "试验"
+          ],
+          "found_keywords": [
+            "试验"
+          ]
+        },
+        {
+          "query": "限寿件包括哪些部件",
+          "category": "综合查询",
+          "passed": false,
+          "answer": "系统当前无法完成外部事实校验，以下仅返回检索证据中的保守摘要：\n[1] 第33.55条 分解检查 / （b）调整位置和功能特性: 不经装机即可确定其调整位置和功能特性的每一部件的调整位置和功能特性必须保持在试验开始时已确定并记录的限制范围内。\n[2] 第33.93条 分解检查 / （b）30秒和2分钟OEI持久试验后: 在完成第33.87条的持久试验后，每台发动机必须完全分解：\n1. 每个部件的调整位置和功能特性必须保持在试验开始时确定和记录的限制范围内\n2. 每型发动机可以有超出本条允许的损伤，当中国民用航空局认为必要时，申请人必须通过分析、试验，证明发动机的结构完整性得到了保持\n---\n[...",
+          "citations_count": 5,
+          "expected_keywords": [
+            "限寿件",
+            "轮盘",
+            "叶片",
+            "轴"
+          ],
+          "found_keywords": []
+        },
+        {
+          "query": "吸鸟试验的验收标准是什么",
+          "category": "综合查询",
+          "passed": false,
+          "answer": "系统当前无法完成外部事实校验，以下仅返回检索证据中的保守摘要：\n[1] 第33.201条 早期ETOPS资格的设计和试验要求 / （c）ETOPS任务循环持久试验: #### （1）试验循环要求\n必须按照批准的试验计划，在基本符合最终型号设计的一台发动机上进行一次**模拟ETOPS任务循环的持久试验**，该试验必须：\n1. 包括至少**3000次**代表使用中起动—停车任务循环\n2. 进行**3次**以最大连续功率或推力进行的**模拟改航飞行\n[2] 第33.95条 发动机—螺旋桨系统试验 / General Section: 如果设计的发动机是带螺旋桨工作的，则必须在装有一个有代表性的螺旋桨...",
+          "citations_count": 5,
+          "expected_keywords": [
+            "吸鸟",
+            "验收",
+            "标准"
+          ],
+          "found_keywords": []
+        }
+      ]
+    }
+  }
+}

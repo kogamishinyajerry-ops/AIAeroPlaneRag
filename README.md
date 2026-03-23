@@ -4,10 +4,11 @@ AeroPower-RAG is a prototype aviation knowledge system for civil aircraft engine
 
 ## Current Stage
 
-This repository is in a prototype stabilization phase.
+This repository is in a `v0.2` prototype hardening phase.
 
-- The core backend flow already exists: parse or mock-parse documents, chunk them, index them into ChromaDB, query Neo4j, and generate guarded answers.
-- The frontend shell is present and wired to the FastAPI backend.
+- The backend now exposes query, focused graph, health, indexing, and official source-catalog endpoints.
+- The frontend graph view has been shifted from a full graph dump to a query-driven explanation subgraph.
+- The repository now includes an official source catalog covering CAAC, FAA, and EASA entry points for v0.2 expansion.
 - Several flows still rely on mock or fallback behavior when external services are unavailable.
 
 ## Environment Setup
@@ -75,6 +76,12 @@ Run the FastAPI main-chain smoke test directly:
 .\\.venv\\Scripts\\python.exe -m pytest tests\\test_main_api.py -q
 ```
 
+Inspect the official source catalog:
+
+```powershell
+Invoke-WebRequest -UseBasicParsing http://127.0.0.1:8000/api/v1/sources
+```
+
 Inspect the sample golden set template and summary stats:
 
 ```powershell
@@ -90,7 +97,9 @@ The `evaluation/` folder is intentionally lightweight for now. It is meant to ho
 |-- data/
 |   |-- raw/              # Source documents
 |   `-- processed/        # Parsed markdown, graph exports, vector DB artifacts
+|   `-- catalog/          # Official source catalog and source metadata seeds
 |-- src/
+|   |-- knowledge_base/   # Source catalog and metadata models
 |   |-- ingestion/        # Parsing and ingestion logic
 |   |-- ontology/         # Entity extraction and graph access
 |   `-- rag/              # Chunking, retrieval, and guardrail logic
@@ -110,7 +119,8 @@ The `evaluation/` folder is intentionally lightweight for now. It is meant to ho
 - ChromaDB persistence and data-directory handling still need hardening for production use.
 - Release/version labels now exist for the app, document set, prompts, embeddings, and graph exports, but the project is still early in formal release automation.
 - The guardrail layer should be treated as a prototype until it is backed by stronger evaluation and test coverage.
-- The repository currently focuses on a single regulation family and sample dataset rather than a complete multi-source corpus.
+- The source catalog is official and curated, but only CCAR-33 sample content is currently ingested into the local retriever.
+- The graph UI is now focused and query-driven, but it still runs on a lightweight custom renderer rather than a full graph visualization library.
 
 ## Release Governance
 

@@ -1,0 +1,9 @@
+{
+  "document_id": "official-source-catalog",
+  "source_filename": "official_sources_catalog.md",
+  "markdown_path": "D:/AIAeroPlaneRag/data/processed/official_sources_catalog.md",
+  "content_mode": "real",
+  "document_version": "official-sources-v1",
+  "parser": "catalog_seed",
+  "app_mode": "catalog"
+}

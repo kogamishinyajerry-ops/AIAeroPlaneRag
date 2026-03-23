@@ -9,7 +9,6 @@ except ImportError:
 
 from settings import has_real_value
 
-
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
@@ -17,8 +16,7 @@ logger = logging.getLogger(__name__)
 class FactCheckingGuardrail:
     """
     Verify that answers are supported by retrieved contexts.
-    If the external verifier is unavailable, default to a conservative response
-    instead of passing the draft answer through unchecked.
+    If the external verifier is unavailable, default to a conservative response.
     """
 
     def __init__(self):
@@ -35,7 +33,7 @@ class FactCheckingGuardrail:
         if not retrieved_contexts:
             return {
                 "status": "NOT_FOUND",
-                "reasoning": "没有可用于验证的检索上下文，系统拒绝放行回答。",
+                "reasoning": "没有可用于校验的检索上下文，系统拒绝放行回答。",
                 "safe_answer": "当前知识库中没有检索到足够证据，无法给出可靠回答。",
             }
 
@@ -48,8 +46,8 @@ class FactCheckingGuardrail:
 
         context_str = "\n\n".join(
             [
-                f"[Source: {c['metadata'].get('source', '?')} - {c['metadata'].get('section', '?')}]\n{c['text']}"
-                for c in retrieved_contexts
+                f"[Source: {item['metadata'].get('source', '?')} - {item['metadata'].get('section', '?')}]\n{item['text']}"
+                for item in retrieved_contexts
             ]
         )
 

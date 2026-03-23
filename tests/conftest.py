@@ -50,6 +50,32 @@ class FakeGraphStore:
     def query_graph(self, keyword: str):
         return []
 
+    def get_graph_snapshot(self):
+        return {
+            "mode": "fallback",
+            "summary": "test graph snapshot",
+            "nodes": [
+                {"id": "reg-1", "label": "Clause 1", "type": "regulation", "description": "Clause 1"},
+                {"id": "comp-1", "label": "Compressor", "type": "component", "description": "Compressor"},
+            ],
+            "edges": [{"source": "reg-1", "target": "comp-1", "type": "CONSTRAINS", "description": ""}],
+            "stats": {"nodeCount": 2, "edgeCount": 1},
+        }
+
+    def get_subgraph(self, *, query: str = "", node_id: str | None = None, limit: int = 18, include_parameters: bool = False):
+        return {
+            "mode": "fallback",
+            "query": query,
+            "focusNodeId": node_id or "reg-1",
+            "summary": "test graph subgraph",
+            "nodes": [
+                {"id": "reg-1", "label": "Clause 1", "type": "regulation", "description": "Clause 1"},
+                {"id": "comp-1", "label": "Compressor", "type": "component", "description": "Compressor"},
+            ],
+            "edges": [{"source": "reg-1", "target": "comp-1", "type": "CONSTRAINS", "description": ""}],
+            "stats": {"nodeCount": 2, "edgeCount": 1},
+        }
+
 
 class FakeGuardrail:
     def __init__(self):

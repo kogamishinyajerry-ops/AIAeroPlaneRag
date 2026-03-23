@@ -1,3 +1,4 @@
+import hashlib
 import logging
 import os
 import re
@@ -15,20 +16,20 @@ except ImportError:
     embedding_functions = None
     load_dotenv = None
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
 def tokenize_text(text: str) -> List[str]:
     tokens: List[str] = []
-    buffer = []
+    buffer: List[str] = []
 
-    def flush_buffer():
+    def flush_buffer() -> None:
         if buffer:
             tokens.append("".join(buffer))
             buffer.clear()
 
-    for char in text.lower():
+    for char in (text or "").lower():
         if "\u4e00" <= char <= "\u9fff":
             flush_buffer()
             tokens.append(char)
@@ -43,9 +44,9 @@ def tokenize_text(text: str) -> List[str]:
 
 def extract_phrase_candidates(text: str) -> List[str]:
     phrases: List[str] = []
-    for block in re.findall(r"[\u4e00-\u9fff]{2,}", text):
-        parts = re.split(r"(?:的是|什么|要求|如何|哪些|多少|是否|吗|？|\?)", block)
-        phrases.extend(part for part in parts if len(part) >= 2)
+    for block in re.findall(r"[\u4e00-\u9fff]{2,}|[a-zA-Z][a-zA-Z0-9_\-]{2,}", text or ""):
+        if len(block) >= 2:
+            phrases.append(block.lower())
     return list(dict.fromkeys(phrases))
 
 
@@ -68,8 +69,8 @@ class SimpleHashEmbeddingFunction:
                 slot = hash(token) % self.dimension
                 vector[slot] += 1.0
 
-            norm = sum(v * v for v in vector) ** 0.5 or 1.0
-            embeddings.append([v / norm for v in vector])
+            norm = sum(value * value for value in vector) ** 0.5 or 1.0
+            embeddings.append([value / norm for value in vector])
         return embeddings
 
     def embed_query(self, input: List[str]) -> List[List[float]]:
@@ -86,171 +87,200 @@ class SimpleHashEmbeddingFunction:
     def get_config(self):
         return {"dimension": self.dimension}
 
+
 class VectorStoreEngine:
     """
-    Handles indexing of document chunks into a vector database (ChromaDB) 
-    for semantic retrieval based on engineer queries.
+    Handles indexing of document chunks into a vector database for semantic retrieval.
     """
+
     def __init__(self, db_dir: str = "./data/processed/chroma_db", collection_name: str = "regulations"):
         if load_dotenv:
             load_dotenv()
-            
+
         configured_dir = os.getenv("CHROMA_DB_DIR", db_dir)
         self.db_dir = str(Path(configured_dir).resolve())
         self.collection_name = collection_name
-        self._indexed_cache: List[Dict] = []
-        
+        self._indexed_cache: Dict[str, Dict] = {}
+        self._query_cache: Dict[tuple[str, int], List[Dict]] = {}
+
         if not chromadb:
             logger.warning("chromadb is not installed. Running in mock mode.")
             self.collection = None
             return
 
         self._repair_broken_store()
-
-        # Initialize ChromaDB client
         self.client = chromadb.PersistentClient(path=self.db_dir)
-        
-        # Determine embedding function (OpenAI by default if API key exists, otherwise local fallback)
-        openai_ef = None
+
+        embedding_function = None
         if has_real_value(os.getenv("OPENAI_API_KEY")):
             logger.info("Using OpenAI embeddings.")
-            openai_ef = embedding_functions.OpenAIEmbeddingFunction(
+            embedding_function = embedding_functions.OpenAIEmbeddingFunction(
                 api_key=os.getenv("OPENAI_API_KEY"),
-                model_name="text-embedding-3-small"
+                model_name="text-embedding-3-small",
             )
         else:
             logger.info("OPENAI_API_KEY not found. Using offline hash embeddings.")
-            openai_ef = SimpleHashEmbeddingFunction()
+            embedding_function = SimpleHashEmbeddingFunction()
+        self.embedding_function = embedding_function
 
-        self.collection = self.client.get_or_create_collection(
-            name=self.collection_name, 
-            embedding_function=openai_ef
-        )
-        logger.info(f"Initialized ChromaDB collection: {self.collection_name}")
+        self.collection = self.client.get_or_create_collection(name=self.collection_name, embedding_function=embedding_function)
+        logger.info("Initialized ChromaDB collection: %s", self.collection_name)
 
-    def _repair_broken_store(self):
-        """Remove obviously broken sqlite artifacts before Chroma starts."""
+    def _repair_broken_store(self) -> None:
         db_path = Path(self.db_dir)
         db_path.mkdir(parents=True, exist_ok=True)
 
         sqlite_file = db_path / "chroma.sqlite3"
         journal_file = db_path / "chroma.sqlite3-journal"
-
         if sqlite_file.exists() and sqlite_file.stat().st_size == 0:
             logger.warning("Detected a zero-byte Chroma sqlite file. Rebuilding store directory.")
             sqlite_file.unlink(missing_ok=True)
             journal_file.unlink(missing_ok=True)
 
-    def index_chunks(self, chunks: List[Dict]):
-        """
-        Takes structured chunks (from StructuralChunker) and indexes them into ChromaDB.
-        """
+    def _make_chunk_id(self, chunk: Dict, index: int) -> str:
+        metadata = chunk.get("metadata", {})
+        source = metadata.get("source", "unknown")
+        chapter = metadata.get("chapter", "")
+        section = metadata.get("section", "")
+        text = chunk.get("original_text") or chunk.get("text", "")
+        stable_input = f"{source}|{chapter}|{section}|{text[:256]}|{index}"
+        digest = hashlib.sha1(stable_input.encode("utf-8")).hexdigest()[:16]
+        return f"{Path(source).stem}:{digest}"
+
+    def index_chunks(self, chunks: List[Dict]) -> None:
         if not self.collection:
-            logger.info(f"Mock Indexing: Would have indexed {len(chunks)} chunks.")
+            logger.info("Mock Indexing: Would have indexed %s chunks.", len(chunks))
             return
 
         if not chunks:
             logger.warning("No chunks provided to index.")
             return
 
-        documents = [c["text"] for c in chunks]
-        metadatas = [c["metadata"] for c in chunks]
-        # Generate unique IDs based on source and section (Simplified for MVP)
-        ids = [f"{c['metadata']['source']}_{c['metadata']['chapter']}_{idx}" for idx, c in enumerate(chunks)]
+        normalized_chunks: List[Dict] = []
+        seen_ids = set()
+        for index, chunk in enumerate(chunks):
+            chunk_id = chunk.get("metadata", {}).get("chunk_id") or self._make_chunk_id(chunk, index)
+            if chunk_id in seen_ids:
+                continue
+            seen_ids.add(chunk_id)
 
-        logger.info(f"Indexing {len(documents)} document chunks into the database...")
-        self.collection.add(
-            documents=documents,
-            metadatas=metadatas,
-            ids=ids
-        )
-        self._indexed_cache = [
-            {"text": doc, "metadata": meta, "id": chunk_id}
-            for doc, meta, chunk_id in zip(documents, metadatas, ids)
-        ]
+            metadata = dict(chunk.get("metadata", {}))
+            metadata["chunk_id"] = chunk_id
+            normalized_chunks.append(
+                {
+                    "id": chunk_id,
+                    "text": chunk.get("text", ""),
+                    "original_text": chunk.get("original_text", ""),
+                    "metadata": metadata,
+                }
+            )
+
+        documents = [chunk["text"] for chunk in normalized_chunks]
+        metadatas = [chunk["metadata"] for chunk in normalized_chunks]
+        ids = [chunk["id"] for chunk in normalized_chunks]
+
+        logger.info("Indexing %s document chunks into the database...", len(normalized_chunks))
+        self._recreate_collection()
+        if hasattr(self.collection, "upsert"):
+            self.collection.upsert(documents=documents, metadatas=metadatas, ids=ids)
+        else:
+            self.collection.add(documents=documents, metadatas=metadatas, ids=ids)
+
+        self._indexed_cache = {chunk["id"]: chunk for chunk in normalized_chunks}
+        self._query_cache.clear()
         logger.info("Indexing complete.")
 
+    def _recreate_collection(self) -> None:
+        try:
+            self.client.delete_collection(self.collection_name)
+        except Exception:
+            pass
+        self.collection = self.client.get_or_create_collection(
+            name=self.collection_name,
+            embedding_function=self.embedding_function,
+        )
+
     def search(self, query: str, top_k: int = 3) -> List[Dict]:
-        """
-        Perform a semantic search for the most relevant regulations.
-        """
         if not self.collection:
-            logger.info(f"Mock Search Execution for query: '{query}'")
+            logger.info("Mock Search Execution for query: '%s'", query)
             return [{"text": "Mock retrieved document segment", "metadata": {"source": "CCAR-33_mock"}}]
 
-        logger.info(f"Executing semantic search for: '{query}'")
-        results = self.collection.query(
-            query_texts=[query],
-            n_results=max(top_k * 3, top_k)
-        )
-        
-        retrieved_items = []
-        if results and "documents" in results and results["documents"]:
-            for i in range(len(results["documents"][0])):
-                retrieved_items.append({
-                    "text": results["documents"][0][i],
-                    "metadata": results["metadatas"][0][i],
-                    "id": results["ids"][0][i]
-                })
+        cache_key = ((query or "").strip().lower(), top_k)
+        if cache_key in self._query_cache:
+            return list(self._query_cache[cache_key])
+
+        candidate_count = max(top_k * 2, min(top_k * 4, 12))
+        logger.info("Executing semantic search for: '%s'", query)
+        results = self.collection.query(query_texts=[query], n_results=candidate_count)
+
+        retrieved_items: List[Dict] = []
+        if results and results.get("documents"):
+            for index in range(len(results["documents"][0])):
+                item = {
+                    "text": results["documents"][0][index],
+                    "metadata": results["metadatas"][0][index],
+                    "id": results["ids"][0][index],
+                }
+                cached = self._indexed_cache.get(item["id"])
+                if cached and cached.get("original_text"):
+                    item["original_text"] = cached["original_text"]
+                retrieved_items.append(item)
 
         reranked = self._rerank_by_keywords(query, retrieved_items, top_k)
-        if reranked:
-            return reranked
-
-        if self._indexed_cache:
-            return self._rerank_by_keywords(query, self._indexed_cache, top_k)
-
-        return retrieved_items[:top_k]
+        final_items = reranked[:top_k] if reranked else retrieved_items[:top_k]
+        self._query_cache[cache_key] = list(final_items)
+        return final_items
 
     def _rerank_by_keywords(self, query: str, items: List[Dict], top_k: int) -> List[Dict]:
         if not items:
             return []
 
-        query_tokens = set(tokenize_text(query))
-        phrase_candidates = extract_phrase_candidates(query)
-        if not query_tokens:
+        query_tokens = [token for token in tokenize_text(query) if len(token) > 1 or "\u4e00" <= token <= "\u9fff"]
+        phrase_candidates = extract_phrase_candidates(query)[:6]
+        if not query_tokens and not phrase_candidates:
             return items[:top_k]
 
-        scored = []
-        for item in items:
+        scored: List[tuple[int, Dict]] = []
+        for item in items[: max(top_k * 3, 8)]:
             metadata = item.get("metadata", {})
-            haystack = " ".join(
-                [
-                    item.get("text", ""),
-                    metadata.get("chapter", ""),
-                    metadata.get("section", ""),
-                    metadata.get("document", ""),
-                ]
-            ).lower()
-            score = sum(1 for token in query_tokens if token and token in haystack)
+            searchable_parts = [
+                metadata.get("chapter", ""),
+                metadata.get("section", ""),
+                metadata.get("document", ""),
+                item.get("text", "")[:800],
+            ]
+            haystack = " ".join(searchable_parts).lower()
+            score = 0
+
+            for token in query_tokens:
+                if token in haystack:
+                    score += 2 if len(token) == 1 else 4
 
             section_text = f"{metadata.get('chapter', '')} {metadata.get('section', '')}".lower()
             for phrase in phrase_candidates:
-                phrase_lower = phrase.lower()
-                if phrase_lower in section_text:
-                    score += 10
-                elif phrase_lower in haystack:
-                    score += 4
+                if phrase in section_text:
+                    score += 8
+                elif phrase in haystack:
+                    score += 3
 
             scored.append((score, item))
 
         scored.sort(key=lambda pair: pair[0], reverse=True)
-        return [item for score, item in scored if score > 0][:top_k] or [item for _, item in scored[:top_k]]
+        positive = [item for score, item in scored if score > 0]
+        return positive[:top_k] if positive else [item for _, item in scored[:top_k]]
+
 
 if __name__ == "__main__":
     from semantic_chunker import StructuralChunker
-    
-    # 1. Chunk document
+
     chunker = StructuralChunker(processed_dir="../../data/processed")
     chunks = chunker.chunk_markdown("CCAR-33.md")
-    
-    # 2. Index into Vector DB
+
     engine = VectorStoreEngine(db_dir="../../data/processed/chroma_db")
     engine.index_chunks(chunks)
-    
-    # 3. Test Retrieval
-    results = engine.search("什么是压气机的喘振裕度要求？")
-    print(f"\n--- Search Results for '什么是压气机的喘振裕度要求？' ---")
-    for r in results:
-        print(f"Source: {r['metadata']}")
-        print(f"Content Outline: {r['text'][:100]}...\n")
+
+    results = engine.search("压气机的喘振裕度要求是什么？")
+    print("\n--- Search Results for '压气机的喘振裕度要求是什么？' ---")
+    for item in results:
+        print(f"Source: {item['metadata']}")
+        print(f"Content Outline: {item['text'][:100]}...\n")
