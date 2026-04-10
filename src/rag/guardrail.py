@@ -212,30 +212,79 @@ Example:
             )
         return "\n".join(lines)
 
+    # Status 归一化表：处理 GLM 常见的格式漂移
+    _STATUS_NORM: Dict[str, str] = {
+        "pass": "PASS", "passed": "PASS",
+        "fail": "FAIL", "failed": "FAIL", "false": "FAIL",
+        "partial": "PARTIAL", "partial_pass": "PARTIAL", "partially": "PARTIAL",
+    }
+
+    @staticmethod
+    def _normalize_status(raw: str) -> str:
+        """
+        把 GLM 返回的各种 status 变体归一化到 PASS / PARTIAL / FAIL。
+        处理：小写、尾部句号/感叹号/空白、下划线变体。
+        """
+        cleaned = re.sub(r"[\s\.\!\,\;]+$", "", raw.strip()).lower()
+        return FactCheckingGuardrail._STATUS_NORM.get(cleaned, raw.strip().upper())
+
+    @staticmethod
+    def _extract_json_str(raw_text: str) -> str:
+        """
+        多策略从 LLM 输出中提取第一个完整 JSON 对象字符串。
+        优先级：
+          1. ```json ... ``` 代码块
+          2. ``` ... ``` 代码块（无语言标识）
+          3. 平衡括号扫描（找到第一个 { 到对应的 }）
+          4. 原文兜底
+        """
+        # 策略 1 & 2：markdown 代码块
+        fence = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', raw_text, re.DOTALL)
+        if fence:
+            return fence.group(1)
+
+        # 策略 3：平衡括号扫描，正确处理嵌套
+        depth = 0
+        start = -1
+        for i, ch in enumerate(raw_text):
+            if ch == '{':
+                if depth == 0:
+                    start = i
+                depth += 1
+            elif ch == '}':
+                depth -= 1
+                if depth == 0 and start != -1:
+                    return raw_text[start:i + 1]
+
+        # 策略 4：兜底，把整段文字送给 json.loads（大概率会报 JSONDecodeError）
+        return raw_text
+
     def _parse_guardrail_output(self, raw_text: str, original_draft: str, retrieved_contexts: List[Dict]) -> Dict:
         import json
-        import re
 
         try:
-            # 尝试提取可能的JSON块 (防御LLM带有```json前缀的情况)
-            json_match = re.search(r'\{.*\}', raw_text, re.DOTALL)
-            json_str = json_match.group(0) if json_match else raw_text
-            
+            json_str = self._extract_json_str(raw_text)
             data = json.loads(json_str)
-            
-            status = data.get("status", "FAIL")
+
+            raw_status = data.get("status", "FAIL")
+            status = self._normalize_status(str(raw_status))
             reasoning = data.get("reasoning", "")
             safe_answer = data.get("safe_answer", original_draft)
 
             if status not in {"PASS", "PARTIAL", "FAIL"}:
+                logger.warning(
+                    "Guardrail 返回了非标准 status=%r（归一化后=%r），改为保守返回。",
+                    raw_status, status,
+                )
                 return {
                     "status": "UNVERIFIED",
-                    "reasoning": "Guardrail 返回了非标准状态，系统改为保守返回。",
+                    "reasoning": f"Guardrail 返回了非标准状态 '{raw_status}'，系统改为保守返回。",
                     "safe_answer": self._build_conservative_answer(retrieved_contexts),
                 }
             return {"status": status, "reasoning": reasoning, "safe_answer": safe_answer}
+
         except json.JSONDecodeError as exc:
-            logger.error("JSON parsing error in Guardrail: %s. Raw LLM response: %s", exc, raw_text)
+            logger.error("JSON parsing error in Guardrail: %s. Raw: %.200s", exc, raw_text)
             return {
                 "status": "UNVERIFIED",
                 "reasoning": "无法解析 Guardrail 输出 (JSON解析失败)，系统改为保守返回。",
