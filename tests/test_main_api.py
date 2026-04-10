@@ -74,6 +74,12 @@ The turbine disk must pass overspeed tests.
 
     assert health.status_code == 200
     health_data = health.json()
+    # ── Four core status items (acceptance criteria) ──────────────────────
+    assert health_data["vector"] in {"connected", "mock", "degraded", "failed"}
+    assert health_data["llm"] in {"connected", "mock"}
+    assert health_data["ollama"] in {"available", "unavailable", "degraded", "not_configured"}
+    assert health_data["chroma"] in {"connected", "mock", "degraded", "failed"}
+    # ── Legacy / extended fields ──────────────────────────────────────────
     assert health_data["vector_db"] == "connected"
     assert health_data["guardrail"] == "conservative"
     assert health_data["app_version"] == "0.3.0"
