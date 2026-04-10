@@ -1,0 +1,34 @@
+name: Notion — Nightly Task → Issue Sync
+
+# 每天 02:00 UTC 把 Notion 里 Status∈{Ready,In Progress} 且没 GitHub Issue 的
+# 任务自动推成 GitHub Issue. 手动也可以通过 workflow_dispatch 触发.
+
+on:
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  push-tasks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install requests python-dotenv
+
+      - name: Push Notion tasks → GitHub Issues
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.PAT_WITH_ISSUES || secrets.GITHUB_TOKEN }}
+          GITHUB_OWNER: ${{ github.repository_owner }}
+          GITHUB_REPO: ${{ github.event.repository.name }}
+        run: |
+          if [ -z "$NOTION_API_KEY" ]; then
+            echo "::warning ::NOTION_API_KEY secret not set, skipping"
+            exit 0
+          fi
+          python scripts/notion/sync.py push-tasks
