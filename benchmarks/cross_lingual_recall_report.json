@@ -1,0 +1,351 @@
+{
+  "benchmark": "cross_lingual_recall",
+  "metric": "recall@3",
+  "threshold": 0.6,
+  "total": 25,
+  "hits": 18,
+  "recall_at_3": 0.72,
+  "passed": true,
+  "results": [
+    {
+      "id": "q01",
+      "query": "压气机喘振裕度的适航要求是什么",
+      "expected": [
+        "far-surge"
+      ],
+      "retrieved_top3": [
+        "far-surge",
+        "far-noise",
+        "far-fuel"
+      ],
+      "hit": true,
+      "expanded_query_tokens": "飞行适航性 资质 审定 压气机 认证 flow separation 适航 失速裕度 compressor airworthiness 喘振裕度 stall margin certification compressor surge 气流分"
+    },
+    {
+      "id": "q02",
+      "query": "涡轮叶片的包容性如何验证",
+      "expected": [
+        "far-containment",
+        "far-turbine-blade"
+      ],
+      "retrieved_top3": [
+        "far-turbine-blade",
+        "far-cooling",
+        "far-rotor"
+      ],
+      "hit": true,
+      "expanded_query_tokens": "verification 有效性验证 叶片 确认 validation blade 涡轮叶片 包容 涡轮盘 核实 导叶 turbine 验证 wheel 涡轮轮盘 proof 导向叶片 涡轮机 turbine blade 工作叶片 证明 b"
+    },
+    {
+      "id": "q03",
+      "query": "燃油系统的供油流量和压力要求",
+      "expected": [
+        "far-fuel",
+        "far-pressure"
+      ],
+      "retrieved_top3": [
+        "far-fuel",
+        "far-pressure",
+        "far-lubrication"
+      ],
+      "hit": true,
+      "expanded_query_tokens": "pressure 燃油系统 燃料系统 流量 气压 fuel system fuel 燃油供给系统 压力 质量流量 空气流量 压强 mass flow flow rate"
+    },
+    {
+      "id": "q04",
+      "query": "发动机工作温度范围限制",
+      "expected": [
+        "far-temperature"
+      ],
+      "retrieved_top3": [
+        "far-temperature",
+        "far-pressure",
+        "far-vibration"
+      ],
+      "hit": true,
+      "expanded_query_tokens": "motor heat propulsion thermal 动力装置 powerplant engine temperature range operating temperature 动力系统 发电厂 温度限制 发动机 推进 温度范围 t"
+    },
+    {
+      "id": "q05",
+      "query": "转子超速保护要求",
+      "expected": [
+        "far-overspeed",
+        "far-rotor"
+      ],
+      "retrieved_top3": [
+        "far-overspeed",
+        "far-rotor"
+      ],
+      "hit": true,
+      "expanded_query_tokens": "转子 rotor 超速 转子组件 overspeed 转速超限"
+    },
+    {
+      "id": "q06",
+      "query": "发动机推力性能认证方法",
+      "expected": [
+        "far-thrust"
+      ],
+      "retrieved_top3": [
+        "far-thrust",
+        "far-pressure",
+        "far-reverser"
+      ],
+      "hit": true,
+      "expanded_query_tokens": "motor propulsion 表现 动力装置 powerplant engine output 运行性能 performance 动力系统 性能 推力值 发电厂 thrust 发动机 推进 推进力 引擎 特性 rating propul"
+    },
+    {
+      "id": "q07",
+      "query": "润滑系统供油可靠性",
+      "expected": [
+        "far-lubrication"
+      ],
+      "retrieved_top3": [
+        "far-lubrication",
+        "far-cooling",
+        "far-fuel"
+      ],
+      "hit": true,
+      "expanded_query_tokens": "可靠性 lubricating system dependability 可信性 润滑系统 lubrication system 可靠度 reliability"
+    },
+    {
+      "id": "q08",
+      "query": "发动机振动限制标准",
+      "expected": [
+        "far-vibration"
+      ],
+      "retrieved_top3": [
+        "far-vibration",
+        "far-noise",
+        "far-endurance"
+      ],
+      "hit": true,
+      "expanded_query_tokens": "motor 动力系统 propulsion powerplant engine 引擎 oscillation 发电厂 颤动 动力装置 振动 颤振 震动 发动机 推进 vibration"
+    },
+    {
+      "id": "q09",
+      "query": "旋转部件疲劳寿命验证方法",
+      "expected": [
+        "far-fatigue"
+      ],
+      "retrieved_top3": [
+        "far-endurance",
+        "far-material",
+        "far-rotor"
+      ],
+      "hit": false,
+      "expanded_query_tokens": "verification 有效性验证 longevity 确认 validation fatigue life durability 核实 验证 寿命 life limit proof 证明 fatigue life 疲劳寿命 疲劳强度 e"
+    },
+    {
+      "id": "q10",
+      "query": "点火系统高空重新起动能力",
+      "expected": [
+        "far-ignition"
+      ],
+      "retrieved_top3": [
+        "far-ignition",
+        "far-lubrication",
+        "far-cooling"
+      ],
+      "hit": true,
+      "expanded_query_tokens": "ignition system 点燃系统 点火系统"
+    },
+    {
+      "id": "q11",
+      "query": "叶片碎片包容性设计",
+      "expected": [
+        "far-containment",
+        "far-turbine-blade"
+      ],
+      "retrieved_top3": [
+        "far-turbine-blade",
+        "far-cooling",
+        "far-containment"
+      ],
+      "hit": true,
+      "expanded_query_tokens": "包容 叶片 导向叶片 导叶 包容性 工作叶片 blade vane 涡轮叶片 containment bucket"
+    },
+    {
+      "id": "q12",
+      "query": "功率损失失效的危害控制",
+      "expected": [
+        "far-power-loss"
+      ],
+      "retrieved_top3": [],
+      "hit": false,
+      "expanded_query_tokens": ""
+    },
+    {
+      "id": "q13",
+      "query": "发动机材料强度和耐久性要求",
+      "expected": [
+        "far-material"
+      ],
+      "retrieved_top3": [
+        "far-material",
+        "far-stress",
+        "far-noise"
+      ],
+      "hit": true,
+      "expanded_query_tokens": "motor propulsion component 动力装置 strength alloy 金属材料 强度 powerplant engine 原材料 intensity 合金 material property 材料 动力系统 发电厂 "
+    },
+    {
+      "id": "q14",
+      "query": "结构件应力分析极限载荷",
+      "expected": [
+        "far-stress"
+      ],
+      "retrieved_top3": [
+        "far-stress"
+      ],
+      "hit": true,
+      "expanded_query_tokens": "极限载荷 极限力 ultimate load 极限强度"
+    },
+    {
+      "id": "q15",
+      "query": "发动机耐久性持久试验要求",
+      "expected": [
+        "far-endurance"
+      ],
+      "retrieved_top3": [
+        "far-fatigue",
+        "far-turbine-blade",
+        "far-rotor"
+      ],
+      "hit": false,
+      "expanded_query_tokens": "motor 动力系统 propulsion powerplant engine 引擎 试验 test 发电厂 实验 发动机 动力装置 testing 测试 测试中 检测 推进"
+    },
+    {
+      "id": "q16",
+      "query": "高空工作飞行包线限制",
+      "expected": [
+        "far-altitude"
+      ],
+      "retrieved_top3": [],
+      "hit": false,
+      "expanded_query_tokens": ""
+    },
+    {
+      "id": "q17",
+      "query": "工作压力条件性能验证",
+      "expected": [
+        "far-pressure",
+        "far-fuel"
+      ],
+      "retrieved_top3": [
+        "far-pressure",
+        "far-rotor",
+        "far-thrust"
+      ],
+      "hit": true,
+      "expanded_query_tokens": "verification 有效性验证 表现 确认 validation 气压 压强 压力 核实 output 运行性能 performance 验证 性能 proof 证明 pressure 特性 rating"
+    },
+    {
+      "id": "q18",
+      "query": "轮盘完整性防灾难性失效",
+      "expected": [
+        "far-rotor"
+      ],
+      "retrieved_top3": [],
+      "hit": false,
+      "expanded_query_tokens": ""
+    },
+    {
+      "id": "q19",
+      "query": "涡轮叶片冷却温度控制",
+      "expected": [
+        "far-cooling",
+        "far-temperature"
+      ],
+      "retrieved_top3": [
+        "far-cooling",
+        "far-turbine-blade",
+        "far-temperature"
+      ],
+      "hit": true,
+      "expanded_query_tokens": "heat 叶片 thermal blade 涡轮叶片 涡轮盘 thermal management 导叶 turbine 散热 wheel 涡轮轮盘 导向叶片 涡轮机 turbine blade 工作叶片 heat transfer buc"
+    },
+    {
+      "id": "q20",
+      "query": "发动机维修性和可检查性设计",
+      "expected": [
+        "far-maintenance"
+      ],
+      "retrieved_top3": [
+        "far-maintenance",
+        "far-endurance",
+        "far-noise"
+      ],
+      "hit": true,
+      "expanded_query_tokens": "motor propulsion 动力装置 维护 翻修 维修 修复 修理 保养 powerplant engine repair service maintenance 动力系统 发电厂 大修 发动机 推进 引擎 全面检修 overhaul"
+    },
+    {
+      "id": "q21",
+      "query": "发动机噪音适航符合性",
+      "expected": [
+        "far-noise"
+      ],
+      "retrieved_top3": [
+        "far-noise",
+        "far-fatigue",
+        "far-endurance"
+      ],
+      "hit": true,
+      "expanded_query_tokens": "motor 飞行适航性 propulsion 资质 审定 动力装置 认证 适航 airworthiness 一致性 powerplant engine 符合性 certification 动力系统 符合 发电厂 航空适航 complianc"
+    },
+    {
+      "id": "q22",
+      "query": "发动机排放物 NOx 和 CO 标准",
+      "expected": [
+        "far-emissions"
+      ],
+      "retrieved_top3": [
+        "far-emissions",
+        "far-fuel",
+        "far-ignition"
+      ],
+      "hit": true,
+      "expanded_query_tokens": "motor propulsion emission 一氧化碳 carbon monoxide 动力装置 exhaust nox powerplant engine co 动力系统 发电厂 氮氧化合物 发动机 排气 推进 排放 引擎 氮氧化物"
+    },
+    {
+      "id": "q23",
+      "query": "结冰条件下发动机工作验证",
+      "expected": [
+        "far-icing"
+      ],
+      "retrieved_top3": [
+        "far-rotor",
+        "far-noise",
+        "far-endurance"
+      ],
+      "hit": false,
+      "expanded_query_tokens": "motor 动力系统 propulsion powerplant engine 引擎 verification 有效性验证 发电厂 核实 确认 proof validation 动力装置 验证 证明 发动机 推进"
+    },
+    {
+      "id": "q24",
+      "query": "反推力装置飞行中意外展开防护",
+      "expected": [
+        "far-reverser"
+      ],
+      "retrieved_top3": [
+        "far-reverser",
+        "far-thrust"
+      ],
+      "hit": true,
+      "expanded_query_tokens": "推力值 推进力 thrust propulsive force 推力"
+    },
+    {
+      "id": "q25",
+      "query": "发动机吸鸟试验不可接受危害",
+      "expected": [
+        "far-bird-ingestion"
+      ],
+      "retrieved_top3": [
+        "far-fatigue",
+        "far-turbine-blade",
+        "far-rotor"
+      ],
+      "hit": false,
+      "expanded_query_tokens": "motor 动力系统 propulsion powerplant engine 引擎 试验 test 发电厂 实验 发动机 动力装置 testing 测试 测试中 检测 推进"
+    }
+  ]
+}
