@@ -1,0 +1,36 @@
+name: Notion — Mark Task Done on Issue Close
+
+# 当一个 Issue 被关闭 (completed) 时, 把 Notion Tasks 表里
+# GitHub Issue URL 匹配的那行置 Done.
+
+on:
+  issues:
+    types: [closed]
+
+jobs:
+  close-task:
+    if: github.event.issue.state_reason == 'completed' || github.event.issue.state_reason == null
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps
+        run: pip install requests python-dotenv
+
+      - name: Mark Notion task done
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_OWNER: ${{ github.repository_owner }}
+          GITHUB_REPO: ${{ github.event.repository.name }}
+        run: |
+          if [ -z "$NOTION_API_KEY" ]; then
+            echo "::warning ::NOTION_API_KEY secret not set, skipping"
+            exit 0
+          fi
+          python scripts/notion/sync.py close-issue --url "${{ github.event.issue.html_url }}"
