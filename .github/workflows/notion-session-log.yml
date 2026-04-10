@@ -1,0 +1,62 @@
+name: Notion — Session Log on Push
+
+# 每次 push 到任何分支都把 commit 元信息作为一条 Session 写回 Notion 控制塔.
+# 需要在 repo Settings → Secrets → Actions 添加:
+#   NOTION_API_KEY
+# GITHUB_TOKEN 由 Actions 默认注入, 无需手动配置.
+
+on:
+  push:
+    branches: ["**"]
+
+jobs:
+  log-session:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps
+        run: pip install requests python-dotenv
+
+      - name: Build session metadata
+        id: meta
+        run: |
+          SHA="${{ github.sha }}"
+          SHORT="${SHA:0:7}"
+          TITLE="$(git log -1 --pretty=%s $SHA | cut -c1-80)"
+          AUTHOR="$(git log -1 --pretty=%an $SHA)"
+          FILES="$(git show --name-only --pretty=format: $SHA | grep -v '^$' | head -20 | tr '\n' ';' )"
+          DATE="$(date -u +%Y-%m-%d)"
+          URL="${{ github.server_url }}/${{ github.repository }}/commit/$SHA"
+          {
+            echo "title=$DATE $SHORT $TITLE"
+            echo "files=$FILES"
+            echo "commit_url=$URL"
+            echo "author=$AUTHOR"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Append session to Notion
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_OWNER: ${{ github.repository_owner }}
+          GITHUB_REPO: ${{ github.event.repository.name }}
+        run: |
+          if [ -z "$NOTION_API_KEY" ]; then
+            echo "::warning ::NOTION_API_KEY secret not set, skipping"
+            exit 0
+          fi
+          python scripts/notion/sync.py log-session \
+            --title "${{ steps.meta.outputs.title }}" \
+            --type Implement \
+            --handoff "Auto from push by ${{ steps.meta.outputs.author }} on ${{ github.ref_name }}" \
+            --files "${{ steps.meta.outputs.files }}" \
+            --commit "${{ steps.meta.outputs.commit_url }}"
