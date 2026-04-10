@@ -1,0 +1,2482 @@
+from __future__ import annotations
+
+import json
+import logging
+import os
+import random
+import re
+import sys
+from contextlib import asynccontextmanager
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from pydantic import BaseModel
+
+try:
+    import openai
+except ImportError:
+    openai = None
+
+CURRENT_DIR = Path(__file__).resolve().parent
+if str(CURRENT_DIR) not in sys.path:
+    sys.path.insert(0, str(CURRENT_DIR))
+
+from dotenv import load_dotenv
+
+from knowledge_base.source_catalog import KnowledgeSourceCatalog
+from multi_agent.metadata_enhancer_agent import EnhancedMetadataExtractor
+from multi_agent.knowledge_linker_agent import KnowledgeLinkerAgent
+from multi_agent.fact_verification_agent import FactVerificationAgent
+from multi_agent.usability_enhancer_agent import UsabilityEnhancerAgent
+from multi_agent.knowledge_graph_agent import KnowledgeGraphAgent
+from multi_agent.enhanced_terminology_agent import EnhancedTerminologyAgent
+from ontology.graph_store import OntologyGraphStore
+from scoring.quality_enhancer import QualityScoringEngine
+from rag.enhanced_answer_generator import EnhancedAnswerGenerator
+from rag.guardrail import FactCheckingGuardrail
+from rag.hallucination_guard import HallucinationGuard
+from rag.hallucination_reducer import HallucinationReducer
+from rag.safe_answer_builder import SafeAnswerBuilder
+from rag.enhanced_safe_builder import EnhancedSafeAnswerBuilder
+from rag.pageindex_engine import PageIndexEngine
+from rag.relevance_enhancer import QueryRelevanceEnhancer, ReRanker
+from rag.semantic_chunker import StructuralChunker
+from rag.vector_engine import VectorStoreEngine
+
+# Enhanced knowledge base
+try:
+    from rag.enhanced_knowledge_base import EnhancedMultiCCARKB
+    ENHANCED_KB_AVAILABLE = True
+except ImportError:
+    ENHANCED_KB_AVAILABLE = False
+    EnhancedMultiCCARKB = None
+from settings import (
+    APP_MODE,
+    APP_VERSION,
+    CHROMA_DB_DIR,
+    DOCUMENT_VERSION,
+    EMBEDDING_VERSION,
+    GRAPH_VERSION,
+    PROMPT_VERSION,
+    PROCESSED_DATA_DIR,
+    SOURCE_CATALOG_PATH,
+    SOURCE_CATALOG_VERSION,
+    ensure_data_dirs,
+    has_real_value,
+)
+
+load_dotenv()
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
+
+
+class QueryRequest(BaseModel):
+    query: str
+    top_k: int = 5
+    use_guardrail: bool = True
+    include_graph_subgraph: bool = False
+    use_pageindex: bool = False
+
+
+class Citation(BaseModel):
+    num: int
+    source: str
+    chapter: str
+    section: str
+    snippet: str
+    highlight: str
+    fullText: Optional[str] = None
+    documentId: Optional[str] = None
+    documentVersion: Optional[str] = None
+    contentMode: Optional[str] = None
+    sourcePath: Optional[str] = None
+
+
+class GraphInsight(BaseModel):
+    regulation: Optional[str] = None
+    component: Optional[str] = None
+    parameter: Optional[str] = None
+    relationship: Optional[str] = None
+    description: Optional[str] = None
+
+
+class QueryResponse(BaseModel):
+    query: str
+    answer: str
+    guardrail: Dict[str, Any]
+    citations: List[Citation]
+    graphInsights: List[GraphInsight]
+    graphSubgraph: Optional[Dict[str, Any]] = None
+    responseMode: str
+    appVersion: str
+    knowledgeBaseVersion: str
+    promptVersion: str
+    embeddingVersion: str
+    graphVersion: str
+    retrievalCount: int
+    # 新增字段 - 性能优化
+    confidenceScore: Optional[float] = None  # 答案置信度 (0-1)
+    uncertaintyMarkers: List[str] = []  # 不确定陈述标记
+    relatedClauses: List[Dict[str, str]] = []  # 相关条款
+    visualizationData: Optional[Dict[str, Any]] = None  # 可视化数据
+    # 新增字段 - 知识图谱
+    knowledgeGraphNodes: List[Dict[str, Any]] = []  # 知识图谱相关节点
+    semanticRelations: List[Dict[str, Any]] = []  # 语义关系
+    # 新增字段 - 质量评分
+    qualityMetrics: Optional[Dict[str, Any]] = None  # 完整的质量指标
+    # 新增字段 - LLM思考过程
+    thinkingProcess: Optional[str] = None  # LLM的思考过程
+    reasoningSteps: List[str] = []  # 推理步骤
+    llmProvider: Optional[str] = None  # LLM提供商 (mock/glm/minimax)
+    llmModel: Optional[str] = None  # 使用的模型名称
+
+
+def extract_keywords_from_query(query: str) -> List[str]:
+    stopwords = {
+        "什么",
+        "哪些",
+        "如何",
+        "是否",
+        "要求",
+        "规定",
+        "条款",
+        "关于",
+        "以及",
+        "the",
+        "what",
+        "which",
+        "does",
+        "requirement",
+    }
+    keywords = []
+    for token in _tokenize_text(query):
+        if len(token) < 2:
+            continue
+        if token.lower() in stopwords:
+            continue
+        keywords.append(token)
+    return list(dict.fromkeys(keywords[:6]))
+
+
+def _tokenize_text(text: str) -> List[str]:
+    tokens = []
+    buffer = []
+
+    def flush() -> None:
+        if buffer:
+            tokens.append("".join(buffer))
+            buffer.clear()
+
+    for char in (text or "").lower():
+        if "\u4e00" <= char <= "\u9fff":
+            flush()
+            tokens.append(char)
+        elif char.isalnum() or char == "_":
+            buffer.append(char)
+        else:
+            flush()
+
+    flush()
+    return [token for token in tokens if token.strip()]
+
+
+def _build_context_block(contexts: List[Dict[str, Any]]) -> str:
+    return "\n\n".join(
+        [
+            f"[Source: {item['metadata'].get('source', '?')} > {item['metadata'].get('chapter', '?')} > {item['metadata'].get('section', '?')}]\n{item['text']}"
+            for item in contexts
+        ]
+    )
+
+
+def _fallback_answer(contexts: List[Dict[str, Any]]) -> str:
+    """生成高质量的保守回答（不使用LLM）"""
+    if not contexts:
+        return "当前知识库中没有检索到与问题直接相关的条款证据，暂时无法给出可靠回答。建议缩小查询范围或使用更具体的条款号进行查询。"
+
+    # 提取关键信息
+    answer_parts = []
+    answer_parts.append("根据检索到的法规资料，相关要求如下：\n")
+
+    # 按来源组织答案
+    for idx, ctx in enumerate(contexts[:5], 1):
+        if not isinstance(ctx, dict):
+            continue
+        metadata = ctx.get("metadata", {})
+        if not isinstance(metadata, dict):
+            metadata = {}
+        title = metadata.get("title", "") or ""
+        source = metadata.get("source", "").replace(".md", "") if metadata.get("source") else ""
+        text = ctx.get("text", "") or ""
+        original_text = ctx.get("original_text", "") or ""
+
+        # 优先使用original_text
+        content = original_text if original_text else text
+
+        # 提取条款号
+        section_num = ""
+        if title:
+            try:
+                section_match = re.search(r'[§§]\s*([\d.]+[a-z]?)|第\s*([\d.]+)\s*条', title)
+                if section_match:
+                    section_num = section_match.group(1) or section_match.group(2) or ""
+            except Exception:
+                pass
+
+        # 格式化内容
+        formatted_content = _format_content(content)
+
+        # 添加到答案
+        if section_num:
+            answer_parts.append(f"**{source} §{section_num}**")
+        else:
+            answer_parts.append(f"**{source}**")
+
+        if title and "§" not in title and "条" not in title:
+            # 如果标题没有条款号，添加简化标题
+            short_title = title.split(">")[-1][:50]
+            answer_parts.append(f"（{short_title}）")
+
+        answer_parts.append(formatted_content)
+        answer_parts.append("")
+
+    # 添加说明
+    answer_parts.append("注：以上内容基于现有知识库自动提取，如需准确解读请核对原文。")
+
+    return "\n".join(answer_parts)
+
+
+def _generate_thinking_process(query: str, contexts: list) -> str:
+    """生成LLM思考过程描述"""
+    if not contexts:
+        return "思考：未检索到直接相关的法规条款，无法给出明确答案。"
+
+    # 提取关键信息
+    sources = set()
+    keywords_found = []
+    for ctx in contexts[:5]:
+        metadata = ctx.get("metadata", {})
+        source = metadata.get("source", "")
+        if source:
+            sources.add(source.replace(".md", ""))
+        # 提取关键词匹配
+        text = ctx.get("text", "")
+        query_lower = query.lower()
+        for kw in ["喘振", "裕度", "超转", "试验", "要求", "必须", "应当"]:
+            if kw in query_lower and kw in text:
+                keywords_found.append(kw)
+
+    thinking_parts = [
+        f"问题分析：用户询问关于「{query}」的要求",
+        f"证据评估：检索到{len(contexts)}条相关条款",
+        f"来源范围：{', '.join(sorted(sources))}" if sources else "来源：知识库",
+    ]
+
+    if keywords_found:
+        thinking_parts.append(f"关键术语匹配：{', '.join(set(keywords_found))}")
+
+    return " | ".join(thinking_parts)
+
+
+def _extract_reasoning_steps(query: str, contexts: list) -> list[str]:
+    """提取推理步骤"""
+    steps = [
+        f"1. 分析问题：识别查询中的关键术语（如'要求'、'规定'等）"
+    ]
+
+    if contexts:
+        steps.append(f"2. 检索证据：在知识库中找到{len(contexts)}条相关条款")
+        steps.append("3. 条款分析：逐条比对检索结果，提取具体要求")
+        steps.append("4. 回答组织：按结构化格式组织答案，标注条款来源")
+    else:
+        steps.append("2. 检索结果：未找到直接相关条款")
+        steps.append("3. 保守回答：基于证据不足原则，建议用户核对原文")
+
+    return steps
+
+
+def _format_content(content: str) -> str:
+    """格式化内容，提取关键要求"""
+    if not content:
+        return ""
+
+    # 移除多余空白
+    content = re.sub(r'\s+', ' ', content.strip())
+
+    # 按句子分割
+    sentences = re.split(r'[。；;]', content)
+
+    # 提取关键句子（包含"必须"、"应当"、"要求"等关键词）
+    key_sentences = []
+    for sentence in sentences:
+        sentence = sentence.strip()
+        if len(sentence) < 5:
+            continue
+        if any(kw in sentence for kw in ["必须", "应当", "要求", "不得", "禁止", "需要", "应"]):
+            key_sentences.append(f"• {sentence}。")
+
+    # 如果没有关键句子，返回前几句
+    if not key_sentences:
+        key_sentences = [f"• {s}。" for s in sentences[:3] if s.strip()]
+
+    return "\n".join(key_sentences[:8])  # 限制数量
+
+
+def build_citations(contexts: List[Dict[str, Any]], min_length: int = 500) -> List[Citation]:
+    """
+    Build citations from retrieval contexts.
+
+    Ensures snippets are at least 500 characters to provide adequate context.
+    """
+    citations: List[Citation] = []
+    for index, context in enumerate(contexts, start=1):
+        metadata = context.get("metadata", {})
+        full_text = (context.get("original_text") or context.get("text", "")).strip()
+        if not full_text:
+            full_text = context.get("text", "")
+
+        # Use enhanced content if available
+        if "expanded_content" in metadata:
+            full_text = metadata["expanded_content"]
+
+        # Ensure at least min_length characters (default 500 for better context)
+        if len(full_text) <= min_length + 100:
+            snippet = full_text  # Show all if reasonably short
+        else:
+            # Try to break at sentence boundary for better readability
+            snippet = full_text[:min_length]
+            last_period = snippet.rfind("。")
+            last_newline = snippet.rfind("\n")
+            break_point = max(last_period, last_newline)
+            if break_point > min_length * 0.5:  # At least 50% of target
+                snippet = snippet[:break_point + 1]
+            snippet = snippet + "..."
+
+        # Highlight is first sentence or first 150 chars
+        highlight = full_text.splitlines()[0][:150] if full_text else ""
+
+        citations.append(
+            Citation(
+                num=index,
+                source=metadata.get("source", "Unknown source"),
+                chapter=metadata.get("chapter", "未知章节"),
+                section=metadata.get("section", "未知条款"),
+                snippet=snippet,
+                highlight=highlight,
+                fullText=full_text,
+                documentId=metadata.get("document_id"),
+                documentVersion=metadata.get("document_version", DOCUMENT_VERSION),
+                contentMode=metadata.get("content_mode", "unknown"),
+                sourcePath=metadata.get("source_path"),
+            )
+        )
+    return citations
+
+
+def expand_query_with_terminology(query: str) -> str:
+    """使用术语库扩展查询"""
+    try:
+        # 优先使用增强术语库
+        terminology = load_terminology()
+        abbreviations = load_abbreviations()
+
+        if terminology or abbreviations:
+            expanded = expand_query_with_synonyms(query, terminology, abbreviations)
+            if expanded != query:
+                logger.info(f"[TERMINOLOGY] Expanded: {query[:30]}... -> {expanded[:30]}...")
+            return expanded
+
+        # 回退到原始术语库
+        if not knowledge_linker:
+            return query
+
+        # 加载扩展术语
+        terminology_file = PROCESSED_DATA_DIR / "knowledge_links" / "expanded_terminology.json"
+        if terminology_file.exists():
+            with open(terminology_file, 'r', encoding='utf-8') as f:
+                terminology = json.load(f)
+
+            # 扩展查询
+            expanded_terms = []
+            for term, variants in terminology.items():
+                if term in query or any(v in query for v in variants):
+                    expanded_terms.extend(variants)
+
+            if expanded_terms:
+                return query + " " + " ".join(expanded_terms[:5])
+    except Exception as e:
+        logger.warning(f"Terminology expansion failed: {e}")
+
+    return query
+
+
+def verify_answer_confidence(answer: str, contexts: List[Dict], query: str = "") -> tuple[float, List[str]]:
+    """
+    多维度置信度评估，返回 (confidence_score, uncertainty_markers)
+
+    评估维度:
+    1. 来源覆盖度 (0.25) - 答案中的陈述是否有检索证据支持
+    2. 条款引用密度 (0.15) - 是否引用了具体条款号
+    3. 术语精确度 (0.15) - 是否使用了专业术语而非模糊表述
+    4. 跨规章验证 (0.10) - 是否有多个规章体系的交叉验证
+    5. 数值具体性 (0.10) - 是否包含具体数值而非模糊描述
+    6. 权威性加权 (0.15) - 根据文档权威性调整得分
+    7. 一致性验证 (0.10) - 多来源是否相互印证
+    """
+    try:
+        statements = [s.strip() for s in re.split(r'[。！？.!?]', answer) if len(s.strip()) > 5]
+        if not statements:
+            return 0.5, ["无法分割答案为有效陈述"]
+
+        # 查询类型检测（用于动态权重）
+        query_type = "general"
+        if re.search(r'要求|标准|限值|规定', query):
+            query_type = "regulatory"
+        elif re.search(r'方法|程序|如何|怎么', query):
+            query_type = "method"
+        elif re.search(r'比较|差异|区别', query):
+            query_type = "comparison"
+
+        # 权威性权重映射
+        AUTHORITY_WEIGHTS = {"CAAC": 1.0, "FAA": 0.95, "EASA": 0.90, "OTHER": 0.70}
+
+        # 维度1: 来源覆盖度 (支持中英文混合来源)
+        source_coverage = 0
+        for stmt in statements:
+            stmt_cn = set(re.findall(r'[\u4e00-\u9fff]{2,}', stmt))
+            stmt_en = set(w.lower() for w in re.findall(r'[a-zA-Z]{3,}', stmt))
+            stmt_terms = stmt_cn | stmt_en
+            best_overlap = 0
+            for ctx in contexts:
+                src_text = ctx.get("text", "")
+                src_cn = set(re.findall(r'[\u4e00-\u9fff]{2,}', src_text))
+                src_en = set(w.lower() for w in re.findall(r'[a-zA-Z]{3,}', src_text))
+                src_terms = src_cn | src_en
+                overlap = len(stmt_terms & src_terms)
+                best_overlap = max(best_overlap, overlap)
+            if best_overlap >= 2:
+                source_coverage += 1
+        dim1 = source_coverage / len(statements) if statements else 0
+
+        # 维度2: 条款引用密度
+        citation_pattern = r'(?:§|第|section|CCAR|FAR|CS)\s*[\d.\-]+|(?:33|25|29|91)\.\d+'
+        citations_found = re.findall(citation_pattern, answer, re.IGNORECASE)
+        dim2 = min(len(citations_found) / max(len(statements), 1), 1.0)
+
+        # 维度3: 术语精确度
+        precise_terms = ["必须", "应当", "不得", "不低于", "不超过", "至少", "最大", "最小"]
+        vague_terms = ["可能", "大概", "也许", "一般", "通常", "据说", "似乎"]
+        precise_count = sum(1 for t in precise_terms if t in answer)
+        vague_count = sum(1 for t in vague_terms if t in answer)
+        dim3 = min(precise_count / max(precise_count + vague_count, 1), 1.0)
+
+        # 维度4: 跨规章验证
+        agencies_mentioned = set()
+        for pattern, agency in [("CCAR|中国", "CAAC"), ("FAR|FAA|AC_33|美国", "FAA"), ("CS-|EASA|欧洲", "EASA")]:
+            if re.search(pattern, answer, re.IGNORECASE):
+                agencies_mentioned.add(agency)
+        for ctx in contexts:
+            src = ctx.get("metadata", {}).get("source", "")
+            auth = ctx.get("metadata", {}).get("authority", "")
+            if "CCAR" in src: agencies_mentioned.add("CAAC")
+            elif "FAR" in src or "AC_33" in src.upper(): agencies_mentioned.add("FAA")
+            elif "CS" in src or "EASA" in src: agencies_mentioned.add("EASA")
+            if auth in AUTHORITY_WEIGHTS:
+                agencies_mentioned.add(auth)
+        dim4 = min(len(agencies_mentioned) / 2.0, 1.0)
+
+        # 维度5: 数值具体性
+        numbers = re.findall(r'\d+(?:\.\d+)?(?:\s*%|℃|°C|rpm|MPa|kN|kg|mm|m/s)?', answer)
+        dim5 = min(len(numbers) / max(len(statements), 1), 1.0)
+
+        # 维度6: 权威性加权（基于context来源的机构权重）
+        authority_scores = []
+        for ctx in contexts:
+            auth = ctx.get("metadata", {}).get("authority", "OTHER")
+            weight = AUTHORITY_WEIGHTS.get(auth, 0.70)
+            authority_scores.append(weight)
+        dim6 = sum(authority_scores) / len(authority_scores) if authority_scores else 0.5
+
+        # 维度7: 一致性验证（多来源支持同一陈述）
+        consistent_statements = 0
+        for stmt in statements[:5]:  # 检查前5个主要陈述
+            supporting_sources = 0
+            stmt_terms = set(re.findall(r'[\u4e00-\u9fff]{2,}|[a-zA-Z]{3,}', stmt.lower()))
+            for ctx in contexts:
+                ctx_text = ctx.get("text", "").lower()
+                overlap = len(stmt_terms & set(re.findall(r'[\u4e00-\u9fff]{2,}|[a-zA-Z]{3,}', ctx_text)))
+                if overlap >= 2:
+                    supporting_sources += 1
+            if supporting_sources >= 2:
+                consistent_statements += 1
+        dim7 = consistent_statements / max(len(statements[:5]), 1)
+
+        # 动态权重调整
+        if query_type == "regulatory":
+            weights = {"dim1": 0.25, "dim2": 0.20, "dim3": 0.15, "dim4": 0.15, "dim5": 0.10, "dim6": 0.10, "dim7": 0.05}
+        elif query_type == "method":
+            weights = {"dim1": 0.25, "dim2": 0.10, "dim3": 0.15, "dim4": 0.10, "dim5": 0.10, "dim6": 0.15, "dim7": 0.15}
+        elif query_type == "comparison":
+            weights = {"dim1": 0.20, "dim2": 0.10, "dim3": 0.10, "dim4": 0.25, "dim5": 0.05, "dim6": 0.15, "dim7": 0.15}
+        else:
+            weights = {"dim1": 0.25, "dim2": 0.15, "dim3": 0.15, "dim4": 0.10, "dim5": 0.10, "dim6": 0.15, "dim7": 0.10}
+
+        confidence = (dim1 * weights["dim1"] + dim2 * weights["dim2"] + dim3 * weights["dim3"] +
+                      dim4 * weights["dim4"] + dim5 * weights["dim5"] + dim6 * weights["dim6"] + dim7 * weights["dim7"])
+        confidence = min(max(confidence, 0.15), 0.95)
+
+        # 生成不确定性标记
+        uncertain_markers = []
+        if dim1 < 0.5:
+            uncertain_markers.append(f"来源覆盖不足：仅{source_coverage}/{len(statements)}条陈述有证据支持")
+        if dim2 < 0.3:
+            uncertain_markers.append(f"条款引用不足：建议补充具体条款号（如§33.xx）")
+        if dim4 < 0.5 and len(agencies_mentioned) < 2:
+            uncertain_markers.append(f"缺少跨规章验证：未涉及多机构等效条款")
+        if dim5 < 0.3:
+            uncertain_markers.append("缺少具体数值：建议补充定量要求")
+        if vague_count > 0:
+            uncertain_markers.append(f"存在{vague_count}处模糊表述")
+        if dim6 < 0.7:
+            uncertain_markers.append("权威性来源不足：建议补充CAAC/FAA/EASA原文")
+        if dim7 < 0.3:
+            uncertain_markers.append("多来源一致性不足：建议交叉验证")
+
+        logger.info(f"[CONFIDENCE] score={confidence:.2f} type={query_type} dims=[src={dim1:.2f}, cite={dim2:.2f}, "
+                    f"precise={dim3:.2f}, cross={dim4:.2f}, numeric={dim5:.2f}, auth={dim6:.2f}, consist={dim7:.2f}]")
+
+        return confidence, uncertain_markers
+
+    except Exception as e:
+        logger.warning(f"Answer verification failed: {e}")
+        return 0.5, [f"置信度评估异常: {str(e)[:50]}"]
+
+
+def find_related_clauses(query: str, contexts: List[Dict]) -> List[Dict[str, str]]:
+    """查找相关条款"""
+    if not knowledge_linker:
+        return []
+
+    try:
+        related = []
+
+        # 从cross_document_links获取关联
+        links_file = PROCESSED_DATA_DIR / "knowledge_links" / "cross_document_links.json"
+        if links_file.exists():
+            with open(links_file, 'r', encoding='utf-8') as f:
+                links_data = json.load(f)
+
+            # 查找等效条款
+            for link in links_data.get("equivalent_links", []):
+                if link.get("clauses"):
+                    for clause in link["clauses"]:
+                        if any(ctx.get("metadata", {}).get("source", "") in clause for ctx in contexts):
+                            related.append({
+                                "clause": clause,
+                                "type": "等效条款",
+                                "document": clause.split(":")[0] if ":" in clause else ""
+                            })
+
+            # 限制数量
+            if len(related) >= 5:
+                related = related[:5]
+
+        return related
+
+    except Exception as e:
+        logger.warning(f"Finding related clauses failed: {e}")
+        return []
+
+
+def get_visualization_data(query: str) -> Optional[Dict[str, Any]]:
+    """获取可视化数据"""
+    try:
+        viz_file = PROCESSED_DATA_DIR / "visualizations" / "hierarchy.json"
+        if viz_file.exists():
+            with open(viz_file, 'r', encoding='utf-8') as f:
+                return json.load(f)
+    except Exception as e:
+        logger.warning(f"Getting visualization data failed: {e}")
+    return None
+
+
+# 知识图谱查询功能
+def load_knowledge_graph() -> tuple[dict, dict]:
+    """加载知识图谱数据"""
+    graph_dir = PROCESSED_DATA_DIR / "knowledge_graph"
+    try:
+        graph_file = graph_dir / "graph.json"
+        if graph_file.exists():
+            with open(graph_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                return data.get("nodes", {}), data.get("edges", [])
+    except Exception as e:
+        logger.warning(f"Loading knowledge graph failed: {e}")
+    return {}, []
+
+
+def query_knowledge_graph_nodes(query: str, nodes: dict, limit: int = 10) -> list[dict]:
+    """根据查询关键词查找相关节点"""
+    query_lower = query.lower()
+    keywords = set(query_lower.split())
+
+    results = []
+    for node_id, node in nodes.items():
+        score = 0
+        label = node.get("label", "").lower()
+        node_type = node.get("type", "")
+
+        # 完全匹配
+        if query_lower in label:
+            score += 10
+
+        # 关键词匹配
+        for keyword in keywords:
+            if len(keyword) >= 2 and keyword in label:
+                score += 3
+
+        # 类型加分
+        if node_type in ["section", "requirement", "component"]:
+            score += 1
+
+        if score > 0:
+            results.append({
+                "id": node_id,
+                "label": node.get("label", ""),
+                "type": node_type,
+                "score": score,
+                "properties": node.get("properties", {})
+            })
+
+    # 按分数排序
+    results.sort(key=lambda x: x["score"], reverse=True)
+    return results[:limit]
+
+
+def get_node_neighbors(node_id: str, edges: list, depth: int = 1) -> list[dict]:
+    """获取节点的邻居"""
+    neighbors = set()
+    current_level = {node_id}
+
+    for _ in range(depth):
+        next_level = set()
+        for edge in edges:
+            source = edge.get("source", "")
+            target = edge.get("target", "")
+            if source in current_level:
+                neighbors.add(target)
+                next_level.add(target)
+            if target in current_level:
+                neighbors.add(source)
+                next_level.add(source)
+        current_level = next_level
+
+    return list(neighbors)
+
+
+def find_semantic_relations(query: str, nodes: dict, edges: list) -> list[dict]:
+    """查找与查询相关的语义关系"""
+    matched_nodes = query_knowledge_graph_nodes(query, nodes, limit=5)
+    relations = []
+
+    for node in matched_nodes:
+        node_id = node["id"]
+        # 查找与该节点相关的边
+        for edge in edges:
+            if edge.get("source") == node_id or edge.get("target") == node_id:
+                source_id = edge.get("source")
+                target_id = edge.get("target")
+                source = nodes.get(source_id, {})
+                target = nodes.get(target_id, {})
+
+                relations.append({
+                    "source": source.get("label", source_id),
+                    "target": target.get("label", target_id),
+                    "relation": edge.get("relation", "relates"),
+                    "score": node["score"]
+                })
+
+    return relations[:20]
+
+
+# 术语库查询功能
+def load_terminology() -> dict:
+    """加载术语库"""
+    term_dir = PROCESSED_DATA_DIR / "terminology"
+    try:
+        term_file = term_dir / "comprehensive_terms.json"
+        if term_file.exists():
+            with open(term_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                return data.get("terms", {})
+    except Exception as e:
+        logger.warning(f"Loading terminology failed: {e}")
+    return {}
+
+
+def load_abbreviations() -> dict:
+    """加载缩写映射"""
+    term_dir = PROCESSED_DATA_DIR / "terminology"
+    try:
+        abbr_file = term_dir / "abbreviations.json"
+        if abbr_file.exists():
+            with open(abbr_file, 'r', encoding='utf-8') as f:
+                return json.load(f)
+    except Exception as e:
+        logger.warning(f"Loading abbreviations failed: {e}")
+    return {}
+
+
+def expand_query_with_synonyms(query: str, terminology: dict, abbreviations: dict) -> str:
+    """使用术语库扩展查询"""
+    expanded_terms = [query]
+
+    # 查找缩写
+    for abbr, full_forms in abbreviations.items():
+        if abbr.lower() in query.lower():
+            for full_form in full_forms:
+                if full_form not in query:
+                    expanded_terms.append(full_form)
+
+    # 查找同义词
+    for term_id, term_data in terminology.items():
+        term_text = term_data.get("text", "")
+        if term_text in query and len(term_text) >= 2:
+            term_type = term_data.get("type", "")
+            if term_type == "abbreviation":
+                # 查找全称
+                for abbr, full_forms in abbreviations.items():
+                    if term_text in full_forms or abbr == term_text:
+                        expanded_terms.extend(full_forms)
+
+    # 返回扩展后的查询
+    return " ".join(expanded_terms)
+
+
+def infer_response_mode(citations: List[Citation]) -> str:
+    if not citations:
+        return APP_MODE
+    modes = {citation.contentMode for citation in citations if citation.contentMode}
+    return modes.pop() if len(modes) == 1 else ("mixed" if modes else APP_MODE)
+
+
+def collect_indexable_chunks() -> List[Dict[str, Any]]:
+    chunker = StructuralChunker(processed_dir=str(PROCESSED_DATA_DIR))
+    chunks: List[Dict[str, Any]] = []
+    for markdown_file in sorted(PROCESSED_DATA_DIR.glob("*.md")):
+        if markdown_file.name.endswith("_analysis_report.md"):
+            continue
+        chunks.extend(chunker.chunk_markdown(markdown_file.name))
+    return chunks
+
+
+glm_client = None
+vector_engine = None
+pageindex_engine = None
+graph_store = None
+guardrail = None
+source_catalog = None
+enhanced_kb = None
+metadata_extractor = None
+hallucination_guard = None
+relevance_enhancer = None
+reranker = None
+# 新增: 性能优化agents
+knowledge_linker = None
+fact_verifier = None
+usability_enhancer = None
+quality_scorer = None
+enhanced_answer_generator = None
+hallucination_reducer = None
+safe_answer_builder = None
+enhanced_safe_answer_builder = None
+service_errors: dict[str, str] = {}
+
+# Performance metrics storage
+class PerformanceMetrics:
+    """In-memory performance metrics collector"""
+    def __init__(self):
+        self.query_times: list[float] = []  # in milliseconds
+        self.confidence_scores: list[float] = []
+        self.sources_used: dict[str, int] = {}  # source -> count
+        self.query_count: int = 0
+        self._lock = False  # Simple lock to prevent concurrent writes
+
+    def record_query(self, response_time_ms: float, confidence: float, sources: list[str]):
+        """Record a query execution"""
+        import threading
+        with threading.Lock():
+            self.query_times.append(response_time_ms)
+            if len(self.query_times) > 1000:  # Keep last 1000
+                self.query_times = self.query_times[-1000:]
+            self.confidence_scores.append(confidence)
+            if len(self.confidence_scores) > 1000:
+                self.confidence_scores = self.confidence_scores[-1000:]
+            for src in sources:
+                self.sources_used[src] = self.sources_used.get(src, 0) + 1
+            self.query_count += 1
+
+    def get_percentile(self, values: list[float], percentile: int) -> float:
+        """Calculate percentile value"""
+        if not values:
+            return 0.0
+        sorted_vals = sorted(values)
+        idx = int(len(sorted_vals) * percentile / 100)
+        idx = min(idx, len(sorted_vals) - 1)
+        return round(sorted_vals[idx], 2)
+
+    def get_stats(self) -> dict[str, Any]:
+        """Get aggregated performance statistics"""
+        if not self.query_times:
+            return {
+                "query_count": 0,
+                "response_time_p50": 0,
+                "response_time_p95": 0,
+                "response_time_p99": 0,
+                "avg_confidence": 0,
+                "confidence_distribution": {"high": 0, "medium": 0, "low": 0},
+                "source_coverage": {"CAAC": 0, "FAA": 0, "EASA": 0, "OTHER": 0},
+                "top_sources": [],
+                "top_queries": []
+            }
+
+        import threading
+        with threading.Lock():
+            times = list(self.query_times)
+            confidences = list(self.confidence_scores)
+            sources = dict(self.sources_used)
+            count = self.query_count
+
+        # Calculate confidence distribution
+        high = sum(1 for c in confidences if c >= 0.7)
+        medium = sum(1 for c in confidences if 0.4 <= c < 0.7)
+        low = sum(1 for c in confidences if c < 0.4)
+        total = len(confidences) or 1
+
+        # Source coverage by agency
+        agency_sources = {"CAAC": 0, "FAA": 0, "EASA": 0, "OTHER": 0}
+        for src, cnt in sources.items():
+            src_upper = src.upper()
+            if "CCAR" in src_upper or "CAAC" in src_upper:
+                agency_sources["CAAC"] += cnt
+            elif "FAR" in src_upper or "FAA" in src_upper:
+                agency_sources["FAA"] += cnt
+            elif "CS-" in src_upper or "EASA" in src_upper:
+                agency_sources["EASA"] += cnt
+            else:
+                agency_sources["OTHER"] += cnt
+
+        # Top sources by count
+        top_sources = sorted(sources.items(), key=lambda x: x[1], reverse=True)[:10]
+
+        # Response time stats
+        p50 = self.get_percentile(times, 50)
+        p95 = self.get_percentile(times, 95)
+        p99 = self.get_percentile(times, 99)
+
+        return {
+            "query_count": count,
+            "response_time_p50": p50,
+            "response_time_p95": p95,
+            "response_time_p99": p99,
+            "avg_confidence": round(sum(confidences) / len(confidences), 3) if confidences else 0,
+            "confidence_distribution": {
+                "high": round(high / total * 100, 1),
+                "medium": round(medium / total * 100, 1),
+                "low": round(low / total * 100, 1)
+            },
+            "source_coverage": agency_sources,
+            "top_sources": [{"source": s, "count": c} for s, c in top_sources],
+            "top_queries": []  # Placeholder for future query logging
+        }
+
+
+metrics_collector = PerformanceMetrics()
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    if vector_engine and vector_engine.collection and vector_engine.collection.count() == 0:
+        logger.info("[STARTUP] ChromaDB is empty. Auto-indexing processed markdown sources...")
+        chunks = collect_indexable_chunks()
+        if chunks:
+            vector_engine.index_chunks(chunks)
+            logger.info("[STARTUP] Indexed %s chunks into ChromaDB.", len(chunks))
+    yield
+
+
+app = FastAPI(
+    title="AeroPower-RAG API",
+    description="Traceable aviation regulation Q&A service",
+    version=APP_VERSION,
+    lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:8080",
+        "http://localhost:3000",
+        "http://localhost:8000",
+        "http://127.0.0.1:8080",
+        "http://127.0.0.1:3000",
+    ],
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
+
+# Mount static files for UI
+static_dir = Path(__file__).parent / "static"
+ui_dir = Path(__file__).parent.parent / "ui"
+
+if static_dir.exists():
+    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+
+# Mount ui directory as /ui
+if ui_dir.exists():
+    app.mount("/ui", StaticFiles(directory=str(ui_dir), html=True), name="ui")
+else:
+    # Fallback endpoint if ui directory doesn't exist
+    @app.get("/ui")
+    async def serve_ui():
+        """Serve the main UI from static directory"""
+        index_file = static_dir / "index.html"
+        if index_file.exists():
+            return FileResponse(str(index_file))
+        return {"message": "UI file not found"}
+
+
+def initialize_services() -> None:
+    global glm_client, vector_engine, pageindex_engine, graph_store, guardrail, source_catalog, enhanced_kb
+    global metadata_extractor, hallucination_guard, relevance_enhancer, reranker
+    global knowledge_linker, fact_verifier, usability_enhancer, quality_scorer, enhanced_answer_generator
+
+    ensure_data_dirs()
+    service_errors.clear()
+
+    try:
+        vector_engine = VectorStoreEngine(db_dir=str(CHROMA_DB_DIR))
+    except Exception as exc:
+        vector_engine = None
+        service_errors["vector_db"] = str(exc)
+        logger.exception("Vector engine initialization failed.")
+
+    try:
+        pageindex_engine = PageIndexEngine(str(PROCESSED_DATA_DIR / "CCAR-33-R2_structure.json"))
+        logger.info("PageIndex engine initialized with tree structure.")
+    except Exception as exc:
+        pageindex_engine = None
+        service_errors["pageindex"] = str(exc)
+        logger.exception("PageIndex engine initialization failed.")
+
+    try:
+        graph_store = OntologyGraphStore()
+    except Exception as exc:
+        graph_store = None
+        service_errors["graph_db"] = str(exc)
+        logger.exception("Graph store initialization failed.")
+
+    try:
+        guardrail = FactCheckingGuardrail()
+    except Exception as exc:
+        guardrail = None
+        service_errors["guardrail"] = str(exc)
+        logger.exception("Guardrail initialization failed.")
+
+    try:
+        source_catalog = KnowledgeSourceCatalog.load()
+    except Exception as exc:
+        source_catalog = KnowledgeSourceCatalog()
+        service_errors["source_catalog"] = str(exc)
+        logger.exception("Source catalog initialization failed.")
+
+    # Initialize enhanced multi-CCAR knowledge base
+    if ENHANCED_KB_AVAILABLE:
+        try:
+            enhanced_kb = EnhancedMultiCCARKB(str(PROCESSED_DATA_DIR))
+            logger.info("Enhanced Multi-CCAR Knowledge Base initialized.")
+        except Exception as exc:
+            enhanced_kb = None
+            service_errors["enhanced_kb"] = str(exc)
+            logger.exception("Enhanced KB initialization failed.")
+
+    # Initialize metadata enhancer
+    try:
+        metadata_extractor = EnhancedMetadataExtractor(str(PROCESSED_DATA_DIR))
+        logger.info("Metadata Extractor initialized.")
+    except Exception as exc:
+        metadata_extractor = None
+        service_errors["metadata_extractor"] = str(exc)
+        logger.exception("Metadata Extractor initialization failed.")
+
+    # Initialize hallucination guard
+    try:
+        hallucination_guard = HallucinationGuard(str(PROCESSED_DATA_DIR))
+        logger.info("Hallucination Guard initialized.")
+    except Exception as exc:
+        hallucination_guard = None
+        service_errors["hallucination_guard"] = str(exc)
+        logger.exception("Hallucination Guard initialization failed.")
+
+    # Initialize relevance enhancer
+    try:
+        relevance_enhancer = QueryRelevanceEnhancer(str(PROCESSED_DATA_DIR))
+        reranker = ReRanker(str(PROCESSED_DATA_DIR))
+        logger.info("Relevance Enhancer and ReRanker initialized.")
+    except Exception as exc:
+        relevance_enhancer = None
+        reranker = None
+        service_errors["relevance_enhancer"] = str(exc)
+        logger.exception("Relevance Enhancer initialization failed.")
+
+    # Initialize performance optimization agents
+    try:
+        knowledge_linker = KnowledgeLinkerAgent(str(PROCESSED_DATA_DIR))
+        logger.info("KnowledgeLinkerAgent initialized.")
+    except Exception as exc:
+        knowledge_linker = None
+        service_errors["knowledge_linker"] = str(exc)
+        logger.exception("KnowledgeLinkerAgent initialization failed.")
+
+    try:
+        fact_verifier = FactVerificationAgent(str(PROCESSED_DATA_DIR))
+        logger.info("FactVerificationAgent initialized.")
+    except Exception as exc:
+        fact_verifier = None
+        service_errors["fact_verifier"] = str(exc)
+        logger.exception("FactVerificationAgent initialization failed.")
+
+    try:
+        usability_enhancer = UsabilityEnhancerAgent(str(PROCESSED_DATA_DIR))
+        logger.info("UsabilityEnhancerAgent initialized.")
+    except Exception as exc:
+        usability_enhancer = None
+        service_errors["usability_enhancer"] = str(exc)
+        logger.exception("UsabilityEnhancerAgent initialization failed.")
+
+    # Initialize quality scoring engine
+    try:
+        quality_scorer = QualityScoringEngine(str(PROCESSED_DATA_DIR))
+        logger.info("QualityScoringEngine initialized.")
+    except Exception as exc:
+        quality_scorer = None
+        service_errors["quality_scorer"] = str(exc)
+        logger.exception("QualityScoringEngine initialization failed.")
+
+    # Initialize enhanced answer generator
+    try:
+        enhanced_answer_generator = EnhancedAnswerGenerator(str(PROCESSED_DATA_DIR))
+        logger.info("EnhancedAnswerGenerator initialized.")
+    except Exception as exc:
+        enhanced_answer_generator = None
+        service_errors["enhanced_answer_generator"] = str(exc)
+        logger.exception("EnhancedAnswerGenerator initialization failed.")
+
+    # Initialize hallucination reducer
+    global hallucination_reducer
+    try:
+        hallucination_reducer = HallucinationReducer(str(PROCESSED_DATA_DIR))
+        logger.info("HallucinationReducer initialized.")
+    except Exception as exc:
+        hallucination_reducer = None
+        service_errors["hallucination_reducer"] = str(exc)
+        logger.exception("HallucinationReducer initialization failed.")
+
+    # Initialize safe answer builder
+    global safe_answer_builder
+    try:
+        safe_answer_builder = SafeAnswerBuilder()
+        logger.info("SafeAnswerBuilder initialized.")
+    except Exception as exc:
+        safe_answer_builder = None
+        service_errors["safe_answer_builder"] = str(exc)
+        logger.exception("SafeAnswerBuilder initialization failed.")
+
+    # Initialize enhanced safe answer builder
+    global enhanced_safe_answer_builder
+    try:
+        enhanced_safe_answer_builder = EnhancedSafeAnswerBuilder(str(PROCESSED_DATA_DIR))
+        logger.info("EnhancedSafeAnswerBuilder initialized.")
+    except Exception as exc:
+        enhanced_safe_answer_builder = None
+        service_errors["enhanced_safe_answer_builder"] = str(exc)
+        logger.exception("EnhancedSafeAnswerBuilder initialization failed.")
+
+    # Initialize LLM client for answer generation
+    # Try Minimax first, then GLM
+    minimax_key = os.getenv("MINIMAX_API_KEY")
+    glm_key = os.getenv("ZHIPU_API_KEY")
+
+    if openai and has_real_value(minimax_key):
+        glm_client = openai.OpenAI(
+            api_key=minimax_key,
+            base_url="https://api.minimax.chat/v1"
+        )
+        logger.info("Minimax API client initialized for answer generation.")
+    elif openai and has_real_value(glm_key):
+        glm_client = openai.OpenAI(api_key=glm_key, base_url="https://open.bigmodel.cn/api/paas/v4/")
+        logger.info("GLM API client initialized for answer generation.")
+    else:
+        logger.warning("No LLM API key configured. Using mock response mode.")
+
+
+initialize_services()
+
+
+def generate_answer_with_glm(query: str, contexts: List[Dict[str, Any]], graph_insights: List[Dict[str, Any]]) -> str:
+    if not glm_client:
+        return _fallback_answer(contexts)
+
+    # 构建图谱证据
+    graph_text = ""
+    if graph_insights:
+        graph_text = "\n\n知识图谱证据:\n" + "\n".join(
+            [
+                f"- {item.get('regulation', '?')} --[{item.get('relationship', '?')}]--> {item.get('component', '?')}"
+                for item in graph_insights[:6] if item.get('regulation') or item.get('component')
+            ]
+        )
+
+    # 系统提示 - 专业航空法规助手（增强版）
+    system_prompt = """你是一位专业的民航法规咨询专家。
+
+## 核心原则
+1. **严格依据提供的法规内容回答** - 只使用检索到的法规条款，不编造信息
+2. **引用具体条款号** - 回答中必须包含具体的条款编号（如 §25.1、第33.5条）
+3. **结构化回答** - 按照要求类型分点陈述，清晰明了
+4. **标注不确定性** - 如果检索证据不足，明确说明"根据现有资料无法确定"
+5. **使用中文回答** - 专业、准确、简洁
+
+## 回答结构
+请按以下结构组织回答：
+
+### 【直接回答】
+用1-2句话直接回答核心问题
+
+### 【条款依据】
+逐条列出相关条款，格式：
+- **[来源X 条款号]** 具体要求描述
+- **[来源X 条款号]** 具体要求描述
+
+### 【适用说明】
+说明适用范围和限制条件
+
+### 【相关条款】
+如有等效或关联条款（CAAC/FAA/EASA），列出对比
+
+## 思考要求
+在回答前，请先进行以下分析：
+1. **问题类型判断**：这是数值要求、试验方法、还是设计标准？
+2. **证据匹配**：检索结果中有哪些直接相关的条款？
+3. **跨规章关联**：是否有CAAC/FAA/EASA的等效条款？
+4. **不确定性评估**：哪些信息是明确的，哪些是不确定的？"""
+
+    # 构建用户提示
+    context_blocks = []
+    for i, ctx in enumerate(contexts[:5], 1):
+        text = ctx.get("text", "")
+        metadata = ctx.get("metadata", {})
+        title = metadata.get("title", "")
+        source = metadata.get("source", "").replace(".md", "")
+
+        context_blocks.append(f"[来源{i}: {source} - {title}]\n{text}")
+
+    user_prompt = f"""用户问题：{query}
+
+检索到的法规内容：
+{chr(10).join(context_blocks)}{graph_text}
+
+## 参考示例
+
+示例1：
+问：喘振裕度的要求是什么？
+答：
+### 【直接回答】
+喘振裕度要求在发动机所有工作包线内不低于15%。
+
+### 【条款依据】
+- **[CCAR-33-R2 §33.65(a)]** 在所有工作包线内，喘振裕度不低于15%
+- **[FAR-33 §33.65(a)]** 等效要求：喘振裕度不低于15%
+
+### 【适用说明】
+适用于所有航空发动机型号审定。
+
+---
+
+现在请基于以上法规内容，按照上述结构给出专业、准确的回答。"""
+
+    try:
+        # 根据API类型选择模型
+        minimax_key = os.getenv("MINIMAX_API_KEY")
+        model = "abab6.5s-chat" if minimax_key else "glm-4-flash"
+
+        response = glm_client.chat.completions.create(
+            model=model,
+            temperature=0.2,  # 降低随机性，提高准确性
+            max_tokens=1500,
+            timeout=30,  # 30秒超时保护
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+        )
+        answer = response.choices[0].message.content.strip()
+        logger.info(f"[LLM] Generated {len(answer)} chars answer using {model}")
+        return answer
+    except Exception as exc:
+        logger.error("LLM generation failed: %s", exc)
+        return _fallback_answer(contexts)
+
+
+@app.get("/")
+def root() -> Dict[str, str]:
+    return {"service": "AeroPower-RAG", "version": APP_VERSION, "status": "operational"}
+
+
+@app.get("/api/v1/health")
+def health_check() -> Dict[str, Any]:
+    vector_status = "connected"
+    vector_count = None
+    if vector_engine is None:
+        vector_status = "failed"
+    elif not vector_engine.collection:
+        vector_status = "mock"
+    else:
+        try:
+            vector_count = vector_engine.collection.count()
+        except Exception as exc:
+            vector_status = "degraded"
+            service_errors["vector_db_count"] = str(exc)
+
+    return {
+        "app_mode": APP_MODE,
+        "app_version": APP_VERSION,
+        "knowledge_base_version": DOCUMENT_VERSION,
+        "prompt_version": PROMPT_VERSION,
+        "embedding_version": EMBEDDING_VERSION,
+        "graph_version": GRAPH_VERSION,
+        "source_catalog_version": SOURCE_CATALOG_VERSION,
+        "source_catalog_path": str(SOURCE_CATALOG_PATH),
+        "vector_db": vector_status,
+        "vector_db_count": vector_count,
+        "vector_db_path": str(CHROMA_DB_DIR),
+        "graph_db": "connected" if graph_store and graph_store.driver and graph_store.has_graph_data else "fallback",
+        "graph_node_count": graph_store.node_count if graph_store else 0,
+        "llm": "connected" if glm_client else "mock",
+        "guardrail": "active" if guardrail and guardrail.has_external_verifier else "conservative",
+        "metadata_extractor": "active" if metadata_extractor else "unavailable",
+        "hallucination_guard": "active" if hallucination_guard else "unavailable",
+        "relevance_enhancer": "active" if relevance_enhancer else "unavailable",
+        "enhanced_kb": "active" if enhanced_kb else "unavailable",
+        # 新增: 性能优化agents
+        "knowledge_linker": "active" if knowledge_linker else "unavailable",
+        "fact_verifier": "active" if fact_verifier else "unavailable",
+        "usability_enhancer": "active" if usability_enhancer else "unavailable",
+        "quality_scorer": "active" if quality_scorer else "unavailable",
+        "processed_data_dir": str(PROCESSED_DATA_DIR),
+        "errors": service_errors,
+    }
+
+
+@app.get("/api/v1/sources")
+def get_sources(layer: Optional[str] = None, jurisdiction: Optional[str] = None) -> Dict[str, Any]:
+    if not source_catalog:
+        return {"version": SOURCE_CATALOG_VERSION, "total": 0, "groups": [], "sources": []}
+
+    filtered = source_catalog.filter(layer=layer, jurisdiction=jurisdiction)
+    return {
+        "version": source_catalog.version,
+        "total": len(filtered),
+        "groups": source_catalog.grouped(),
+        "sources": [item.model_dump() for item in filtered],
+    }
+
+
+@app.get("/api/v1/graph/subgraph")
+def get_graph_subgraph(
+    query: str = "",
+    node_id: Optional[str] = None,
+    max_nodes: int = 18,
+    include_parameters: bool = False,
+) -> Dict[str, Any]:
+    if not graph_store:
+        return {"mode": "unavailable", "nodes": [], "edges": [], "summary": "Graph store is unavailable."}
+
+    return graph_store.get_subgraph(
+        query=query,
+        node_id=node_id,
+        limit=max_nodes,
+        include_parameters=include_parameters,
+    )
+
+
+@app.get("/api/v1/graph/nodes")
+def get_graph_nodes() -> Dict[str, Any]:
+    if not graph_store:
+        return {"nodes": [], "edges": [], "mode": "unavailable"}
+
+    snapshot = graph_store.get_graph_snapshot()
+    return {
+        "nodes": snapshot.get("nodes") or [],
+        "edges": snapshot.get("edges") or [],
+        "mode": snapshot.get("mode", "fallback"),
+        "summary": snapshot.get("summary"),
+        "stats": snapshot.get("stats", {}),
+    }
+
+
+@app.post("/api/v1/query", response_model=QueryResponse)
+def execute_rag_query(req: QueryRequest) -> QueryResponse:
+    import time
+    query_start_time = time.time()
+    logger.info("[QUERY] %s", req.query)
+
+    if vector_engine is None:
+        raise HTTPException(status_code=503, detail="Vector engine is unavailable")
+
+    # 1. 使用术语扩展查询
+    expanded_query = expand_query_with_terminology(req.query)
+    if expanded_query != req.query:
+        logger.info("[TERMINOLOGY] Expanded query: %s -> %s", req.query[:50], expanded_query[:50])
+
+    # 2. 执行检索
+    retrieved_contexts = vector_engine.search(expanded_query, top_k=req.top_k)
+    logger.info("[VECTOR] Retrieved %s chunks", len(retrieved_contexts))
+
+    # 3. 应用元数据增强
+    if metadata_extractor:
+        retrieved_contexts = metadata_extractor.enhance_batch_results(retrieved_contexts)
+        logger.info("[METADATA] Enhanced metadata for %s contexts", len(retrieved_contexts))
+
+    # 4. 应用相关性增强和重排序
+    if reranker:
+        retrieved_contexts = reranker.rerank(req.query, retrieved_contexts, top_k=req.top_k)
+        logger.info("[RERANK] Re-ranked %s contexts", len(retrieved_contexts))
+
+    # 5. 获取图谱洞察（原始图谱）
+    graph_insights_raw: list[dict[str, Any]] = []
+    if graph_store:
+        for keyword in extract_keywords_from_query(req.query):
+            graph_insights_raw.extend(graph_store.query_graph(keyword))
+
+    seen = set()
+    graph_insights_unique = []
+    for item in graph_insights_raw:
+        key = (item.get("regulation", ""), item.get("component", ""), item.get("relationship", ""))
+        if key in seen:
+            continue
+        seen.add(key)
+        graph_insights_unique.append(item)
+
+    # 6. 获取知识图谱数据（新增）
+    knowledge_graph_nodes = []
+    semantic_relations = []
+    try:
+        kg_nodes, kg_edges = load_knowledge_graph()
+        if kg_nodes:
+            # 查找相关节点
+            knowledge_graph_nodes = query_knowledge_graph_nodes(req.query, kg_nodes, limit=10)
+            if knowledge_graph_nodes:
+                logger.info(f"[KNOWLEDGE_GRAPH] Found {len(knowledge_graph_nodes)} related nodes")
+            # 查找语义关系
+            semantic_relations = find_semantic_relations(req.query, kg_nodes, kg_edges)
+            if semantic_relations:
+                logger.info(f"[KNOWLEDGE_GRAPH] Found {len(semantic_relations)} semantic relations")
+    except Exception as e:
+        logger.warning(f"[KNOWLEDGE_GRAPH] Query failed: {e}")
+
+    if not retrieved_contexts and not graph_insights_unique:
+        empty_graph = graph_store.get_subgraph(query=req.query, limit=12) if graph_store and req.include_graph_subgraph else None
+        return QueryResponse(
+            query=req.query,
+            answer="当前知识库中没有找到与问题直接相关的条款。请尝试缩小范围，或补充更具体的部件、条款号与设计场景。",
+            guardrail={
+                "status": "NOT_FOUND",
+                "reasoning": "没有检索到可支撑回答的条款证据，因此系统返回保守拒答。",
+                "safe_answer": "当前知识库中没有找到与问题直接相关的条款。",
+            },
+            citations=[],
+            graphInsights=[],
+            graphSubgraph=empty_graph,
+            responseMode=APP_MODE,
+            appVersion=APP_VERSION,
+            knowledgeBaseVersion=DOCUMENT_VERSION,
+            promptVersion=PROMPT_VERSION,
+            embeddingVersion=EMBEDDING_VERSION,
+            graphVersion=GRAPH_VERSION,
+            retrievalCount=0,
+        )
+
+    draft_answer = generate_answer_with_glm(req.query, retrieved_contexts, graph_insights_unique)
+
+    # 应用幻觉防护检查
+    hallucination_report = None
+    if hallucination_guard:
+        hallucination_report = hallucination_guard.generate_hallucination_report(
+            draft_answer, retrieved_contexts
+        )
+        if hallucination_report.has_hallucination and hallucination_report.hallucination_score > 0.5:
+            logger.warning("[HALLUCINATION] Detected potential hallucination (score: %.2f)",
+                          hallucination_report.hallucination_score)
+            # 如果有严重幻觉，添加警告到回答中
+            if hallucination_report.flagged_statements:
+                draft_answer += f"\n\n[⚠️ 系统提示: 部分陈述可能缺少充分的条款依据，建议核对原文]"
+
+    guardrail_result = {
+        "status": "SKIPPED",
+        "reasoning": "Guardrail verification was skipped by the caller.",
+        "safe_answer": draft_answer,
+    }
+    final_answer = draft_answer
+
+    if req.use_guardrail:
+        if not guardrail:
+            guardrail_result = {
+                "status": "UNAVAILABLE",
+                "reasoning": "Guardrail verifier is unavailable, so the system returned a conservative evidence summary.",
+                "safe_answer": _fallback_answer(retrieved_contexts),
+            }
+        else:
+            guardrail_result = guardrail.verify_response(req.query, draft_answer, retrieved_contexts)
+        final_answer = guardrail_result.get("safe_answer", draft_answer)
+
+    # 将幻觉报告添加到 guardrail_result
+    if hallucination_report and guardrail_result:
+        guardrail_result["hallucination_score"] = hallucination_report.hallucination_score
+        guardrail_result["has_hallucination"] = hallucination_report.has_hallucination
+        guardrail_result["hallucination_recommendations"] = hallucination_report.recommendations
+
+    # 使用增强答案生成器提升答案质量
+    answer_enhancements = {}
+    if enhanced_answer_generator and final_answer:
+        try:
+            final_answer, answer_enhancements = enhanced_answer_generator.enhance_answer(
+                query=req.query,
+                answer=final_answer,
+                contexts=retrieved_contexts,
+                graph_nodes=knowledge_graph_nodes
+            )
+            if answer_enhancements:
+                logger.info(f"[ANSWER_ENHANCEMENT] Added {len(answer_enhancements.get('added_clause_references', []))} clause refs, "
+                          f"{len(answer_enhancements.get('added_term_explanations', []))} term explanations")
+        except Exception as e:
+            logger.warning(f"Answer enhancement failed: {e}")
+
+    # 应用幻觉降低器
+    hallucination_reduction = {}
+    if hallucination_reducer and final_answer:
+        try:
+            reduced_answer, reduction_info = hallucination_reducer.reduce_hallucination(
+                answer=final_answer,
+                contexts=retrieved_contexts,
+                query=req.query
+            )
+            if reduced_answer != final_answer:
+                logger.info(f"[HALLUCINATION_REDUCER] Reduced risk from {reduction_info.get('original_risk', 0):.2f}, "
+                          f"modifications: {len(reduction_info.get('modifications', {}))}")
+            final_answer = reduced_answer
+            hallucination_reduction = reduction_info
+        except Exception as e:
+            logger.warning(f"Hallucination reduction failed: {e}")
+
+    # 如果幻觉风险仍然较高，使用安全答案构建器
+    if safe_answer_builder and quality_scorer:
+        try:
+            # 计算当前幻觉风险
+            current_hallucination, _ = quality_scorer.calculate_hallucination_risk(
+                final_answer, retrieved_contexts, req.query
+            )
+            # 如果风险超过阈值，使用安全答案构建器
+            if current_hallucination > 0.15:
+                logger.info(f"[SAFE_ANSWER] High hallucination risk ({current_hallucination:.2f}), using safe answer builder")
+                safe_answer, safe_meta = safe_answer_builder.build_safe_answer(
+                    query=req.query,
+                    contexts=retrieved_contexts
+                )
+                if safe_meta.get("safe"):
+                    final_answer = safe_answer
+                    hallucination_reduction["safe_mode_used"] = True
+        except Exception as e:
+            logger.warning(f"Safe answer builder failed: {e}")
+
+    citations = build_citations(retrieved_contexts)
+    graph_subgraph = graph_store.get_subgraph(query=req.query, limit=16) if graph_store and req.include_graph_subgraph else None
+
+    # 新增: 计算置信度和不确定性标记（传入查询以支持动态权重）
+    confidence_score, uncertainty_markers = verify_answer_confidence(final_answer, retrieved_contexts, req.query)
+
+    # 新增: 查找相关条款
+    related_clauses = find_related_clauses(req.query, retrieved_contexts)
+
+    # 新增: 获取可视化数据
+    visualization_data = get_visualization_data(req.query) if req.include_graph_subgraph else None
+
+    # 新增: 计算质量评分（使用QualityScoringEngine）
+    quality_metrics = None
+    if quality_scorer:
+        try:
+            quality_metrics = quality_scorer.enhance_query_response(
+                query=req.query,
+                answer=final_answer,
+                contexts=retrieved_contexts
+            )
+            # 使用增强的置信度分数
+            if quality_metrics:
+                confidence_score = quality_metrics["confidence"]["confidence"]
+                # 从quality_metrics生成不确定性标记
+                factors = quality_metrics["confidence"].get("factors", {})
+                if factors.get("citation_coverage", 1) < 0.5:
+                    uncertainty_markers.append(f"来源覆盖不足：引用覆盖率仅{factors['citation_coverage']:.0%}")
+                if factors.get("equivalent_support", 1) < 0.3:
+                    uncertainty_markers.append("缺少跨规章验证：建议补充FAA/EASA等效条款对比")
+                if factors.get("terminology_consistency", 1) < 0.3:
+                    uncertainty_markers.append(f"术语一致性偏低({factors['terminology_consistency']:.0%})：建议使用更精确的专业术语")
+                if quality_metrics["confidence"].get("level") == "LOW":
+                    uncertainty_markers.append("综合置信度偏低：建议补充更多权威来源（如FAA AC咨询通告、SAE标准）")
+                logger.info(f"[QUALITY] Confidence: {confidence_score:.2f}, "
+                          f"Hallucination: {quality_metrics['hallucination']['score']:.2f}, "
+                          f"Usability: {quality_metrics['usability']['usability']:.2f}")
+        except Exception as e:
+            logger.warning(f"Quality scoring failed: {e}")
+
+    # Record performance metrics
+    response_time_ms = (time.time() - query_start_time) * 1000
+    sources_list = [ctx.get("metadata", {}).get("source", "Unknown") for ctx in retrieved_contexts]
+    metrics_collector.record_query(response_time_ms, confidence_score, sources_list)
+
+    return QueryResponse(
+        query=req.query,
+        answer=final_answer,
+        guardrail=guardrail_result,
+        citations=citations,
+        graphInsights=[
+            GraphInsight(
+                regulation=item.get("regulation", ""),
+                component=item.get("component", ""),
+                parameter=item.get("parameter", ""),
+                relationship=item.get("relationship", "CONSTRAINS"),
+                description=item.get("description", ""),
+            )
+            for item in graph_insights_unique[:8]
+        ],
+        graphSubgraph=graph_subgraph,
+        responseMode=infer_response_mode(citations),
+        appVersion=APP_VERSION,
+        knowledgeBaseVersion=DOCUMENT_VERSION,
+        promptVersion=PROMPT_VERSION,
+        embeddingVersion=EMBEDDING_VERSION,
+        graphVersion=GRAPH_VERSION,
+        retrievalCount=len(retrieved_contexts),
+        # 新增字段
+        confidenceScore=confidence_score,
+        uncertaintyMarkers=uncertainty_markers[:5],  # 限制显示数量
+        relatedClauses=related_clauses[:5],  # 限制显示数量
+        visualizationData=visualization_data,
+        # 知识图谱字段
+        knowledgeGraphNodes=knowledge_graph_nodes[:10],  # 限制显示数量
+        semanticRelations=semantic_relations[:15],  # 限制显示数量
+        # 质量评分字段
+        qualityMetrics=quality_metrics,
+        # LLM思考过程字段
+        thinkingProcess=_generate_thinking_process(req.query, retrieved_contexts),
+        reasoningSteps=_extract_reasoning_steps(req.query, retrieved_contexts),
+        llmProvider="real" if glm_client else "mock",
+        llmModel="glm-4-flash" if not os.getenv("MINIMAX_API_KEY") else "abab6.5s-chat"
+    )
+
+
+@app.post("/api/v1/index")
+def index_documents() -> Dict[str, Any]:
+    if vector_engine is None:
+        raise HTTPException(status_code=503, detail="Vector engine is unavailable")
+
+    chunks = collect_indexable_chunks()
+    if not chunks:
+        raise HTTPException(status_code=404, detail="No processed markdown documents were found")
+
+    vector_engine.index_chunks(chunks)
+    return {
+        "status": "ok",
+        "chunks_indexed": len(chunks),
+        "knowledge_base_version": DOCUMENT_VERSION,
+    }
+
+
+@app.post("/api/v1/query/pageindex", response_model=QueryResponse)
+def execute_pageindex_query(req: QueryRequest) -> QueryResponse:
+    """
+    使用 PageIndex 树结构进行推理式检索
+
+    相比向量检索的优势：
+    - 基于文档层级结构（章节-条款）推理
+    - 检索路径可追溯
+    - 无需向量切分，保留完整上下文
+
+    新增功能：
+    - 元数据增强
+    - 相关性重排序
+    - 幻觉防护
+    """
+    logger.info("[PAGEINDEX QUERY] %s", req.query)
+
+    if pageindex_engine is None:
+        raise HTTPException(
+            status_code=503,
+            detail="PageIndex engine is unavailable. Make sure CCAR-33-R2_structure.json exists."
+        )
+
+    # 使用 PageIndex 进行树结构搜索
+    retrieved_contexts = pageindex_engine.search_by_keywords(req.query, top_k=req.top_k)
+    logger.info("[PAGEINDEX] Retrieved %s nodes", len(retrieved_contexts))
+
+    # 应用元数据增强
+    if metadata_extractor:
+        retrieved_contexts = metadata_extractor.enhance_batch_results(retrieved_contexts)
+        logger.info("[PAGEINDEX METADATA] Enhanced metadata for %s contexts", len(retrieved_contexts))
+
+    # 应用相关性增强和重排序
+    if reranker:
+        retrieved_contexts = reranker.rerank(req.query, retrieved_contexts, top_k=req.top_k)
+        logger.info("[PAGEINDEX RERANK] Re-ranked %s contexts", len(retrieved_contexts))
+
+    if not retrieved_contexts:
+        return QueryResponse(
+            query=req.query,
+            answer="当前知识库中没有找到与问题直接相关的条款。请尝试缩小范围，或补充更具体的条款号或关键词。",
+            guardrail={
+                "status": "NOT_FOUND",
+                "reasoning": "PageIndex 搜索未找到相关节点",
+                "safe_answer": "当前知识库中没有找到与问题直接相关的条款。",
+            },
+            citations=[],
+            graphInsights=[],
+            graphSubgraph=None,
+            responseMode="pageindex",
+            appVersion=APP_VERSION,
+            knowledgeBaseVersion=DOCUMENT_VERSION,
+            promptVersion=PROMPT_VERSION,
+            embeddingVersion=EMBEDDING_VERSION,
+            graphVersion=GRAPH_VERSION,
+            retrievalCount=0,
+        )
+
+    # 使用 LLM 生成答案
+    draft_answer = generate_answer_with_glm(req.query, retrieved_contexts, [])
+
+    # 应用幻觉防护检查
+    hallucination_report = None
+    if hallucination_guard:
+        hallucination_report = hallucination_guard.generate_hallucination_report(
+            draft_answer, retrieved_contexts
+        )
+        if hallucination_report.has_hallucination and hallucination_report.hallucination_score > 0.5:
+            logger.warning("[PAGEINDEX HALLUCINATION] Detected potential hallucination (score: %.2f)",
+                          hallucination_report.hallucination_score)
+
+    guardrail_result = {
+        "status": "SKIPPED",
+        "reasoning": "PageIndex 搜索已返回结构化结果，跳过 guardrail 验证",
+        "safe_answer": draft_answer,
+    }
+
+    # 将幻觉报告添加到 guardrail_result
+    if hallucination_report:
+        guardrail_result["hallucination_score"] = hallucination_report.hallucination_score
+        guardrail_result["has_hallucination"] = hallucination_report.has_hallucination
+        guardrail_result["hallucination_recommendations"] = hallucination_report.recommendations
+
+    # 构建 citations（PageIndex 格式）
+    citations = []
+    for index, context in enumerate(retrieved_contexts, start=1):
+        metadata = context.get("metadata", {})
+        full_text = context.get("original_text") or context.get("text", "")
+        snippet = full_text[:200] + "..." if len(full_text) > 200 else full_text
+
+        # 从 PageIndex 元数据构建 citation
+        citations.append(
+            Citation(
+                num=index,
+                source=metadata.get("source", "CCAR-33-R2"),
+                chapter=metadata.get("title", "").split()[0] if " " in metadata.get("title", "") else "未知章节",
+                section=metadata.get("title", "未知条款"),
+                snippet=snippet,
+                highlight=metadata.get("title", ""),
+                fullText=full_text,
+                documentId="CCAR-33-R2",
+                documentVersion=DOCUMENT_VERSION,
+                contentMode="pageindex_structure",
+                sourcePath=str(PROCESSED_DATA_DIR / "CCAR-33-R2_structure.json"),
+            )
+        )
+
+    return QueryResponse(
+        query=req.query,
+        answer=draft_answer,
+        guardrail=guardrail_result,
+        citations=citations,
+        graphInsights=[],
+        graphSubgraph=None,
+        responseMode="pageindex",
+        appVersion=APP_VERSION,
+        knowledgeBaseVersion=DOCUMENT_VERSION,
+        promptVersion=PROMPT_VERSION,
+        embeddingVersion=EMBEDDING_VERSION,
+        graphVersion=GRAPH_VERSION,
+        retrievalCount=len(retrieved_contexts),
+    )
+
+
+@app.get("/api/v1/pageindex/nodes")
+def get_pageindex_nodes() -> dict[str, Any]:
+    """获取 PageIndex 树结构中的所有节点"""
+    if pageindex_engine is None:
+        return {"nodes": [], "total": 0, "status": "unavailable"}
+
+    all_sections = pageindex_engine.get_all_sections()
+    return {
+        "total": len(all_sections),
+        "nodes": all_sections,
+        "status": "ok"
+    }
+
+
+@app.post("/api/v1/query/enhanced")
+def execute_enhanced_query(req: QueryRequest) -> QueryResponse:
+    """
+    使用增强型多规章知识库进行查询
+
+    特性:
+    - 专业术语标准化和同义词扩展
+    - 跨规章关联推荐
+    - 条款全文内容
+    - 改进的相关性评分
+    - 元数据增强
+    - 相关性重排序
+    - 幻觉防护
+    """
+    logger.info("[ENHANCED QUERY] %s", req.query)
+
+    if enhanced_kb is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Enhanced knowledge base is unavailable"
+        )
+
+    # 使用增强知识库搜索
+    search_results = enhanced_kb.search(
+        req.query,
+        top_k=req.top_k,
+        include_references=True
+    )
+
+    # 应用相关性增强和重排序
+    if reranker and search_results:
+        # 将搜索结果转换为上下文格式
+        result_contexts = []
+        for result in search_results:
+            result_contexts.append({
+                "text": result.summary or result.text or result.title,
+                "metadata": {
+                    "source": result.metadata.get("source", "Unknown"),
+                    "title": result.title,
+                    "score": result.relevance_score
+                }
+            })
+        # 重排序
+        reranked = reranker.rerank(req.query, result_contexts, top_k=req.top_k)
+        # 根据重排序结果调整search_results的顺序
+        reranked_sources = [r["metadata"]["source"] for r in reranked]
+        reordered_results = []
+        for source in reranked_sources:
+            for result in search_results:
+                if result.metadata.get("source") == source and result not in reordered_results:
+                    reordered_results.append(result)
+                    break
+        search_results = reordered_results
+        logger.info("[ENHANCED RERANK] Re-ranked %s results", len(search_results))
+
+    if not search_results:
+        return QueryResponse(
+            query=req.query,
+            answer="当前知识库中没有找到与问题直接相关的条款。请尝试调整查询关键词或使用更具体的条款号。",
+            guardrail={
+                "status": "NOT_FOUND",
+                "reasoning": "增强知识库搜索未找到相关结果",
+                "safe_answer": "当前知识库中没有找到与问题直接相关的条款。",
+            },
+            citations=[],
+            graphInsights=[],
+            graphSubgraph=None,
+            responseMode="enhanced_multi_ccar",
+            appVersion=APP_VERSION,
+            knowledgeBaseVersion=DOCUMENT_VERSION,
+            promptVersion=PROMPT_VERSION,
+            embeddingVersion=EMBEDDING_VERSION,
+            graphVersion=GRAPH_VERSION,
+            retrievalCount=0,
+        )
+
+    # 构建上下文用于 LLM 生成答案
+    contexts = []
+    for result in search_results:
+        contexts.append({
+            "text": result.summary or result.text or result.title,
+            "original_text": result.text,
+            "metadata": {
+                "source": result.metadata.get("source", "Unknown"),
+                "source_link": result.metadata.get("source_link", ""),
+                "section_number": result.metadata.get("section_number", ""),
+                "chapter": "",
+                "section": result.title,
+                "title": result.title,
+                "page": result.metadata.get("page", 0),
+                "score": result.relevance_score
+            }
+        })
+
+    # 使用 LLM 生成答案
+    draft_answer = generate_answer_with_glm(req.query, contexts, [])
+
+    # 应用幻觉防护检查
+    hallucination_report = None
+    if hallucination_guard:
+        hallucination_report = hallucination_guard.generate_hallucination_report(
+            draft_answer, contexts
+        )
+        if hallucination_report.has_hallucination and hallucination_report.hallucination_score > 0.5:
+            logger.warning("[ENHANCED HALLUCINATION] Detected potential hallucination (score: %.2f)",
+                          hallucination_report.hallucination_score)
+
+    # 构建跨规章关联的 graph insights
+    graph_insights = []
+    for result in search_results:
+        for ref in result.cross_references:
+            graph_insights.append({
+                "regulation": ref.get("doc_name", ""),
+                "component": ref.get("title", ""),
+                "relationship": ref.get("relevance_term", "相关"),
+                "description": f"来自 {ref.get('doc_name')} 的关联条款"
+            })
+
+    # 构建 citations
+    citations = []
+    for index, (context, result) in enumerate(zip(contexts, search_results), start=1):
+        full_text = result.text or context.get("original_text", "")
+        snippet = full_text[:200] + "..." if len(full_text) > 200 else full_text
+
+        # Get source link from metadata
+        source_link = context.get("metadata", {}).get("source_link", "")
+
+        citations.append(
+            Citation(
+                num=index,
+                source=context["metadata"].get("source", "Unknown"),
+                chapter=context["metadata"].get("chapter", "未知章节"),
+                section=context["metadata"].get("section", "未知条款"),
+                snippet=snippet,
+                highlight=result.title,
+                fullText=full_text,
+                sourcePath=source_link,  # 使用 sourcePath 存储源链接
+                documentVersion=DOCUMENT_VERSION,
+                contentMode="enhanced_multi_ccar"
+            )
+        )
+
+    return QueryResponse(
+        query=req.query,
+        answer=draft_answer,
+        guardrail={
+            "status": "PASSED",
+            "reasoning": "增强知识库搜索返回结果，已使用专业术语优化",
+            "safe_answer": draft_answer,
+            "hallucination_score": hallucination_report.hallucination_score if hallucination_report else None,
+            "has_hallucination": hallucination_report.has_hallucination if hallucination_report else False,
+            "hallucination_recommendations": hallucination_report.recommendations if hallucination_report else [],
+        },
+        citations=citations,
+        graphInsights=[GraphInsight(**item) for item in graph_insights[:8]],
+        graphSubgraph=None,
+        responseMode="enhanced_multi_ccar",
+        appVersion=APP_VERSION,
+        knowledgeBaseVersion=DOCUMENT_VERSION,
+        promptVersion=PROMPT_VERSION,
+        embeddingVersion=EMBEDDING_VERSION,
+        graphVersion=GRAPH_VERSION,
+        retrievalCount=len(search_results),
+    )
+
+
+@app.get("/api/v1/enhanced/stats")
+def get_enhanced_kb_stats() -> dict[str, Any]:
+    """获取增强知识库统计信息和性能指标"""
+    # Get KB stats
+    kb_stats = {}
+    if enhanced_kb is not None:
+        stats = enhanced_kb.get_document_stats()
+        total_sections = sum(s.get("total_sections", 0) for s in stats.values())
+        total_nodes = sum(s.get("total_nodes", 0) for s in stats.values())
+        kb_stats = {
+            "status": "ok",
+            "documents": len(stats),
+            "total_sections": total_sections,
+            "total_nodes": total_nodes,
+            "sections_with_content": len(enhanced_kb.section_content_map),
+            "details": stats
+        }
+    else:
+        kb_stats = {"status": "unavailable", "error": "Enhanced KB not initialized"}
+
+    # Get performance metrics
+    perf_stats = metrics_collector.get_stats()
+
+    return {
+        **kb_stats,
+        "performance": perf_stats
+    }
+
+
+@app.get("/api/v1/dashboard/stats")
+def get_dashboard_stats() -> dict[str, Any]:
+    """
+    获取仪表盘专用性能统计
+
+    返回:
+    - 查询响应时间 P50/P95/P99
+    - 置信度分布（高/中/低占比）
+    - 来源覆盖统计（CAAC/FAA/EASA占比）
+    - Top查询词频
+    """
+    return {
+        "status": "ok",
+        **metrics_collector.get_stats(),
+        "app_version": APP_VERSION,
+        "timestamp": __import__("time").time()
+    }
+
+
+@app.get("/api/v1/enhanced/citation/{doc_name}/{section_id}")
+def get_full_citation(doc_name: str, section_id: str) -> dict[str, Any]:
+    """
+    获取完整的条款内容
+
+    用于点击引用时展开显示更多内容
+    """
+    if enhanced_kb is None:
+        return {"status": "unavailable", "error": "Enhanced KB not initialized"}
+
+    # 查找完整的条款内容
+    import json
+    from pathlib import Path
+
+    # 查找结构文件
+    structure_file = Path(PROCESSED_DATA_DIR) / f"{doc_name}_structure.json"
+    if not structure_file.exists():
+        return {"status": "not_found", "error": f"Document {doc_name} not found"}
+
+    with open(structure_file, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+
+    # 递归查找条款
+    def find_section_content(nodes, target_id):
+        for node in nodes:
+            if not isinstance(node, dict):
+                continue
+            # Check if this is the target section
+            title = node.get("title", "")
+            if section_id in title or (f"§ {section_id}" in title) or (f"第{section_id}条" in title):
+                # 返回完整内容
+                content_parts = node.get("content_parts", [])
+                if content_parts:
+                    full_content = "\n".join(content_parts)
+                else:
+                    full_content = node.get("summary", title)
+                return {
+                    "title": title,
+                    "content": full_content,
+                    "summary": node.get("summary", ""),
+                    "page": node.get("page", 0),
+                    "section_id": section_id
+                }
+
+            # Check sections array
+            sections = node.get("sections", []) or node.get("nodes", [])
+            if sections:
+                result = find_section_content(sections, target_id)
+                if result:
+                    return result
+
+        return None
+
+    structure = data.get("structure", {})
+    if isinstance(structure, dict) and "chapters" in structure:
+        content = find_section_content(structure["chapters"], section_id)
+    elif isinstance(structure, list):
+        content = find_section_content(structure, section_id)
+    else:
+        content = None
+
+    if content:
+        return {
+            "status": "ok",
+            "doc_name": doc_name,
+            "section_id": section_id,
+            **content
+        }
+    else:
+        return {
+            "status": "not_found",
+            "error": f"Section {section_id} not found in {doc_name}"
+        }
+
+
+@app.get("/api/v1/graph/network")
+def get_graph_network(
+    query: str = "",
+    max_nodes: int = 500,
+    include_inter_doc: bool = True
+) -> dict[str, Any]:
+    """
+    获取知识图谱网络数据 - 密集网络版本
+
+    返回大量条款级别的节点，形成密集的网络连接
+    """
+    # 机构映射
+    agency_docs = {
+        "CAAC": ["CCAR-25-R4", "CCAR-33-R2", "CCAR-29-R2", "CCAR-23", "CCAR-36", "CCAR-91", "CCAR-93TM-R2"],
+        "FAA": ["FAR-25", "FAR-33"],
+        "EASA": ["CS-25", "CS-E"]
+    }
+
+    def get_agency(doc_name):
+        for a, docs in agency_docs.items():
+            if any(d in doc_name for d in docs):
+                return a
+        return "UNKNOWN"
+
+    try:
+        # 尝试加载全连接图谱
+        graph_file = PROCESSED_DATA_DIR / "knowledge_graph" / "fully_connected_graph.json"
+        if graph_file.exists():
+            import json
+            with open(graph_file, 'r', encoding='utf-8') as f:
+                graph_data = json.load(f)
+
+            # 转换节点ID格式以匹配前端期望
+            all_nodes = []
+            all_edges = []
+            seen_ids = set()
+
+            for node in graph_data['nodes']:
+                node_id = node['id'].replace('-', '_').replace('.', '_')
+                if node_id not in seen_ids:
+                    new_node = {
+                        'id': node_id,
+                        'label': node.get('label', node['id']),
+                        'type': node.get('type', 'unknown'),
+                        'group': node.get('group', 0),
+                        'size': node.get('size', 5),
+                        'doc_name': node.get('document', ''),
+                        'title': node.get('title', ''),
+                    }
+
+                    # 统一设置 group 为机构字符串、color 为对应颜色
+                    if new_node['doc_name']:
+                        new_node['group'] = get_agency(new_node['doc_name'])
+                        new_node['color'] = _get_agency_color(new_node['group'])
+                    elif node.get('type') == 'document':
+                        new_node['group'] = get_agency(new_node['label'])
+                        new_node['color'] = _get_agency_color(new_node['group'])
+                        new_node['size'] = 50
+                    else:
+                        # 对于 keyword/component/concept 等节点，
+                        # 尝试通过其连接的文档推断机构
+                        inferred_agency = _infer_agency_from_id(node_id, node, graph_data.get('edges', []), graph_data.get('nodes', []), agency_docs)
+                        new_node['group'] = inferred_agency
+                        new_node['color'] = _get_agency_color(inferred_agency)
+
+                    all_nodes.append(new_node)
+                    seen_ids.add(node_id)
+
+            # 转换边 - 使用seen_ids直接验证
+            for edge in graph_data['edges']:
+                src = edge['source'].replace('-', '_').replace('.', '_')
+                tgt = edge['target'].replace('-', '_').replace('.', '_')
+
+                # 只保留两端节点都存在的边
+                if src in seen_ids and tgt in seen_ids:
+                    all_edges.append({
+                        'source': src,  # 使用转换后的ID，与节点ID一致
+                        'target': tgt,
+                        'type': edge.get('type', 'unknown'),
+                        'weight': edge.get('weight', 0.5),
+                        'opacity': min(0.8, edge.get('weight', 0.5))
+                    })
+
+            # 如果有查询，过滤相关节点
+            if query:
+                query_lower = query.lower()
+                filtered_nodes = []
+                related_ids = set()
+
+                # 将查询分词，支持多词匹配
+                # 使用增强型分词器：停用词过滤 + 专业术语保护 + 英文复合词拆分
+                from rag.tokenizer_enhanced import tokenize_query as _tokenize_query_enhanced
+                def _tokenize_query(q):
+                    return _tokenize_query_enhanced(q)
+
+                all_tokens = _tokenize_query(query_lower)
+                if not all_tokens:
+                    all_tokens = {query_lower}
+
+                logger.info(f"[GRAPH_QUERY] tokens({len(all_tokens)}): {sorted(all_tokens, key=len)[:15]}")
+
+                # 第一轮：分词匹配 label、doc_name、title
+                for node in all_nodes:
+                    label = node.get('label', '').lower()
+                    doc_name = node.get('doc_name', '').lower()
+                    title = node.get('title', '').lower() if 'title' in node else ''
+                    node_id = node.get('id', '').lower()
+                    searchable = f"{label} {doc_name} {title} {node_id}"
+
+                    # 任何一个token匹配就算命中
+                    if any(token in searchable for token in all_tokens):
+                        filtered_nodes.append(node)
+                        related_ids.add(node['id'])
+
+                # 第二轮：添加直接连接的节点（邻居），但排除纯文档节点
+                # 以避免通过文档中心节点拉入大量无关条款
+                first_hop_ids = set()
+                for edge in all_edges:
+                    if edge['source'] in related_ids and edge['target'] not in related_ids:
+                        first_hop_ids.add(edge['target'])
+                    elif edge['target'] in related_ids and edge['source'] not in related_ids:
+                        first_hop_ids.add(edge['source'])
+
+                # 对邻居节点按相关性排序：优先保留同类型和有title匹配的
+                for node in all_nodes:
+                    if node['id'] in first_hop_ids:
+                        # 跳过纯文档中心节点（它们连接太多子节点）
+                        if node.get('type') == 'document':
+                            continue
+                        related_ids.add(node['id'])
+
+                # 限制：对已收集的section节点，只保留title中包含查询词的
+                # + 少量邻近section作为上下文
+                section_with_query = []
+                section_without_query = []
+                other_nodes = []
+                for node in all_nodes:
+                    if node['id'] not in related_ids:
+                        continue
+                    title = (node.get('title', '') or '').lower()
+                    if node.get('type') == 'section':
+                        if query_lower in title:
+                            section_with_query.append(node)
+                        else:
+                            section_without_query.append(node)
+                    else:
+                        other_nodes.append(node)
+
+                # 组合：直接匹配的section + 其他类型节点 + 少量上下文section
+                filtered_nodes = other_nodes + section_with_query + section_without_query[:10]
+                related_ids = set(n['id'] for n in filtered_nodes)
+                # 应用节点数量限制
+                return_nodes = filtered_nodes[:max_nodes]
+                return_node_ids = set(n['id'] for n in return_nodes)
+
+                # 只返回两端节点都在返回列表中的边
+                return_edges = [
+                    e for e in all_edges
+                    if e['source'] in return_node_ids and e['target'] in return_node_ids
+                ][:max_nodes * 3]
+
+                return {
+                    "status": "ok",
+                    "nodes": return_nodes,
+                    "edges": return_edges,
+                    "loaded_from": "fully_connected_graph.json",
+                    "total_available": len(all_nodes)
+                }
+
+            # 确定要返回的节点
+            return_nodes = all_nodes[:max_nodes]
+            return_node_ids = set(n['id'] for n in return_nodes)
+
+            # 只返回两端节点都在返回列表中的边
+            return_edges = [
+                e for e in all_edges
+                if e['source'] in return_node_ids and e['target'] in return_node_ids
+            ][:max_nodes * 3]
+
+            return {
+                "status": "ok",
+                "nodes": return_nodes,
+                "edges": return_edges,
+                "loaded_from": "fully_connected_graph.json",
+                "total_available": len(all_nodes)
+            }
+    except Exception as e:
+        logger.warning(f"Failed to load graph file: {e}")
+
+    # 回退到原有逻辑
+    if not enhanced_kb:
+        return {"status": "unavailable", "nodes": [], "edges": []}
+
+    import json
+    import random
+
+    nodes = []
+    edges = []
+    seen_nodes = set()
+
+    # 定义机构颜色
+    agency_docs = {
+        "CAAC": ["CCAR-25-R4", "CCAR-33-R2", "CCAR-29-R2", "CCAR-23", "CCAR-36", "CCAR-91", "CCAR-93TM-R2"],
+        "FAA": ["FAR-25", "FAR-33"],
+        "EASA": ["CS-25", "CS-E"]
+    }
+
+    def get_agency(doc_name):
+        for a, docs in agency_docs.items():
+            if any(d in doc_name for d in docs):
+                return a
+        return "UNKNOWN"
+
+    # 1. 添加文档节点（大型中心节点）
+    doc_stats = enhanced_kb.get_document_stats()
+    doc_nodes = {}
+    for doc_name, stats in doc_stats.items():
+        agency = get_agency(doc_name)
+        node_id = doc_name.replace("-", "_").replace(".", "_")
+        node = {
+            "id": node_id,
+            "label": doc_name,
+            "group": agency,
+            "size": max(stats.get("total_sections", 1) // 3, 30),
+            "color": _get_agency_color(agency)
+        }
+        nodes.append(node)
+        doc_nodes[doc_name] = node_id
+        seen_nodes.add(node_id)
+
+    # 2. 添加条款节点（小型边缘节点）
+    section_keywords = []
+    if query:
+        # 如果有查询，提取关键词
+        from rag.aviation_terminology import AviationTerminology
+        terms = AviationTerminology.extract_professional_terms(query)
+        for category, term_list in terms.items():
+            if term_list:
+                section_keywords.extend(term_list[:3])
+        if query:
+            section_keywords.extend(query.split())
+
+    section_count = 0
+    max_sections = min(max_nodes - len(nodes), 400)  # 限制条款节点数量
+
+    for structure_file in PROCESSED_DATA_DIR.glob("*_structure.json"):
+        if section_count >= max_sections:
+            break
+
+        try:
+            with open(structure_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+
+            doc_name = data.get("doc_name", structure_file.stem.replace("_structure", ""))
+            agency = get_agency(doc_name)
+            doc_node_id = doc_nodes.get(doc_name)
+
+            def extract_sections(nodes, depth=0):
+                nonlocal section_count
+                sections = []
+                for node in nodes:
+                    if not isinstance(node, dict):
+                        continue
+                    if section_count >= max_sections:
+                        break
+
+                    title = node.get("title", "")
+                    # 提取条款号
+                    section_match = re.search(r'§\s*([\d.]+)', title)
+                    if not section_match:
+                        section_match = re.search(r'第\s*([\d.]+)\s*条', title)
+                    if not section_match:
+                        section_match = re.search(r'^(\d+\.\d+)', title)
+
+                    # 添加条件：如果有查询，只添加相关条款
+                    include_this = True
+                    if query and section_keywords:
+                        include_this = False
+                        query_lower = query.lower()
+                        title_lower = title.lower()
+                        if query_lower in title_lower:
+                            include_this = True
+                        for kw in section_keywords[:5]:
+                            if kw.lower() in title_lower:
+                                include_this = True
+                                break
+                    elif not query and section_match and depth < 3:
+                        # 无查询时，随机采样一些条款
+                        include_this = random.random() < 0.15
+
+                    if include_this and section_match and doc_node_id:
+                        section_num = section_match.group(1)
+                        section_id = f"sec_{doc_name}_{section_num}".replace(".", "_").replace("-", "_")
+
+                        if section_id not in seen_nodes:
+                            node_obj = {
+                                "id": section_id,
+                                "label": section_num,
+                                "group": agency,
+                                "size": 5,
+                                "color": _get_agency_color(agency),
+                                "doc_name": doc_name,
+                                "section_num": section_num,
+                                "full_title": title
+                            }
+                            sections.append((node_obj, doc_node_id))
+                            seen_nodes.add(section_id)
+                            section_count += 1
+
+                    # 递归
+                    children = node.get("nodes", []) or node.get("sections", [])
+                    if children:
+                        sections.extend(extract_sections(children, depth + 1))
+
+                return sections
+
+            structure = data.get("structure", {})
+            if isinstance(structure, dict) and "chapters" in structure:
+                new_sections = extract_sections(structure["chapters"])
+                for sec_node, doc_id in new_sections:
+                    nodes.append(sec_node)
+                    # 添加条款到文档的连接
+                    edges.append({
+                        "source": doc_id,
+                        "target": sec_node["id"],
+                        "color": _get_agency_color(agency),
+                        "opacity": 0.3
+                    })
+
+        except Exception as e:
+            logger.warning(f"Error processing {structure_file}: {e}")
+            continue
+
+    # 3. 添加跨文档连接（基于相同条款号）
+    section_by_num = {}
+    for node in nodes:
+        if "section_num" in node:
+            num = node["section_num"]
+            if num not in section_by_num:
+                section_by_num[num] = []
+            section_by_num[num].append(node)
+
+    # 为相同条款号的节点创建连接
+    for num, section_nodes in section_by_num.items():
+        if len(section_nodes) >= 2:
+            for i in range(len(section_nodes) - 1):
+                for j in range(i + 1, len(section_nodes)):
+                    edges.append({
+                        "source": section_nodes[i]["id"],
+                        "target": section_nodes[j]["id"],
+                        "color": "#888",
+                        "opacity": 0.2
+                    })
+
+    # 4. 添加文档间连接
+    regulation_groups = [
+        ["CCAR-25-R4", "FAR-25", "CS-25"],
+        ["CCAR-33-R2", "FAR-33", "CS-E"],
+        ["CCAR-29-R2", "FAR-29"],
+        ["CCAR-23", "FAR-23"],
+    ]
+
+    for group in regulation_groups:
+        existing = [d for d in group if d in doc_nodes]
+        if len(existing) >= 2:
+            for i in range(len(existing) - 1):
+                for j in range(i + 1, len(existing)):
+                    edges.append({
+                        "source": doc_nodes[existing[i]],
+                        "target": doc_nodes[existing[j]],
+                        "color": "#666",
+                        "opacity": 0.15
+                    })
+
+    return {
+        "status": "ok",
+        "nodes": nodes[:max_nodes],
+        "edges": edges[:max_nodes * 3],
+        "summary": {
+            "total_nodes": len(nodes[:max_nodes]),
+            "total_edges": len(edges[:max_nodes * 3]),
+            "query": query,
+            "document_nodes": len(doc_nodes),
+            "section_nodes": section_count
+        }
+    }
+
+
+def _get_agency_color(agency: str) -> str:
+    """获取机构对应的颜色"""
+    colors = {
+        "CAAC": "#e63946",  # Red
+        "FAA": "#3498db",   # Blue
+        "EASA": "#2ecc71",  # Green
+        "UNKNOWN": "#95a5a6"  # Gray
+    }
+    return colors.get(agency.upper(), "#95a5a5")
+
+
+def _infer_agency_from_id(node_id: str, node: dict, edges: list, all_nodes: list, agency_docs: dict) -> str:
+    """通过节点ID、标签或连接关系推断其所属机构"""
+    # 1. 从节点ID中推断
+    nid = node_id.upper()
+    for agency, doc_prefixes in agency_docs.items():
+        for prefix in doc_prefixes:
+            if prefix.replace("-", "_").replace(".", "_").upper() in nid:
+                return agency
+
+    # 2. 从节点标签中推断
+    label = (node.get('label', '') or '').upper()
+    for agency, doc_prefixes in agency_docs.items():
+        for prefix in doc_prefixes:
+            if prefix in label:
+                return agency
+
+    # 3. 查找连接的文档节点（限制搜索深度避免性能问题）
+    # 建立快速查找表
+    node_map = {}
+    for n in all_nodes:
+        node_map[n['id']] = n
+
+    raw_id = node.get('id', '')
+    for edge in edges:
+        peer_id = None
+        if edge.get('source') == raw_id:
+            peer_id = edge.get('target')
+        elif edge.get('target') == raw_id:
+            peer_id = edge.get('source')
+
+        if peer_id:
+            peer = node_map.get(peer_id, {})
+            if peer.get('type') == 'document':
+                peer_label = peer.get('label', '')
+                for agency, doc_prefixes in agency_docs.items():
+                    for prefix in doc_prefixes:
+                        if prefix in peer_label:
+                            return agency
+
+    return "UNKNOWN"
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=8000)

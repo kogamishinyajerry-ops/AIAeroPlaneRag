@@ -4,7 +4,7 @@ import re
 from pathlib import Path
 from typing import Dict, List
 
-from settings import DOCUMENT_VERSION
+from src.settings import DOCUMENT_VERSION
 
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -134,11 +134,22 @@ class StructuralChunker:
         doc_meta: Dict,
     ) -> Dict:
         contextualized_text = f"[{h1} > {h2} > {h3}]\n{text}"
+        # Determine authority from document
+        doc_id = doc_meta.get("document_id", filepath.stem).upper()
+        if "CCAR" in doc_id or "CAAC" in doc_id:
+            authority = "CAAC"
+        elif "FAR" in doc_id or "FAA" in doc_id:
+            authority = "FAA"
+        elif "CS-" in doc_id or "EASA" in doc_id:
+            authority = "EASA"
+        else:
+            authority = "OTHER"
         return {
             "text": contextualized_text,
             "original_text": text,  # Preserve original text without context prefix
             "metadata": {
                 "source": source,
+                "authority": authority,
                 "document": h1,
                 "chapter": h2,
                 "section": h3,

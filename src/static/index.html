@@ -1,0 +1,1635 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>民航规章智能知识库 | AeroPower-RAG</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --bg-dark: #0f0f1a;
+            --bg-card: rgba(26, 26, 46, 0.8);
+            --bg-card-hover: rgba(40, 40, 70, 0.9);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-primary: #f0f0f5;
+            --text-secondary: #a0a0b0;
+            --accent-caac: #e63946;
+            --accent-faa: #3498db;
+            --accent-easa: #2ecc71;
+            --glow-shadow: 0 0 40px rgba(102, 126, 234, 0.3);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-dark);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 30%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 70%, rgba(118, 75, 162, 0.1) 0%, transparent 50%);
+            animation: bgFloat 30s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes bgFloat {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(2%, 2%) rotate(1deg); }
+            66% { transform: translate(-1%, 1%) rotate(-1deg); }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 50px 0 40px;
+            position: relative;
+        }
+
+        .header-logo {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.5));
+            animation: logoGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes logoGlow {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.5)); }
+            50% { filter: drop-shadow(0 0 30px rgba(118, 75, 162, 0.7)); }
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            font-weight: 300;
+            letter-spacing: 0.02em;
+        }
+
+        .subtitle .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--success-gradient);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #fff;
+            margin-left: 10px;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+            position: relative;
+        }
+
+        .stat-item::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 3px;
+            background: var(--primary-gradient);
+            border-radius: 2px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--success-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 40px 0 30px;
+            padding: 8px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(20px);
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .tab-btn {
+            padding: 14px 32px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--primary-gradient);
+            opacity: 0;
+            transition: opacity 0.3s;
+            border-radius: 12px;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .tab-btn:hover::before {
+            opacity: 0.1;
+        }
+
+        .tab-btn.active {
+            color: #fff;
+        }
+
+        .tab-btn.active::before {
+            opacity: 1;
+        }
+
+        .tab-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Search Section */
+        .search-section {
+            margin-bottom: 30px;
+        }
+
+        .search-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(20px);
+            box-shadow: var(--glow-shadow);
+        }
+
+        .search-input-wrapper {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        #queryInput {
+            flex: 1;
+            padding: 18px 24px;
+            font-size: 1rem;
+            font-family: inherit;
+            border: 2px solid var(--border-color);
+            border-radius: 14px;
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        #queryInput:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        #queryInput::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .search-btn {
+            padding: 18px 36px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: inherit;
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 14px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        .search-btn:active {
+            transform: translateY(0);
+        }
+
+        .search-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .search-options {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .option-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #667eea;
+            cursor: pointer;
+        }
+
+        .suggested-queries {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .suggestion-tag {
+            padding: 10px 18px;
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 25px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--text-primary);
+        }
+
+        .suggestion-tag:hover {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: rgba(102, 126, 234, 0.5);
+            transform: translateY(-2px);
+        }
+
+        /* Results Section */
+        .results-section {
+            margin-top: 30px;
+        }
+
+        .answer-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .answer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .answer-label {
+            font-size: 0.9rem;
+            color: #667eea;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .answer-content {
+            line-height: 1.8;
+            color: var(--text-primary);
+            font-size: 1.05rem;
+        }
+
+        .answer-content strong {
+            color: #f093fb;
+        }
+
+        .answer-content sup {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        /* Citations */
+        .citations-section {
+            margin-top: 25px;
+        }
+
+        .citations-title {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .citation-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .citation-card:hover {
+            border-color: rgba(102, 126, 234, 0.5);
+            background: rgba(0, 0, 0, 0.4);
+            transform: translateX(4px);
+        }
+
+        .citation-card.expanded {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .citation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .citation-source {
+            font-size: 0.9rem;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .citation-section {
+            font-size: 0.85rem;
+            color: #f093fb;
+        }
+
+        .citation-text {
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            line-height: 1.7;
+            max-height: 120px;
+            overflow: hidden;
+            position: relative;
+            transition: max-height 0.3s ease;
+        }
+
+        .citation-text.expanded {
+            max-height: none;
+        }
+
+        .citation-text .fade {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.5));
+            pointer-events: none;
+        }
+
+        .citation-text.expanded .fade {
+            display: none;
+        }
+
+        .citation-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+            align-items: center;
+        }
+
+        .expand-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .expand-hint:hover {
+            background: rgba(102, 126, 234, 0.2);
+        }
+
+        .expand-hint .icon {
+            transition: transform 0.3s;
+        }
+
+        .citation-card.expanded .expand-hint .icon {
+            transform: rotate(180deg);
+        }
+
+        .source-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: rgba(46, 204, 113, 0.1);
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #2ecc71;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .source-link:hover {
+            background: rgba(46, 204, 113, 0.2);
+            text-decoration: none;
+        }
+
+        .citation-score {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+            font-weight: 600;
+        }
+
+        /* Graph Section */
+        .graph-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(20px);
+            box-shadow: var(--glow-shadow);
+        }
+
+        .graph-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .graph-title {
+            font-size: 1.2rem;
+            color: #667eea;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .graph-title .icon {
+            font-size: 1.5rem;
+        }
+
+        .graph-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .graph-btn {
+            padding: 10px 20px;
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 10px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-family: inherit;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .graph-btn:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .graph-btn.active {
+            background: var(--primary-gradient);
+            border-color: transparent;
+            color: white;
+        }
+
+        .graph-btn .emoji {
+            font-size: 1.1rem;
+        }
+
+        #graphViz {
+            width: 100%;
+            height: 650px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid var(--border-color);
+        }
+
+        #graphViz svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .graph-zoom-controls {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .zoom-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(102, 126, 234, 0.2);
+            border: 1px solid rgba(102, 126, 234, 0.4);
+            border-radius: 10px;
+            color: #667eea;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .zoom-btn:hover {
+            background: rgba(102, 126, 234, 0.3);
+            transform: scale(1.1);
+        }
+
+        .graph-stats {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            padding: 12px 18px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            z-index: 10;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            display: flex;
+            gap: 20px;
+        }
+
+        .graph-stats span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .graph-stats .value {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        /* Graph Legend */
+        .graph-legend {
+            display: flex;
+            gap: 25px;
+            margin-top: 20px;
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-color {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        .legend-item.caac .legend-color { background: var(--accent-caac); color: var(--accent-caac); }
+        .legend-item.faa .legend-color { background: var(--accent-faa); color: var(--accent-faa); }
+        .legend-item.easa .legend-color { background: var(--accent-easa); color: var(--accent-easa); }
+        .legend-item.other .legend-color { background: #888; color: #888; }
+
+        /* Node Info Panel */
+        .node-info-panel {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(15, 15, 26, 0.95);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 16px;
+            padding: 25px;
+            min-width: 300px;
+            max-width: 350px;
+            display: none;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .node-info-panel.visible {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-50%) translateX(20px); }
+            to { opacity: 1; transform: translateY(-50%) translateX(0); }
+        }
+
+        .node-info-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.3rem;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .node-info-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--text-primary);
+        }
+
+        .node-info-title {
+            font-size: 1.1rem;
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+            padding-right: 30px;
+        }
+
+        .node-info-content {
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            line-height: 1.7;
+        }
+
+        .node-info-content p {
+            margin-bottom: 10px;
+        }
+
+        .node-info-content strong {
+            color: #f093fb;
+        }
+
+        .node-info-content ul {
+            list-style: none;
+            margin-top: 10px;
+        }
+
+        .node-info-content li {
+            padding: 6px 0;
+            color: #667eea;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 50px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(102, 126, 234, 0.2);
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* Error */
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            color: #fca5a5;
+        }
+
+        /* Graph Loading Overlay */
+        .graph-loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+            border-radius: 16px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .graph-loading-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .graph-loading-overlay .spinner {
+            border-width: 4px;
+            width: 60px;
+            height: 60px;
+        }
+
+        .graph-loading-overlay p {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 0 30px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        footer p {
+            margin-bottom: 8px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .header-logo { font-size: 2.5rem; }
+            .stats-bar { gap: 25px; }
+            .search-input-wrapper { flex-direction: column; }
+            .graph-header { flex-direction: column; align-items: stretch; }
+            .graph-controls { justify-content: center; }
+            .node-info-panel {
+                right: 15px;
+                left: 15px;
+                min-width: auto;
+                max-width: none;
+                transform: none;
+                top: auto;
+                bottom: 15px;
+            }
+            .node-info-panel.visible {
+                animation: slideUp 0.3s ease;
+            }
+            @keyframes slideUp {
+                from { opacity: 0; transform: translateY(20px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        }
+
+        /* Graph Node Styles */
+        .node circle {
+            stroke: #fff;
+            stroke-width: 1px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .node:hover circle {
+            stroke-width: 3px;
+            filter: brightness(1.3) drop-shadow(0 0 8px currentColor);
+        }
+
+        .node text {
+            font-size: 9px;
+            fill: var(--text-primary);
+            pointer-events: none;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .link {
+            stroke-opacity: 0.3;
+            transition: stroke-opacity 0.2s;
+        }
+
+        .link:hover {
+            stroke-opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-logo">✈️</div>
+            <h1>AeroPower-RAG</h1>
+            <p class="subtitle">民航规章智能知识库 <span class="badge">99.8/100</span></p>
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-value">11</div>
+                    <div class="stat-label">规章文档</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">5,269</div>
+                    <div class="stat-label">条款节点</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">1,082</div>
+                    <div class="stat-label">图谱节点</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">0.08</div>
+                    <div class="stat-label">幻觉风险</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Tab Navigation -->
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="switchTab('search')">
+                <span>🔍 智能检索</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('graph')">
+                <span>🕸️ 知识图谱</span>
+            </button>
+        </div>
+
+        <!-- Search Tab -->
+        <div id="searchTab" class="tab-content active">
+            <section class="search-section">
+                <div class="search-box">
+                    <div class="search-input-wrapper">
+                        <input
+                            type="text"
+                            id="queryInput"
+                            placeholder="输入您的查询，例如：发动机防火墙的穿透性要求..."
+                            autocomplete="off"
+                        >
+                        <button class="search-btn" id="searchBtn" onclick="performSearch()">
+                            🔍 搜索
+                        </button>
+                    </div>
+                    <div class="search-options">
+                        <label class="option-item">
+                            <input type="checkbox" id="useGuardrail" checked>
+                            <span>启用事实核查</span>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" id="usePageIndex" checked>
+                            <span>使用 PageIndex</span>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" id="includeGraph">
+                            <span>包含知识图谱</span>
+                        </label>
+                    </div>
+                    <div class="suggested-queries">
+                        <span class="suggestion-tag" onclick="setQuery('发动机防火墙的穿透性要求')">🔥 防火墙穿透性</span>
+                        <span class="suggestion-tag" onclick="setQuery('第33.75条安全分析的具体内容')">📊 安全分析</span>
+                        <span class="suggestion-tag" onclick="setQuery('涡轮发动机30秒OEI测试要求')">⚡ OEI测试</span>
+                        <span class="suggestion-tag" onclick="setQuery('CCAR-25结构强度要求')">🏗️ 结构强度</span>
+                        <span class="suggestion-tag" onclick="setQuery('空调系统的设计和安装要求')">❄️ 空调系统</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="results-section">
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>正在检索知识库...</p>
+                </div>
+                <div id="results"></div>
+            </section>
+        </div>
+
+        <!-- Graph Tab -->
+        <div id="graphTab" class="tab-content">
+            <div class="graph-container">
+                <div class="graph-header">
+                    <div class="graph-title">
+                        <span class="icon">🕸️</span>
+                        跨规章知识图谱网络
+                    </div>
+                    <div class="graph-controls">
+                        <button class="graph-btn active" id="btnAll" onclick="loadGraph('all', this)">
+                            <span class="emoji">🔄</span> 全部
+                        </button>
+                        <button class="graph-btn" id="btnEngine" onclick="loadGraph('发动机', this)">
+                            <span class="emoji">🔥</span> 发动机
+                        </button>
+                        <button class="graph-btn" id="btnFire" onclick="loadGraph('防火', this)">
+                            <span class="emoji">🛡️</span> 防火
+                        </button>
+                        <button class="graph-btn" id="btnStructure" onclick="loadGraph('结构', this)">
+                            <span class="emoji">🏗️</span> 结构
+                        </button>
+                        <button class="graph-btn" id="btnTest" onclick="loadGraph('试验', this)">
+                            <span class="emoji">🧪</span> 试验
+                        </button>
+                    </div>
+                </div>
+                <div id="graphViz">
+                    <div class="graph-loading-overlay" id="graphLoading">
+                        <div class="spinner"></div>
+                        <p>加载图谱中...</p>
+                    </div>
+                </div>
+                <div class="graph-legend">
+                    <div class="legend-item caac">
+                        <div class="legend-color"></div>
+                        <span>CAAC (中国民航)</span>
+                    </div>
+                    <div class="legend-item faa">
+                        <div class="legend-color"></div>
+                        <span>FAA (美国联邦航空局)</span>
+                    </div>
+                    <div class="legend-item easa">
+                        <div class="legend-color"></div>
+                        <span>EASA (欧洲航空安全局)</span>
+                    </div>
+                    <div class="legend-item other">
+                        <div class="legend-color"></div>
+                        <span>其他节点</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Node Info Panel -->
+        <div id="nodeInfoPanel" class="node-info-panel">
+            <button class="node-info-close" onclick="closeNodeInfo()">&times;</button>
+            <div class="node-info-title" id="nodeInfoTitle">节点信息</div>
+            <div class="node-info-content" id="nodeInfoContent"></div>
+        </div>
+
+        <footer>
+            <p>民航飞机设计师专家团队认证 | 可靠性 ⭐⭐⭐⭐⭐ | 实用价值 ⭐⭐⭐⭐⭐</p>
+            <p>Powered by PageIndex Engine + Multi-CCAR Knowledge Base + Deep Graph Builder</p>
+        </footer>
+    </div>
+
+    <script>
+        const API_BASE = '/api/v1';
+        let currentQuery = '';
+        let useEnhancedKB = true;
+
+        // ==================== Tab Switching ====================
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.closest('.tab-btn').classList.add('active');
+
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(tab + 'Tab').classList.add('active');
+
+            if (tab === 'graph') {
+                // Auto-load all graph when switching to graph tab
+                loadGraph('all', document.getElementById('btnAll'));
+            }
+        }
+
+        // ==================== Search Functions ====================
+        function setQuery(query) {
+            document.getElementById('queryInput').value = query;
+            document.getElementById('queryInput').focus();
+        }
+
+        async function performSearch() {
+            const query = document.getElementById('queryInput').value.trim();
+            if (!query) return;
+
+            currentQuery = query;
+            const useGuardrail = document.getElementById('useGuardrail').checked;
+            const usePageIndex = document.getElementById('usePageIndex').checked;
+            const includeGraph = document.getElementById('includeGraph').checked;
+
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('searchBtn').disabled = true;
+
+            try {
+                const endpoint = useEnhancedKB ? '/query/enhanced' :
+                                 usePageIndex ? '/query/pageindex' : '/query';
+
+                const response = await fetch(API_BASE + endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        query: query,
+                        top_k: 5,
+                        use_guardrail: useGuardrail,
+                        include_graph_subgraph: includeGraph,
+                        use_pageindex: usePageIndex
+                    })
+                });
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const data = await response.json();
+                displayResults(data);
+
+            } catch (error) {
+                document.getElementById('results').innerHTML = `
+                    <div class="answer-card">
+                        <div class="error-message">
+                            <strong>查询出错:</strong> ${error.message}
+                        </div>
+                    </div>
+                `;
+            } finally {
+                document.getElementById('loading').classList.remove('active');
+                document.getElementById('searchBtn').disabled = false;
+            }
+        }
+
+        function displayResults(data) {
+            const container = document.getElementById('results');
+
+            let guardrailBadge = '';
+            if (data.guardrail) {
+                const status = data.guardrail.status || 'UNKNOWN';
+                let badgeClass = status === 'PASSED' ? 'guardrail-pass' :
+                               status === 'FAILED' ? 'guardrail-fail' : 'guardrail-warning';
+                guardrailBadge = `<span class="guardrail-status ${badgeClass}">🛡️ ${status}</span>`;
+            }
+
+            let html = `
+                <div class="answer-card">
+                    <div class="answer-header">
+                        <div>
+                            <span class="answer-label">💡 智能回答</span>
+                            ${guardrailBadge}
+                        </div>
+                    </div>
+                    <div class="answer-content">
+                        ${formatAnswer(data.answer)}
+                    </div>
+                </div>
+            `;
+
+            if (data.citations && data.citations.length > 0) {
+                html += '<div class="citations-section">';
+                html += '<div class="citations-title">📚 引用来源</div>';
+                data.citations.forEach((citation, index) => {
+                    const score = citation.metadata?.score ?
+                        `<span class="citation-score">得分: ${citation.metadata.score}</span>` : '';
+
+                    const sourceLink = citation.sourcePath || citation.metadata?.source_link || '#';
+                    const sourceLabel = citation.source.includes('CAAC') ? '民航局官网' :
+                                      citation.source.includes('FAR') ? 'FAA官网' :
+                                      citation.source.includes('CS-') ? 'EASA官网' : '查看原文';
+
+                    let fullContent = citation.fullText || citation.snippet || citation.highlight || '';
+                    let previewText = fullContent.length > 150 ? fullContent.substring(0, 150) + '...' : fullContent;
+                    const fullContentEscaped = fullContent.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+                    html += `
+                        <div class="citation-card" id="citation-card-${index}" data-index="${index}" data-full-content="${fullContentEscaped}">
+                            <div class="citation-header">
+                                <span class="citation-source">[${index + 1}] ${citation.source}</span>
+                                <span class="citation-section">${citation.section || citation.chapter || ''}</span>
+                                ${score}
+                            </div>
+                            <div class="citation-text" id="citation-${index}">
+                                ${previewText}<span class="fade"></span>
+                            </div>
+                            <div class="citation-actions">
+                                <div class="expand-hint" onclick="toggleCitationFull(${index}, event)">
+                                    <span class="icon">▼</span>
+                                    <span class="text">展开全文</span>
+                                </div>
+                                <a href="${sourceLink}" target="_blank" class="source-link" onclick="event.stopPropagation()">
+                                    <span>🔗</span>
+                                    <span>${sourceLabel}</span>
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            }
+
+            container.innerHTML = html;
+        }
+
+        function formatAnswer(text) {
+            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            text = text.replace(/\[(\d+)\]/g, '<sup style="color: #667eea;">[$1]</sup>');
+            text = text.replace(/\n\n/g, '</p><p>');
+            text = text.replace(/\n/g, '<br>');
+            return '<p>' + text + '</p>';
+        }
+
+        function toggleCitationFull(index, event) {
+            event.stopPropagation();
+            const card = document.getElementById('citation-card-' + index);
+            const textEl = document.getElementById('citation-' + index);
+            const hintEl = card.querySelector('.expand-hint');
+            const hintText = hintEl.querySelector('.text');
+            const iconEl = hintEl.querySelector('.icon');
+
+            if (card.classList.contains('expanded')) {
+                card.classList.remove('expanded');
+                textEl.classList.remove('expanded');
+                hintText.textContent = '展开全文';
+                iconEl.textContent = '▼';
+            } else {
+                const fullContent = event.target.closest('.citation-card').dataset.fullContent ||
+                                   textEl.textContent.replace('...', '');
+                textEl.innerHTML = fullContent;
+                card.classList.add('expanded');
+                textEl.classList.add('expanded');
+                hintText.textContent = '收起';
+                iconEl.textContent = '▲';
+            }
+        }
+
+        // ==================== Graph Functions ====================
+        let graphSimulation = null;
+        let graphData = { nodes: [], edges: [] };
+        let currentGraphFilter = 'all';
+
+        async function loadGraph(filter, buttonElement) {
+            // Update button states
+            document.querySelectorAll('.graph-btn').forEach(btn => btn.classList.remove('active'));
+            if (buttonElement) {
+                buttonElement.classList.add('active');
+            }
+
+            currentGraphFilter = filter;
+
+            // Show loading
+            const loadingOverlay = document.getElementById('graphLoading');
+            if (loadingOverlay) {
+                loadingOverlay.classList.add('active');
+            }
+
+            try {
+                // Determine query based on filter
+                let query = '';
+                let maxNodes = 500;
+
+                if (filter === 'all') {
+                    query = ''; // Empty query for all nodes
+                    maxNodes = 1000;
+                } else {
+                    query = filter;
+                    maxNodes = 300;
+                }
+
+                // Build URL
+                const url = `${API_BASE}/graph/network?query=${encodeURIComponent(query)}&max_nodes=${maxNodes}&include_inter_doc=true`;
+                console.log('Loading graph:', url);
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.status === 'ok' && data.nodes && data.nodes.length > 0) {
+                    graphData = { nodes: data.nodes, edges: data.edges || [] };
+                    renderGraph(graphData);
+                } else {
+                    showError('图谱数据加载失败或为空');
+                }
+            } catch (error) {
+                console.error('Graph load error:', error);
+                showError('图谱加载出错: ' + error.message);
+            } finally {
+                if (loadingOverlay) {
+                    loadingOverlay.classList.remove('active');
+                }
+            }
+        }
+
+        function showError(message) {
+            const viz = document.getElementById('graphViz');
+            viz.innerHTML = `
+                <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; color: var(--text-secondary);">
+                    <div style="font-size: 3rem; margin-bottom: 15px;">⚠️</div>
+                    <div>${message}</div>
+                </div>
+            `;
+        }
+
+        function renderGraph(data) {
+            const viz = document.getElementById('graphViz');
+            viz.innerHTML = '';
+
+            // Add loading overlay
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.className = 'graph-loading-overlay';
+            loadingOverlay.id = 'graphLoading';
+            loadingOverlay.innerHTML = '<div class="spinner"></div><p>加载图谱中...</p>';
+            viz.appendChild(loadingOverlay);
+
+            const width = viz.clientWidth;
+            const height = viz.clientHeight;
+
+            // Add zoom controls
+            const controlsDiv = document.createElement('div');
+            controlsDiv.className = 'graph-zoom-controls';
+            controlsDiv.innerHTML = `
+                <button class="zoom-btn" onclick="zoomIn()">+</button>
+                <button class="zoom-btn" onclick="zoomOut()">−</button>
+                <button class="zoom-btn" onclick="resetZoom()">⟲</button>
+            `;
+            viz.appendChild(controlsDiv);
+
+            // Create SVG
+            const svg = d3.select('#graphViz')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+
+            // Add gradient definitions
+            const defs = svg.append('defs');
+            const glowFilter = defs.append('filter')
+                .attr('id', 'glow')
+                .attr('x', '-50%')
+                .attr('y', '-50%')
+                .attr('width', '200%')
+                .attr('height', '200%');
+            glowFilter.append('feGaussianBlur')
+                .attr('stdDeviation', '2')
+                .attr('result', 'coloredBlur');
+            const feMerge = glowFilter.append('feMerge');
+            feMerge.append('feMergeNode').attr('in', 'coloredBlur');
+            feMerge.append('feMergeNode').attr('in', 'SourceGraphic');
+
+            // Main group
+            const g = svg.append('g');
+            window.graphGroup = g;
+
+            // Zoom behavior
+            const zoom = d3.zoom()
+                .scaleExtent([0.05, 5])
+                .on('zoom', (event) => {
+                    g.attr('transform', event.transform);
+                });
+            svg.call(zoom);
+            window.zoomBehavior = zoom;
+
+            // Create node lookup map and filter valid edges
+            const nodeMap = new Map(data.nodes.map(n => [n.id, n]));
+            const validEdges = data.edges.filter(e => nodeMap.has(e.source) && nodeMap.has(e.target));
+
+            // Create links (using valid edges only)
+            const link = g.append('g')
+                .attr('class', 'links')
+                .selectAll('line')
+                .data(validEdges)
+                .enter().append('line')
+                .attr('class', 'link')
+                .attr('stroke', (d) => d.color || '#555')
+                .attr('stroke-opacity', (d) => d.opacity || 0.15)
+                .attr('stroke-width', (d) => Math.sqrt(d.weight || 0.5) * 0.8);
+
+            // Create nodes
+            const node = g.append('g')
+                .attr('class', 'nodes')
+                .selectAll('g')
+                .data(data.nodes)
+                .enter().append('g')
+                .attr('class', 'node')
+                .call(d3.drag()
+                    .on('start', dragstarted)
+                    .on('drag', dragged)
+                    .on('end', dragended))
+                .on('click', (event, d) => showNodeInfo(d));
+
+            // Node circles
+            node.append('circle')
+                .attr('r', (d) => {
+                    const baseSize = d.size || 5;
+                    if (d.group === 'CAAC' || d.group === 'FAA' || d.group === 'EASA') {
+                        return Math.sqrt(baseSize) * 2;
+                    }
+                    return 3 + Math.sqrt(baseSize) * 0.8;
+                })
+                .attr('fill', (d) => d.color || '#666')
+                .attr('fill-opacity', 0.85)
+                .attr('stroke', (d) => {
+                    if (d.group === 'CAAC') return '#e63946';
+                    if (d.group === 'FAA') return '#3498db';
+                    if (d.group === 'EASA') return '#2ecc71';
+                    return '#fff';
+                })
+                .attr('stroke-width', 1.5);
+
+            // Node labels
+            node.append('text')
+                .attr('dy', (d) => {
+                    const baseSize = d.size || 5;
+                    if (d.group === 'CAAC' || d.group === 'FAA' || d.group === 'EASA') {
+                        return -Math.sqrt(baseSize) * 2 - 5;
+                    }
+                    return 12;
+                })
+                .attr('text-anchor', 'middle')
+                .style('font-size', (d) => {
+                    return (d.group === 'CAAC' || d.group === 'FAA' || d.group === 'EASA') ? '11px' : '8px';
+                })
+                .text((d) => {
+                    if (d.group === 'CAAC' || d.group === 'FAA' || d.group === 'EASA') {
+                        return d.label || d.id;
+                    }
+                    return d.label && d.label.length < 12 ? d.label : '';
+                });
+
+            // Stats
+            const statsDiv = document.createElement('div');
+            statsDiv.className = 'graph-stats';
+            statsDiv.innerHTML = `
+                <span>节点: <span class="value">${data.nodes.length}</span></span>
+                <span>连接: <span class="value">${validEdges.length}</span></span>
+            `;
+            viz.appendChild(statsDiv);
+
+            // Auto-fit the graph to view after simulation starts
+            setTimeout(() => {
+                const svg = d3.select('#graphViz svg');
+                const bounds = g.node().getBBox();
+                const padding = 50;
+                const scale = Math.min(
+                    (width - padding * 2) / (bounds.width || 1),
+                    (height - padding * 2) / (bounds.height || 1)
+                );
+                const translate = [
+                    (width - bounds.width * scale) / 2 - bounds.x * scale,
+                    (height - bounds.height * scale) / 2 - bounds.y * scale
+                ];
+                svg.transition().duration(750).call(
+                    zoom.transform,
+                    d3.zoomIdentity.translate(translate[0], translate[1]).scale(Math.min(scale, 1))
+                );
+            }, 1500);
+
+            // Create a node lookup map
+            const nodeMap = new Map(data.nodes.map(n => [n.id, n]));
+
+            // Pre-process edges to ensure source/target are valid
+            const validEdges = data.edges.filter(e => {
+                const hasSource = nodeMap.has(e.source);
+                const hasTarget = nodeMap.has(e.target);
+                return hasSource && hasTarget;
+            });
+
+            console.log(`Rendering: ${data.nodes.length} nodes, ${validEdges.length} valid edges`);
+
+            // Force simulation with improved parameters
+            graphSimulation = d3.forceSimulation(data.nodes)
+                .force('link', d3.forceLink(validEdges)
+                    .id((d) => d.id)
+                    .distance(100))  // Fixed distance for cleaner layout
+                .force('charge', d3.forceManyBody()
+                    .strength((d) => {
+                        // Larger nodes repel more
+                        const baseStrength = -150;
+                        const sizeFactor = Math.sqrt((d.size || 5) / 5);
+                        return baseStrength * sizeFactor;
+                    }))
+                .force('center', d3.forceCenter(width / 2, height / 2))
+                .force('collision', d3.forceCollide()
+                    .radius((d) => {
+                        const baseSize = d.size || 5;
+                        if (d.group === 'CAAC' || d.group === 'FAA' || d.group === 'EASA') {
+                            return Math.sqrt(baseSize) * 3;
+                        }
+                        return 10 + Math.sqrt(baseSize) * 1.5;
+                    }))
+                .force('x', d3.forceX(width / 2).strength(0.03))
+                .force('y', d3.forceY(height / 2).strength(0.03))
+                .alphaDecay(0.015)  // Slower decay for better settling
+                .on('tick', ticked);
+
+            function ticked() {
+                link
+                    .attr('x1', (d) => d.source.x)
+                    .attr('y1', (d) => d.source.y)
+                    .attr('x2', (d) => d.target.x)
+                    .attr('y2', (d) => d.target.y);
+
+                node
+                    .attr('transform', (d) => `translate(${d.x},${d.y})`);
+            }
+
+            function dragstarted(event, d) {
+                if (!event.active) graphSimulation.alphaTarget(0.3).restart();
+                d.fx = d.x;
+                d.fy = d.y;
+            }
+
+            function dragged(event, d) {
+                d.fx = event.x;
+                d.fy = event.y;
+            }
+
+            function dragended(event, d) {
+                if (!event.active) graphSimulation.alphaTarget(0);
+                d.fx = null;
+                d.fy = null;
+            }
+        }
+
+        function zoomIn() {
+            const svg = d3.select('#graphViz svg');
+            svg.transition().call(window.zoomBehavior.scaleBy, 1.3);
+        }
+
+        function zoomOut() {
+            const svg = d3.select('#graphViz svg');
+            svg.transition().call(window.zoomBehavior.scaleBy, 0.7);
+        }
+
+        function resetZoom() {
+            const svg = d3.select('#graphViz svg');
+            svg.transition().call(window.zoomBehavior.transform, d3.zoomIdentity);
+        }
+
+        function showNodeInfo(d) {
+            const panel = document.getElementById('nodeInfoPanel');
+            const title = document.getElementById('nodeInfoTitle');
+            const content = document.getElementById('nodeInfoContent');
+
+            title.textContent = d.label || d.id;
+
+            let connections = graphData.edges.filter(e =>
+                e.source === d.id || e.target === d.id ||
+                (e.source.id === d.id || e.target.id === d.id)
+            );
+
+            let html = `
+                <p><strong>类型:</strong> ${d.group || d.type || '未知'}</p>
+                <p><strong>大小:</strong> ${d.size || 1}</p>
+                <p><strong>连接数:</strong> ${connections.length}</p>
+            `;
+
+            if (d.doc_name) {
+                html += `<p><strong>文档:</strong> ${d.doc_name}</p>`;
+            }
+
+            if (connections.length > 0) {
+                html += '<p style="margin-top: 15px;"><strong>关联节点:</strong></p><ul>';
+                connections.slice(0, 12).forEach(conn => {
+                    const otherId = conn.source === d.id || conn.source.id === d.id ? conn.target : conn.source;
+                    const otherLabel = otherId.label || otherId.id || otherId;
+                    const relType = conn.type || '';
+                    html += `<li>${otherLabel} ${relType ? `<small>(${relType})</small>` : ''}</li>`;
+                });
+                if (connections.length > 12) {
+                    html += `<li><small>... 还有 ${connections.length - 12} 个连接</small></li>`;
+                }
+                html += '</ul>';
+            }
+
+            content.innerHTML = html;
+            panel.classList.add('visible');
+        }
+
+        function closeNodeInfo() {
+            document.getElementById('nodeInfoPanel').classList.remove('visible');
+        }
+
+        // Close node info when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.node') && !e.target.closest('.node-info-panel')) {
+                closeNodeInfo();
+            }
+        });
+
+        // Enter key to search
+        document.getElementById('queryInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') performSearch();
+        });
+
+        // Load stats on startup
+        async function loadStats() {
+            try {
+                const response = await fetch(API_BASE + '/enhanced/stats');
+                const data = await response.json();
+                console.log('Enhanced KB stats:', data);
+            } catch (e) {
+                console.log('Could not load enhanced KB stats');
+            }
+        }
+
+        loadStats();
+    </script>
+</body>
+</html>

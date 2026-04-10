@@ -8,6 +8,11 @@ from types import ModuleType
 import pytest
 
 
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+
 class FakeCollection:
     def __init__(self, count: int = 2):
         self._count = count
@@ -37,8 +42,15 @@ class FakeVectorStoreEngine:
             ids=[chunk["metadata"].get("chunk_id", f"chunk-{index}") for index, chunk in enumerate(chunks)],
         )
 
+    def _recreate_collection(self):
+        self.collection = FakeCollection()
+
     def search(self, query: str, top_k: int = 3):
         return list(self.search_results)[:top_k]
+
+    def search_hybrid(self, query: str, top_k: int = 3):
+        return list(self.search_results)[:top_k]
+
 
 
 class FakeGraphStore:
@@ -91,38 +103,31 @@ class FakeGuardrail:
 
 @pytest.fixture
 def main_module(monkeypatch):
-    root = Path(__file__).resolve().parents[1]
-    src_dir = root / "src"
-    rag_dir = src_dir / "rag"
-    ontology_dir = src_dir / "ontology"
+    import sys
+    for mod in list(sys.modules.keys()):
+        if mod.startswith("src."):
+            sys.modules.pop(mod, None)
 
-    for module_name in [
-        "main",
-        "settings",
-        "rag",
-        "rag.vector_engine",
-        "rag.guardrail",
-        "ontology",
-        "ontology.graph_store",
-    ]:
-        sys.modules.pop(module_name, None)
+    import importlib
+    main = importlib.import_module("src.main")
+    
+    # Patch ServiceContainer for direct service property access
+    from src.api.dependencies.deps import services, get_vector_engine, get_guardrail
+    services._vector_engine = FakeVectorStoreEngine()
+    services._graph_store = FakeGraphStore()
+    services._guardrail = FakeGuardrail()
+    services.is_initialized = True
+    
+    # Override FastAPI Dependencies to return the EXACT same fakes
+    main.app.dependency_overrides[get_vector_engine] = lambda: services._vector_engine
+    main.app.dependency_overrides[get_guardrail] = lambda: services._guardrail
 
-    rag_package = ModuleType("rag")
-    rag_package.__path__ = [str(rag_dir)]
-    ontology_package = ModuleType("ontology")
-    ontology_package.__path__ = [str(ontology_dir)]
-    sys.modules["rag"] = rag_package
-    sys.modules["ontology"] = ontology_package
-
-    vector_engine_module = ModuleType("rag.vector_engine")
-    vector_engine_module.VectorStoreEngine = FakeVectorStoreEngine
-    guardrail_module = ModuleType("rag.guardrail")
-    guardrail_module.FactCheckingGuardrail = FakeGuardrail
-    graph_store_module = ModuleType("ontology.graph_store")
-    graph_store_module.OntologyGraphStore = FakeGraphStore
-    sys.modules["rag.vector_engine"] = vector_engine_module
-    sys.modules["rag.guardrail"] = guardrail_module
-    sys.modules["ontology.graph_store"] = graph_store_module
-
-    monkeypatch.syspath_prepend(str(src_dir))
-    return importlib.import_module("main")
+    
+    # Patch original intent detector reference
+    try:
+        from src.rag import vector_engine
+        vector_engine.detect_query_intent = lambda query: {"regulatory": 1.0}
+    except ImportError:
+        pass
+        
+    return main

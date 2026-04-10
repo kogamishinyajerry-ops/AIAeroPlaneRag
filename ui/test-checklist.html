@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>功能测试清单 - v0.5.0</title>
+    <style>
+        body { font-family: system-ui; max-width: 800px; margin: 40px auto; padding: 20px; background: #0d1117; color: #c9d1d9; }
+        h1 { color: #58a6ff; }
+        .section { background: #161b22; padding: 20px; margin: 20px 0; border-radius: 8px; border: 1px solid #30363d; }
+        .test-item { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #30363d; }
+        .test-item:last-child { border-bottom: none; }
+        input[type="checkbox"] { margin-right: 10px; transform: scale(1.3); }
+        .checked { text-decoration: line-through; opacity: 0.6; }
+        button { background: #238636; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; margin: 5px; }
+        button:hover { background: #2ea043; }
+        a { color: #58a6ff; }
+    </style>
+</head>
+<body>
+    <h1>🎯 AeroPower-RAG 功能测试清单 v0.5.0</h1>
+    
+    <div class="section">
+        <h2>📊 核心修复验证</h2>
+        
+        <h3>1. 搜索加载状态</h3>
+        <div class="test-item"><input type="checkbox" onclick="this.parentElement.classList.toggle('checked')"> <span>点击"发起分析"后按钮变为"搜索中..."并被禁用</span></div>
+        <div class="test-item"><input type="checkbox" onclick="this.parentElement.classList.toggle('checked')"> <span>显示旋转加载动画</span></div>
+        <div class="test-item"><input type="checkbox" onclick="this.parentElement.classList.toggle('checked')"> <span>加载状态至少显示600ms（避免闪烁）</span></div>
+        <div class="test-item"><input type="checkbox" onclick="this.parentElement.classList.toggle('checked')"> <span>搜索完成后按钮恢复为"发起分析"</span></div>
+        
+        <h3>2. 局部图谱显示</h3>
+        <div class="test-item"><input type="checkbox" onclick="this.parentElement.classList.toggle('checked')"> <span>列视图显示"法规/条款"、"部件/子系统"、"支撑节点"三列</span></div>
+        <div class="test-item"><input type="checkbox" onclick="this.parentElement.classList.toggle('checked')"> <span>每列显示节点数量统计</span></div>
+        <div class="test-item"><input type="checkbox" onclick="this.parentElement.classList.toggle('checked')"> <span>节点按语义类型正确分类（不是按机构）</span></div>
+        <div class="test-item"><input type="checkbox" onclick="this.parentElement.classList.toggle('checked')"> <span>点击节点显示相邻关系</span></div>
+        
+        <h3>3. 完整图谱切换</h3>
+        <div class="test-item"><input type="checkbox" onclick="this.parentElement.classList.toggle('checked')"> <span>新增"加载完整图谱"按钮</span></div>
+        <div class="test-item"><input type="checkbox" onclick="this.parentElement.classList.toggle('checked')"> <span>点击按钮加载完整知识图谱</span></div>
+        <div class="test-item"><input type="checkbox" onclick="this.parentElement.classList.toggle('checked')"> <span>网络视图/列视图切换正常</span></div>
+        <div class="test-item"><input type="checkbox" onclick="this.parentElement.classList.toggle('checked')"> <span>子图状态切换到网络视图时提示加载完整图</span></div>
+        
+        <h3>4. 网络图渲染</h3>
+        <div class="test-item"><input type="checkbox" onclick="this.parentElement.classList.toggle('checked')"> <span>D3.js图谱正确渲染</span></div>
+        <div class="test-item"><input type="checkbox" onclick="this.parentElement.classList.toggle('checked')"> <span>节点按机构着色（CAAC红色、FAA蓝色、EASA绿色）</span></div>
+        <div class="test-item"><input type="checkbox" onclick="this.parentElement.classList.toggle('checked')"> <span>缩放控制按钮可用（+、-、⟲）</span></div>
+        <div class="test-item"><input type="checkbox" onclick="this.parentElement.classList.toggle('checked')"> <span>拖动节点和缩放功能正常</span></div>
+        
+        <h3>5. 响应和反馈</h3>
+        <div class="test-item"><input type="checkbox" onclick="this.parentElement.classList.toggle('checked')"> <span>搜索结果显示在回答面板</span></div>
+        <div class="test-item"><input type="checkbox" onclick="this.parentElement.classList.toggle('checked')"> <span>证据面板显示引用文档</span></div>
+        <div class="test-item"><input type="checkbox" onclick="this.parentElement.classList.toggle('checked')"> <span>图谱摘要显示节点和连接数量</span></div>
+    </div>
+    
+    <div class="section">
+        <h2>🔗 快速链接</h2>
+        <button onclick="window.open('/ui', '_blank')">打开主界面 /ui</button>
+        <button onclick="window.open('http://localhost:8000/docs', '_blank')">API文档</button>
+        <button onclick="location.reload()">刷新测试清单</button>
+    </div>
+    
+    <div class="section">
+        <h2>📝 测试建议</h2>
+        <ol>
+            <li>使用快捷问题按钮测试（"喘振裕度"、"超速试验"等）</li>
+            <li>切换网络视图和列视图，观察图谱显示</li>
+            <li>点击"加载完整图谱"按钮查看完整知识图谱</li>
+            <li>在图谱中点击节点查看详情</li>
+            <li>使用缩放和平移功能探索图谱</li>
+        </ol>
+    </div>
+</body>
+</html>

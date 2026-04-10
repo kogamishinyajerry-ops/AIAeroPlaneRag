@@ -1,0 +1,187 @@
+{
+  "version": "1.0",
+  "description": "航空发动机法规问答系统意图分类测试集 - 6类各5题",
+  "categories": ["regulatory", "method", "comparison", "definition", "numerical", "cross_reference"],
+  "questions": [
+    {
+      "id": "reg-001",
+      "query": "CCAR-33对压气机喘振裕度的要求是什么？",
+      "expected_intent": "regulatory",
+      "reason": "包含'要求'关键词，询问法规规定"
+    },
+    {
+      "id": "reg-002",
+      "query": "FAR-33规定涡轮叶片需要满足什么标准？",
+      "expected_intent": "regulatory",
+      "reason": "询问规章标准，包含'规定''标准'"
+    },
+    {
+      "id": "reg-003",
+      "query": "CS-E对发动机材料有什么限制？",
+      "expected_intent": "regulatory",
+      "reason": "询问法规限制，包含'限制'"
+    },
+    {
+      "id": "reg-004",
+      "query": "适航批准需要满足哪些条件？",
+      "expected_intent": "regulatory",
+      "reason": "询问适航/批准相关，包含'适航''批准'"
+    },
+    {
+      "id": "reg-005",
+      "query": "what are the certification requirements for turbine blades",
+      "expected_intent": "regulatory",
+      "reason": "英文法规查询，'requirements''certification'"
+    },
+    {
+      "id": "method-001",
+      "query": "如何检测压气机是否发生喘振？",
+      "expected_intent": "method",
+      "reason": "询问操作方法，包含'如何''检测'"
+    },
+    {
+      "id": "method-002",
+      "query": "发动机喘振裕度怎么计算？",
+      "expected_intent": "method",
+      "reason": "询问计算方法，包含'怎么''计算'"
+    },
+    {
+      "id": "method-003",
+      "query": "请说明安装涡轮叶片的标准操作流程",
+      "expected_intent": "method",
+      "reason": "询问操作流程，包含'流程''安装'"
+    },
+    {
+      "id": "method-004",
+      "query": "how to verify the compressor surge margin",
+      "expected_intent": "method",
+      "reason": "英文方法查询，'how to''verify'"
+    },
+    {
+      "id": "method-005",
+      "query": "压气机效率测试的步骤是什么？",
+      "expected_intent": "method",
+      "reason": "询问测试步骤，包含'步骤''测试'"
+    },
+    {
+      "id": "comp-001",
+      "query": "FAR-33和CS-E对喘振裕度的要求有什么区别？",
+      "expected_intent": "comparison",
+      "reason": "对比两个法规，包含'和''区别'"
+    },
+    {
+      "id": "comp-002",
+      "query": "CCAR-25与FAR-25在发动机要求上有什么不同？",
+      "expected_intent": "comparison",
+      "reason": "法规对比，包含'与''不同'"
+    },
+    {
+      "id": "comp-003",
+      "query": "涡扇发动机和涡桨发动机的适航要求差异大吗？",
+      "expected_intent": "comparison",
+      "reason": "构型对比，包含'和''差异'"
+    },
+    {
+      "id": "comp-004",
+      "query": "FAA与EASA的认证流程相比有哪些优缺点？",
+      "expected_intent": "comparison",
+      "reason": "认证体系对比，包含'与''优缺点'"
+    },
+    {
+      "id": "comp-005",
+      "query": "what is the difference between FAR-33 and CS-E",
+      "expected_intent": "comparison",
+      "reason": "英文对比查询，'difference between'"
+    },
+    {
+      "id": "def-001",
+      "query": "什么是喘振裕度？",
+      "expected_intent": "definition",
+      "reason": "术语定义查询，包含'什么是'"
+    },
+    {
+      "id": "def-002",
+      "query": "请解释压气机失速的含义",
+      "expected_intent": "definition",
+      "reason": "术语解释，包含'解释''含义'"
+    },
+    {
+      "id": "def-003",
+      "query": "航空发动机适航是什么意思？",
+      "expected_intent": "definition",
+      "reason": "概念定义，包含'是什么意思'"
+    },
+    {
+      "id": "def-004",
+      "query": "what does airworthiness certification mean",
+      "expected_intent": "definition",
+      "reason": "英文定义查询，'what does...mean'"
+    },
+    {
+      "id": "def-005",
+      "query": "燃气涡轮发动机的工作原理是什么？",
+      "expected_intent": "definition",
+      "reason": "原理概念查询，包含'是什么'"
+    },
+    {
+      "id": "num-001",
+      "query": "喘振裕度的最小限值是多少？",
+      "expected_intent": "numerical",
+      "reason": "询问数值范围，包含'多少''限值'"
+    },
+    {
+      "id": "num-002",
+      "query": "发动机最高允许转速是多少RPM？",
+      "expected_intent": "numerical",
+      "reason": "询问具体数值，包含'多少''RPM'"
+    },
+    {
+      "id": "num-003",
+      "query": "排气温度的最大极限是多少摄氏度？",
+      "expected_intent": "numerical",
+      "reason": "询问温度限值，包含'多少''最大'"
+    },
+    {
+      "id": "num-004",
+      "query": "what is the maximum turbine inlet temperature",
+      "expected_intent": "numerical",
+      "reason": "英文数值查询，'maximum...temperature'"
+    },
+    {
+      "id": "num-005",
+      "query": "发动机寿命一般是多少飞行小时？",
+      "expected_intent": "numerical",
+      "reason": "询问寿命数值，包含'多少''寿命'"
+    },
+    {
+      "id": "xref-001",
+      "query": "CCAR-33中与FAR-33等效的条款是哪个？",
+      "expected_intent": "cross_reference",
+      "reason": "跨法规引用，包含'与''等效'"
+    },
+    {
+      "id": "xref-002",
+      "query": "CS-E对应美国的哪个FAR条款？",
+      "expected_intent": "cross_reference",
+      "reason": "跨体系对应，包含'对应'"
+    },
+    {
+      "id": "xref-003",
+      "query": "FAR Part 33和CCAR-33-R2的适用范围有何交叉？",
+      "expected_intent": "cross_reference",
+      "reason": "跨法规交叉，包含'和''交叉'"
+    },
+    {
+      "id": "xref-004",
+      "query": "which FAA regulation corresponds to CCAR-33",
+      "expected_intent": "cross_reference",
+      "reason": "英文跨法规查询，'corresponds to'"
+    },
+    {
+      "id": "xref-005",
+      "query": "EASA CS-E与FAA FAR-33在叶片要求上的对应关系？",
+      "expected_intent": "cross_reference",
+      "reason": "多法规对应关系，包含'对应关系'"
+    }
+  ]
+}

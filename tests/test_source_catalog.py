@@ -5,7 +5,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from knowledge_base.source_catalog import KnowledgeSourceCatalog
+from src.knowledge_base.source_catalog import KnowledgeSourceCatalog
 
 
 def test_source_catalog_loads_seeded_official_sources():

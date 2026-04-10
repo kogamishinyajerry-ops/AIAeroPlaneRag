@@ -519,7 +519,7 @@ def main():
     import sys
     sys.path.insert(0, str(Path(__file__).parent.parent))
 
-    from settings import PROCESSED_DATA_DIR
+    from src.settings import PROCESSED_DATA_DIR
 
     print("=" * 60)
     print(" CCAR-33-R2 Professional Knowledge Graph Builder")

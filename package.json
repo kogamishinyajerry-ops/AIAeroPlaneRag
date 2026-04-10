@@ -1,0 +1,28 @@
+{
+  "name": "aiaeroplanerag",
+  "version": "1.0.0",
+  "description": "AeroPower-RAG is a prototype aviation knowledge system for civil aircraft engine regulations. It combines document ingestion, structural chunking, vector retrieval, knowledge graph extraction, and a guardrail layer to support traceable Q&A over CCAR-style source material.",
+  "main": "playwright.config.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kogamishinyajerry-ops/AIAeroPlaneRag.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/kogamishinyajerry-ops/AIAeroPlaneRag/issues"
+  },
+  "homepage": "https://github.com/kogamishinyajerry-ops/AIAeroPlaneRag#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.58.2"
+  }
+}

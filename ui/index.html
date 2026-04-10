@@ -9,7 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=0.3.0">
+    <link rel="stylesheet" href="styles.css?v=0.9.0">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 <body>
     <div class="app-shell">
@@ -24,23 +25,34 @@
 
             <section class="rail-section">
                 <div class="section-kicker">任务模式</div>
-                <div class="mode-card selected">
+                <div class="mode-card selected" data-mode="qa">
                     <div class="mode-title">法规问答</div>
-                    <div class="mode-desc">围绕当前问题生成证据化结论。</div>
+                    <div class="mode-desc">检索相关法规条款，生成带证据支撑的答案。</div>
+                    <div class="mode-hint">适用：查找规定、要求、条件限制</div>
                 </div>
-                <div class="mode-card">
+                <div class="mode-card" data-mode="graph">
                     <div class="mode-title">图谱探索</div>
-                    <div class="mode-desc">从条款、部件与试验关系切入。</div>
+                    <div class="mode-desc">分析条款间的关联关系和依赖路径。</div>
+                    <div class="mode-hint">适用：理解体系结构、追溯上下游</div>
                 </div>
             </section>
 
             <section class="rail-section">
                 <div class="section-kicker">图谱控制</div>
+                <div class="view-toggle">
+                    <button class="toggle-btn active" data-view="network" id="networkViewBtn">网络视图</button>
+                    <button class="toggle-btn" data-view="column" id="columnViewBtn">列视图</button>
+                </div>
                 <label class="toggle-row">
                     <span>包含参数节点</span>
                     <input id="includeParametersToggle" type="checkbox">
                 </label>
-                <button class="rail-btn" id="refreshGraphBtn">刷新当前子图</button>
+                <label class="toggle-row">
+                    <span>显示完整图谱</span>
+                    <input id="fullGraphToggle" type="checkbox">
+                </label>
+                <button class="rail-btn" id="loadFullGraphBtn">加载完整图谱</button>
+                <button class="rail-btn" id="refreshGraphBtn">刷新图谱</button>
             </section>
 
             <section class="rail-section">
@@ -49,6 +61,26 @@
                     <div class="status-row"><span>后端</span><strong>检查中</strong></div>
                     <div class="status-row"><span>知识库</span><strong>检查中</strong></div>
                     <div class="status-row"><span>图谱</span><strong>检查中</strong></div>
+                </div>
+            </section>
+
+            <section class="rail-section dashboard-section">
+                <div class="section-kicker">性能监控</div>
+                <button class="rail-btn" id="toggleDashboardBtn">显示仪表盘</button>
+                <div class="dashboard-panel" id="dashboardPanel" style="display: none;">
+                    <div class="dashboard-metrics" id="dashboardMetrics">
+                        <div class="loading-state">加载中...</div>
+                    </div>
+                    <div class="dashboard-charts">
+                        <div class="chart-container">
+                            <div class="chart-title">来源覆盖</div>
+                            <div class="chart-wrap" id="sourceCoverageChart"></div>
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-title">Top 来源</div>
+                            <div class="chart-wrap" id="topSourcesChart"></div>
+                        </div>
+                    </div>
                 </div>
             </section>
         </aside>
@@ -118,6 +150,32 @@
                                 在上方输入问题后，这里会显示结论、条款引用和风险提示。
                             </div>
                         </div>
+
+                        <!-- 反馈面板 -->
+                        <div class="feedback-panel" id="feedbackPanel" style="display: none;">
+                            <div class="feedback-header">
+                                <span class="feedback-title">这个回答有帮助吗？</span>
+                                <div class="feedback-actions">
+                                    <button class="feedback-btn" data-type="thumbs_up" title="有帮助">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                                        </svg>
+                                    </button>
+                                    <button class="feedback-btn" data-type="thumbs_down" title="没帮助">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path>
+                                        </svg>
+                                    </button>
+                                    <button class="feedback-btn" data-type="correct" title="纠正答案">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="feedback-status" id="feedbackStatus"></div>
+                        </div>
                     </div>
 
                     <div class="panel-card">
@@ -131,8 +189,11 @@
                         <div class="graph-summary" id="graphSummary">
                             子图会围绕当前问题或当前节点展开，而不是直接展开整个知识图谱。
                         </div>
-                        <div class="graph-stage" id="graphViz">
+                        <div class="graph-stage" id="graphViz" style="display: none;">
                             <div class="empty-state">尚未加载子图。</div>
+                        </div>
+                        <div class="graph-stage" id="networkGraphViz">
+                            <div class="empty-state">尚未加载网络图。</div>
                         </div>
                     </div>
 
@@ -204,6 +265,7 @@
         </main>
     </div>
 
-    <script src="app.js?v=0.3.0"></script>
+    <script src="app.js?v=0.9.4"></script>
+    <script src="graph-enhancements.js?v=0.9.0"></script>
 </body>
 </html>

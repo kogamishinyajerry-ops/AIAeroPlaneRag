@@ -5,7 +5,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from settings import APP_MODE, DOCUMENT_VERSION, has_real_value
+from src.settings import APP_MODE, DOCUMENT_VERSION, has_real_value
 
 try:
     from llama_index.core import SimpleDirectoryReader

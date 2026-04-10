@@ -6,7 +6,7 @@ import os
 import re
 from collections import Counter, defaultdict, deque
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict, List, Optional
 
 try:
     from neo4j import GraphDatabase
@@ -15,7 +15,7 @@ except ImportError:
 
 from dotenv import load_dotenv
 
-from settings import PROCESSED_DATA_DIR
+from src.settings import PROCESSED_DATA_DIR
 
 load_dotenv()
 
@@ -23,7 +23,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 
-def _tokenize(text: str) -> list[str]:
+def _tokenize(text: str) -> List[str]:
     return [token for token in re.split(r"[^0-9A-Za-z\u4e00-\u9fff]+", (text or "").lower()) if token]
 
 
@@ -111,7 +111,39 @@ class OntologyGraphStore:
             logger.warning("Failed to inspect graph state: %s", exc)
             self.node_count = 0
 
-    def _load_fallback_graph(self) -> dict[str, Any]:
+    def _ensure_connection(self) -> bool:
+        """
+        检查 Neo4j 连接是否仍然活跃。
+        如果连接已断开，尝试重新连接；失败则降级到 fallback 模式。
+        返回 True 表示连接正常，False 表示已降级。
+        """
+        if not self.driver:
+            return False
+        try:
+            self.driver.verify_connectivity()
+            self._refresh_graph_state()
+            return True
+        except Exception as exc:
+            logger.warning("Neo4j connection lost: %s. Reconnecting...", exc)
+            try:
+                old_driver = self.driver
+                self.driver = GraphDatabase.driver(self.uri, auth=(self.user, self.password))
+                self.driver.verify_connectivity()
+                self._refresh_graph_state()
+                logger.info("Neo4j reconnected successfully.")
+                return True
+            except Exception as reconnect_exc:
+                logger.warning("Neo4j reconnection failed: %s. Falling back to JSON mode.", reconnect_exc)
+                if old_driver:
+                    try:
+                        old_driver.close()
+                    except Exception:
+                        pass
+                self.driver = None
+                self.node_count = 0
+                return False
+
+    def _load_fallback_graph(self) -> Dict[str, Any]:
         candidates = [
             Path(PROCESSED_DATA_DIR) / "CCAR-33-R2_professional_graph.json",
             Path(PROCESSED_DATA_DIR) / "CCAR-33_graph.json",
@@ -164,13 +196,13 @@ class OntologyGraphStore:
             self.edge_lookup[(target, source)].append(normalized)
             self.relationship_counter[normalized["type"]] += 1
 
-    def query_graph(self, keyword: str) -> list[dict[str, Any]]:
-        if self.driver and self.has_graph_data:
+    def query_graph(self, keyword: str) -> List[Dict[str, Any]]:
+        if self.driver and self.has_graph_data and self._ensure_connection():
             return self._query_neo4j(keyword)
         return self._query_fallback_graph(keyword)
 
-    def _query_neo4j(self, keyword: str) -> list[dict[str, Any]]:
-        results: list[dict[str, Any]] = []
+    def _query_neo4j(self, keyword: str) -> List[Dict[str, Any]]:
+        results: List[Dict[str, Any]] = []
         try:
             with self.driver.session() as session:
                 records = session.run(
@@ -202,9 +234,9 @@ class OntologyGraphStore:
             logger.error("Graph query failed: %s", exc)
         return results
 
-    def _query_fallback_graph(self, keyword: str) -> list[dict[str, Any]]:
+    def _query_fallback_graph(self, keyword: str) -> List[Dict[str, Any]]:
         keyword_lower = (keyword or "").lower()
-        results: list[dict[str, Any]] = []
+        results: List[Dict[str, Any]] = []
         for relationship in self.relationships:
             source = self.entities_by_id.get(relationship["source"], {})
             target = self.entities_by_id.get(relationship["target"], {})
@@ -228,18 +260,18 @@ class OntologyGraphStore:
             )
         return results[:20]
 
-    def get_graph_snapshot(self) -> dict[str, Any]:
+    def get_graph_snapshot(self) -> Dict[str, Any]:
         return self.get_subgraph(limit=18, include_parameters=False)
 
     def get_subgraph(
         self,
         *,
         query: str = "",
-        node_id: str | None = None,
+        node_id: Optional[str] = None,
         limit: int = 18,
         include_parameters: bool = False,
-    ) -> dict[str, Any]:
-        if self.driver and self.has_graph_data:
+    ) -> Dict[str, Any]:
+        if self.driver and self.has_graph_data and self._ensure_connection():
             neo4j_result = self._get_neo4j_subgraph(query=query, node_id=node_id, limit=limit)
             if neo4j_result.get("nodes"):
                 return neo4j_result
@@ -250,9 +282,9 @@ class OntologyGraphStore:
             include_parameters=include_parameters,
         )
 
-    def _get_neo4j_subgraph(self, *, query: str, node_id: str | None, limit: int) -> dict[str, Any]:
-        nodes: dict[str, dict[str, Any]] = {}
-        edges: list[dict[str, Any]] = []
+    def _get_neo4j_subgraph(self, *, query: str, node_id: Optional[str], limit: int) -> Dict[str, Any]:
+        nodes: Dict[str, Dict[str, Any]] = {}
+        edges: List[Dict[str, Any]] = []
         try:
             with self.driver.session() as session:
                 records = session.run(
@@ -316,10 +348,10 @@ class OntologyGraphStore:
         self,
         *,
         query: str,
-        node_id: str | None,
+        node_id: Optional[str],
         limit: int,
         include_parameters: bool,
-    ) -> dict[str, Any]:
+    ) -> Dict[str, Any]:
         if not self.entities_by_id:
             return {
                 "mode": "fallback",
@@ -353,13 +385,13 @@ class OntologyGraphStore:
             },
         }
 
-    def _select_seed_nodes(self, *, query: str, node_id: str | None) -> list[str]:
+    def _select_seed_nodes(self, *, query: str, node_id: Optional[str]) -> List[str]:
         if node_id and node_id in self.entities_by_id:
             return [node_id]
         if not query:
             return self._overview_nodes(limit=5)
 
-        scored: list[tuple[int, str]] = []
+        scored: List[tuple] = []
         for entity_id, entity in self.entities_by_id.items():
             text = " ".join([entity.get("label", ""), entity.get("description", ""), entity.get("rawType", "")])
             score = _text_score(text, query)
@@ -371,7 +403,7 @@ class OntologyGraphStore:
         scored.sort(key=lambda item: item[0], reverse=True)
         return [entity_id for _, entity_id in scored[:4]]
 
-    def _overview_nodes(self, *, limit: int) -> list[str]:
+    def _overview_nodes(self, *, limit: int) -> List[str]:
         ranked = sorted(
             self.entities_by_id.values(),
             key=lambda entity: (
@@ -382,11 +414,11 @@ class OntologyGraphStore:
         )
         return [entity["id"] for entity in ranked[:limit]]
 
-    def _expand_seed_nodes(self, seeds: list[str], *, limit: int, include_parameters: bool) -> list[str]:
+    def _expand_seed_nodes(self, seeds: list[str], *, limit: int, include_parameters: bool) -> List[str]:
         if not seeds:
             return []
 
-        selected: list[str] = []
+        selected: List[str] = []
         queue = deque(seeds)
         seen = set()
 
@@ -418,9 +450,9 @@ class OntologyGraphStore:
 
         return selected[:limit]
 
-    def _collect_edges(self, selected_node_ids: list[str]) -> list[dict[str, Any]]:
+    def _collect_edges(self, selected_node_ids: list[str]) -> List[Dict[str, Any]]:
         selected = set(selected_node_ids)
-        edges: list[dict[str, Any]] = []
+        edges: List[Dict[str, Any]] = []
         seen = set()
         for relationship in self.relationships:
             source = relationship["source"]
@@ -434,7 +466,7 @@ class OntologyGraphStore:
             edges.append(relationship)
         return edges[: max(len(selected_node_ids) * 2, 12)]
 
-    def _sort_nodes(self, nodes: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    def _sort_nodes(self, nodes: list[dict[str, Any]]) -> List[Dict[str, Any]]:
         return sorted(
             nodes,
             key=lambda item: (
@@ -443,7 +475,7 @@ class OntologyGraphStore:
             ),
         )
 
-    def _build_summary(self, query: str, nodes: list[dict[str, Any]], edges: list[dict[str, Any]]) -> str:
+    def _build_summary(self, query: str, nodes: list[dict[str, Any]], edges: List[Dict[str, Any]]) -> str:
         if not nodes:
             return "当前问题没有匹配到可解释的图谱证据。"
 

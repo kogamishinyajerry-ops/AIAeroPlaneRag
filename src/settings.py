@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from typing import Optional
 
 from dotenv import load_dotenv
 
@@ -32,7 +33,7 @@ def ensure_data_dirs() -> None:
     CHROMA_DB_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def has_real_value(value: str | None) -> bool:
+def has_real_value(value: Optional[str]) -> bool:
     if not value:
         return False
 
