@@ -1,4 +1,5 @@
 import logging
+import os
 from typing import Any, Dict
 from fastapi import APIRouter
 from src.settings import (
@@ -15,23 +16,56 @@ def root() -> Dict[str, str]:
     return {"service": "AeroPower-RAG", "version": APP_VERSION, "status": "operational"}
 
 
+def _probe_ollama(base_url: str = "http://localhost:11434", timeout: float = 2.0) -> str:
+    """Return 'available' if Ollama responds, 'unavailable' otherwise."""
+    try:
+        import requests as _req
+        r = _req.get(f"{base_url}/api/tags", timeout=timeout)
+        return "available" if r.status_code == 200 else "degraded"
+    except Exception:
+        return "unavailable"
+
+
+def _chroma_status(vector_engine) -> Dict[str, Any]:
+    """Return chroma connectivity status and doc count."""
+    if vector_engine is None:
+        return {"status": "failed", "doc_count": None}
+    if not vector_engine.collection:
+        return {"status": "mock", "doc_count": None}
+    try:
+        count = vector_engine.collection.count()
+        return {"status": "connected", "doc_count": count}
+    except Exception as exc:
+        return {"status": "degraded", "doc_count": None, "error": str(exc)}
+
 
 @router.get("/api/v1/health")
 def health_check() -> Dict[str, Any]:
-    vector_status = "connected"
-    vector_count = None
-    if services.vector_engine is None:
-        vector_status = "failed"
-    elif not services.vector_engine.collection:
-        vector_status = "mock"
+    # ── Vector / Chroma ──────────────────────────────────────────────────────
+    chroma_info = _chroma_status(services.vector_engine)
+    vector_status = chroma_info["status"]
+    vector_count = chroma_info.get("doc_count")
+    if "error" in chroma_info:
+        services.service_errors["vector_db_count"] = chroma_info["error"]
+
+    # ── Ollama ───────────────────────────────────────────────────────────────
+    ollama_base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+    # If OLLAMA_API_KEY is not "available" we know Ollama isn't configured, skip probe
+    if os.getenv("OLLAMA_API_KEY", "") == "available":
+        ollama_status = _probe_ollama(ollama_base_url)
     else:
-        try:
-            vector_count = services.vector_engine.collection.count()
-        except Exception as exc:
-            vector_status = "degraded"
-            services.service_errors["vector_db_count"] = str(exc)
+        ollama_status = "not_configured"
+
+    # ── LLM ──────────────────────────────────────────────────────────────────
+    llm_status = "connected" if services.glm_client else "mock"
 
     return {
+        # ── Four core status items (acceptance criteria) ──────────────────
+        "vector": vector_status,
+        "llm": llm_status,
+        "ollama": ollama_status,
+        "chroma": chroma_info["status"],
+        # ── Extended fields ───────────────────────────────────────────────
         "app_mode": APP_MODE,
         "app_version": APP_VERSION,
         "knowledge_base_version": DOCUMENT_VERSION,
@@ -40,12 +74,12 @@ def health_check() -> Dict[str, Any]:
         "graph_version": GRAPH_VERSION,
         "source_catalog_version": SOURCE_CATALOG_VERSION,
         "source_catalog_path": str(SOURCE_CATALOG_PATH),
+        # Legacy aliases kept for backward-compat
         "vector_db": vector_status,
         "vector_db_count": vector_count,
         "vector_db_path": str(CHROMA_DB_DIR),
         "graph_db": "connected" if services.graph_store and services.graph_store.driver and services.graph_store.has_graph_data else "fallback",
         "graph_node_count": services.graph_store.node_count if services.graph_store else 0,
-        "llm": "connected" if services.glm_client else "mock",
         "guardrail": "active" if services.guardrail and services.guardrail.has_external_verifier else "conservative",
         "metadata_extractor": "active" if services.metadata_extractor else "unavailable",
         "hallucination_guard": "active" if services.hallucination_guard else "unavailable",
