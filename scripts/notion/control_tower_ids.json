@@ -1,0 +1,20 @@
+{
+  "root": "33ec6894-2bed-8165-8dc5-dc486287ab0b",
+  "os": "33ec6894-2bed-81ad-93d7-fda77ef30305",
+  "automation_ops": "33ec6894-2bed-81ea-a001-c545f0881105",
+  "governance": "33ec6894-2bed-818c-bb46-c497aee959d5",
+  "scope_registry": "33ec6894-2bed-81bd-82c0-c3249f0475a1",
+  "history": "33ec6894-2bed-812b-9103-d43595eddb8e",
+  "databases": {
+    "phases": "33ec6894-2bed-814d-b857-f62ce6f11a3a",
+    "sessions": "33ec6894-2bed-8129-974d-d8d48ec6f8cf",
+    "tasks": "33ec6894-2bed-817b-9823-e6d45c5b17d0",
+    "decisions": "33ec6894-2bed-813f-a301-f7286fa9476d",
+    "docs": "33ec6894-2bed-812d-9db6-ccabf6ec9348",
+    "prompts": "33ec6894-2bed-8181-a0aa-f2fbe5e27faa"
+  },
+  "temp_parent_page": "bfa9836d-535b-486f-8297-c5b2f9ed487c",
+  "created_at": "2026-04-10",
+  "gsd_cockpit": "33ec6894-2bed-8124-839f-cd0acbd9be34",
+  "automation_runbook": "33ec6894-2bed-81fc-92aa-f034b323fa6c"
+}
