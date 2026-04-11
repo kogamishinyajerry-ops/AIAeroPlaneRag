@@ -1431,9 +1431,11 @@ def collect_indexable_chunks() -> list:
     for markdown_file in sorted(PROCESSED_DATA_DIR.glob("*.md")):
         if markdown_file.name.endswith("_analysis_report.md"):
             continue
-        # Skip if a pre-processed JSON already covers this source
+        # Skip if a pre-processed JSON already covers this source.
+        # Match both exact stem ("AC_33.87-1A_Endurance_Test") and prefix-extended stems
+        # ("FAR-33_Full" is covered by json_loaded_source "FAR-33").
         stem = markdown_file.stem
-        if stem in json_loaded_sources:
+        if stem in json_loaded_sources or any(stem.startswith(s) for s in json_loaded_sources):
             logger.debug("Skipping %s — already loaded from *_chunks.json", markdown_file.name)
             continue
         md_chunks = chunker.chunk_markdown(markdown_file.name)
