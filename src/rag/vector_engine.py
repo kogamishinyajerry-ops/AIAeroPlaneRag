@@ -518,6 +518,10 @@ def expand_mixed_query(query: str) -> List[str]:
     return [t for t in terms if t.strip()]
 
 
+# Public alias used by T5.3 acceptance tests and external callers.
+expand_query_multilingual = expand_mixed_query
+
+
 def detect_query_intent(query: str) -> Dict[str, float]:
     """检测查询意图及置信度 - 增强版"""
     query_lower = query.lower()
