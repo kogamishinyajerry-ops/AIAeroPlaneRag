@@ -16,6 +16,7 @@ from src.api.dependencies.deps import (
 )
 from src.rag.vector_engine import VectorStoreEngine, detect_query_intent
 from src.multi_agent.coordinator import AgentCoordinator
+from src.rag.confidence import score_confidence
 from src.settings import (
     APP_VERSION, DOCUMENT_VERSION, EMBEDDING_VERSION,
     GRAPH_VERSION, SOURCE_CATALOG_VERSION, SOURCE_CATALOG_PATH,
@@ -79,6 +80,8 @@ class QueryResponse(BaseModel):
     embeddingVersion: str = EMBEDDING_VERSION
     promptVersion: str = "rag-prompt-v2"
     responseVersion: str = "v2"
+    # 7-dimension confidence breakdown (P2: 置信度评分 7 维度量化)
+    confidenceBreakdown: Optional[Dict[str, Any]] = None
 
 
 # === 辅助函数 ===
@@ -311,30 +314,72 @@ async def execute_rag_query(
 
         processing_time = int((time.time() - start_time) * 1000)
 
+        # ── 7-dimension confidence scoring (P2: 置信度评分 7 维度量化) ──────
+        answer_text = result.get("answer", "")
+        # Convert citations to the context format expected by score_confidence()
+        confidence_contexts = [
+            {
+                "text": c.get("snippet", "") + " " + c.get("fullText", ""),
+                "metadata": {
+                    "source": c.get("source", ""),
+                    "authority": (
+                        "CAAC" if "CCAR" in c.get("source", "") else
+                        "FAA"  if "FAR"  in c.get("source", "") else
+                        "EASA" if "CS-E" in c.get("source", "") or "EASA" in c.get("source", "") else
+                        "OTHER"
+                    ),
+                    "section": c.get("section", ""),
+                }
+            }
+            for c in (citations if isinstance(citations, list) else [])
+        ]
+        confidence_result = score_confidence(answer_text, confidence_contexts, req.query)
+        confidence_summary = confidence_result["summary"]
+        confidence_breakdown = {
+            "summary": confidence_result["summary"],
+            "query_type": confidence_result["query_type"],
+            "explanation": confidence_result["explanation"],
+            "uncertainty_markers": confidence_result["uncertainty_markers"],
+            "dimensions": {
+                k: {
+                    "label":    v["label"],
+                    "score":    v["score"],
+                    "weight":   v["weight"],
+                    "weighted": v["weighted"],
+                    "detail":   v["detail"],
+                }
+                for k, v in confidence_result["dimensions"].items()
+            },
+        }
+
         logger.info(
-            "[Query] request_id=%s query_len=%d retrieval_count=%d response_mode=%s processing_time_ms=%d quality=%.2f",
-            request_id, len(req.query), result.get("retrieval_count", 0), response_mode, processing_time, result.get("quality_score", 0)
+            "[Query] request_id=%s query_len=%d retrieval_count=%d response_mode=%s "
+            "processing_time_ms=%d confidence=%.2f",
+            request_id, len(req.query), result.get("retrieval_count", 0),
+            response_mode, processing_time, confidence_summary,
         )
 
         return QueryResponse(
             query=req.query,
-            answer=result.get("answer", ""),
+            answer=answer_text,
             citations=citations,
             guardrail={
                 "status": "VERIFIED" if result.get("is_valid") else "PARTIAL",
                 "reasoning": f"多Agent验证：质量分数 {result.get('quality_score', 0):.2f}",
-                "safe_answer": result.get("answer", ""),
+                "safe_answer": answer_text,
                 "hallucination_score": 0.2 if result.get("quality_score", 0) > 0.7 else 0.5,
                 "has_hallucination": False,
             },
             responseMode=response_mode,
-            confidence=result.get("quality_score", 0.5),
+            confidence=confidence_summary,
             thinkingProcess="\n".join(result.get("quality_suggestions", [])) if result.get("quality_suggestions") else None,
             reasoningSteps=None,
+            uncertaintyMarkers=confidence_result["uncertainty_markers"],
             retrievalCount=result.get("retrieval_count", 0),
             processingTimeMs=processing_time,
             intentDetection={result.get("intent_type", "regulatory"): 1.0},
             graphInsights=result.get("graph_insights", []),
+            confidenceBreakdown=confidence_breakdown,
         )
 
     except HTTPException:
