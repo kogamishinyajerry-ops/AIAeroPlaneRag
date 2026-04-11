@@ -45,7 +45,7 @@ npx playwright test
 
 ## 当前分支
 
-`codex/v0.1.0-initial-release` — v0.2 Done，**v0.3 Active**
+`codex/v0.1.0-initial-release` — v0.2 Done，v0.3 Done，**Backlog 清空**
 
 ## 当前进度 (2026-04-11)
 
@@ -64,16 +64,28 @@ npx playwright test
 - [x] **v0.3** AC 预处理块接入向量索引 (675 chunks, 14 单元测试)
 - [x] **v0.3** 中英混合 BM25 基准 (recall@3=100%, `benchmarks/multilingual_mixed_bench.py`)
 - [x] **v0.3** FAR-33 全文结构化接入 (69 条款, `data/processed/FAR-33_chunks.json`)
+- [x] **P0** Guardrail JSON 解析硬化 (4层策略 + 41测试)
+- [x] **P0** API /health 完整性修复 (status标准化 + 磁盘块计数fallback + 22测试)
+- [x] **P1** 黄金集扩展至 30题 (CCAR-33/FAR-33/CS-E/cross + 中英双语)
+- [x] **P1** 性能基准自动化 P95<2000ms (`benchmarks/performance_bench.py`, 6测试)
+- [x] **P1** UI E2E 完整覆盖 5条关键路径 (page.route() mock CI + `tests/e2e/app.spec.ts`)
+- [x] **P2** 回归测试 CI 脚本 (`scripts/run_all_benchmarks.sh` + `.github/workflows/ci.yml`)
+- [x] **P2** 置信度评分 7 维度量化 (`src/rag/confidence.py` + QueryResponse.confidenceBreakdown)
+- [x] **P2** Neo4j 真实接入 — schema/constraints/indexes (`scripts/neo4j/setup_schema.py`, 25测试)
 
-### 待完成
-- [ ] **P0**: Guardrail JSON 解析失败率 < 5%
-- [ ] **P0**: API /health 完整性修复
-- [ ] **P1**: 黄金集扩展至 >= 20 题
-- [ ] **P1**: 性能基准自动化 (P95<2000ms)
-- [ ] **P1**: UI E2E 完整覆盖 (5条关键路径)
-- [ ] **P2**: 回归测试 CI 脚本 (`scripts/run_all_benchmarks.sh` + GH Actions)
-- [ ] **P2**: Neo4j 真实接入
-- [ ] **P2**: 置信度评分 7 维度量化
+### 测试覆盖汇总 (477 Python单元测试, 41 JS测试)
+| 模块 | 文件 | 测试数 |
+|------|------|--------|
+| BM25/向量检索 | test_bm25_tokenize, test_cross_language_recall | 多 |
+| Guardrail解析 | test_guardrail_parsing.py | 41 |
+| Health端点 | test_health_endpoint.py | 22 |
+| 性能基准 | test_performance_benchmarks.py | 6 |
+| 置信度7维 | test_confidence_7dim.py + test_confidence_integration.py | 41 |
+| Neo4j接入 | test_neo4j_fallback.py + test_neo4j_real_connection.py | 52 |
+| E2E (Playwright) | tests/e2e/app.spec.ts | 5 |
+
+### 待完成 (无 Notion Backlog)
+全部计划任务已完成。下一轮迭代待用户规划。
 
 ## 关键文件
 
