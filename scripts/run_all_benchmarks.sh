@@ -110,6 +110,20 @@ if [ "$RUN_BENCHMARKS" = "true" ]; then
   fi
 fi
 
+# ── 2b. 性能基准 (BM25 P95 + Golden Set recall@3) ────────────────────────────
+if [ "$RUN_BENCHMARKS" = "true" ]; then
+  echo ""
+  echo "── 2b. 性能基准 (BM25 P95 + Golden Set recall@3) ───────────"
+
+  if python3 benchmarks/performance_bench.py 2>&1 | tee /tmp/performance_bench.log; then
+    P95=$(grep -oP 'P95=\K[\d.]+ms' /tmp/performance_bench.log | head -1 || echo "?")
+    RECALL=$(grep -oP 'recall@3=\K[\d.]+%' /tmp/performance_bench.log | head -1 || echo "?")
+    record "performance_bm25_p95" "true" "P95=${P95} recall@3=${RECALL}"
+  else
+    record "performance_bm25_p95" "false" "see /tmp/performance_bench.log"
+  fi
+fi
+
 # ── 3. 块索引量验证 ───────────────────────────────────────────────────────────
 if [ "$RUN_BENCHMARKS" = "true" ]; then
   echo ""
