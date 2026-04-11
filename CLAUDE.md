@@ -45,9 +45,9 @@ npx playwright test
 
 ## 当前分支
 
-`codex/v0.1.0-initial-release` — v0.1.0 已发布，v0.2 硬化中
+`codex/v0.1.0-initial-release` — v0.2 Done，**v0.3 Active**
 
-## 当前进度 (2026-03-28)
+## 当前进度 (2026-04-11)
 
 ### 已完成
 - [x] v0.1.0 初版发布 (2026-03-26)
@@ -57,43 +57,55 @@ npx playwright test
 - [x] 跨语言召回 ZH→EN 100% / EN→ZH 80%
 - [x] 多代理系统 27 模块实现
 - [x] 民航术语词典 150+ 术语
-- [x] 条款全文提取 650 条
+- [x] 条款全文提取 675 条 (含 FAR-33 69条)
 - [x] 查询性能提升 +97%
+- [x] **v0.3** Graph LOD 三级标签 + 视口裁剪 (41 JS单元测试)
+- [x] **v0.3** PageIndex 树内容填充 (52/53 叶节点, `scripts/enrich_pageindex.py`)
+- [x] **v0.3** AC 预处理块接入向量索引 (675 chunks, 14 单元测试)
+- [x] **v0.3** 中英混合 BM25 基准 (recall@3=100%, `benchmarks/multilingual_mixed_bench.py`)
+- [x] **v0.3** FAR-33 全文结构化接入 (69 条款, `data/processed/FAR-33_chunks.json`)
 
 ### 待完成
 - [ ] **P0**: Guardrail JSON 解析失败率 < 5%
-- [ ] **P0**: 意图检测准确率 >= 80% 基准验证
-- [ ] **P0**: BM25 跨语言召回验证 (中→英 recall@3 >= 0.6)
 - [ ] **P0**: API /health 完整性修复
 - [ ] **P1**: 黄金集扩展至 >= 20 题
 - [ ] **P1**: 性能基准自动化 (P95<2000ms)
 - [ ] **P1**: UI E2E 完整覆盖 (5条关键路径)
+- [ ] **P2**: 回归测试 CI 脚本 (`scripts/run_all_benchmarks.sh` + GH Actions)
 - [ ] **P2**: Neo4j 真实接入
 - [ ] **P2**: 置信度评分 7 维度量化
-- [ ] **Phase 3**: 图谱虚拟化 (视口裁剪 + LOD三级标签)
 
 ## 关键文件
 
 | 文件 | 说明 |
 |------|------|
-| `src/main.py` | FastAPI 主应用 (84KB) |
-| `src/rag/vector_engine.py` | 向量检索引擎 |
+| `src/main.py` | FastAPI 主应用 |
+| `src/rag/vector_engine.py` | 向量检索引擎 + BM25 + collect_indexable_chunks |
 | `src/rag/guardrail.py` | 事实核查护栏 |
-| `src/rag/aviation_terminology.py` | 民航术语词典 (未提交) |
-| `src/multi_agent/` | 27 模块多代理系统 (未提交) |
+| `src/rag/pageindex_engine.py` | PageIndex 树结构推理检索 |
+| `src/rag/aviation_terminology.py` | 民航术语词典 150+ 术语 |
+| `src/multi_agent/` | 27 模块多代理系统 |
 | `src/ontology/graph_store.py` | 本体图存储 (mock) |
-| `src/api/routes/` | 模块化 API 路由 (未提交) |
-| `docs/DEVELOPMENT_PLAN.md` | 4 阶段开发计划 |
+| `scripts/enrich_pageindex.py` | CCAR-33-R2 树节点内容填充 |
+| `scripts/notion/sync.py` | Notion ↔ GitHub GSD 同步工具 |
+| `docs/DEVELOPMENT_PLAN.md` | 4 阶段开发计划 (已同步至 v0.3) |
+| `data/processed/FAR-33_chunks.json` | FAR-33 69条款预处理块 |
+| `data/processed/FAR-33_Full.md` | FAR-33 全文 Markdown (来自PDF) |
+| `data/processed/CCAR-33-R2_structure.json` | CCAR-33-R2 层级树 (52节点有text) |
 | `evaluation/golden_set_sample.json` | 黄金集测试用例 |
+| `benchmarks/multilingual_mixed_bench.py` | 中英混合召回基准 (recall@3=100%) |
+| `tests/unit/test_chunk_ingestion.py` | AC块接入验收测试 (14测试) |
+| `tests/unit/test_far33_ingestion.py` | FAR-33接入验收测试 (11测试) |
+| `tests/unit/test_graph_virtualization.js` | LOD+视口裁剪JS测试 (41测试) |
 
 ## 风险与注意事项
 
-1. **89 个未追踪文件** — 含完整多代理系统，需立即 commit
-2. **Guardrail 脆弱** — LLM JSON 解析失败率高
-3. **Neo4j 为 mock** — graph_store.py 未接入真实数据
-4. **文档与代码有偏差** — DEVELOPMENT_PLAN.md (3/26) 滞后于代码
-5. **向量嵌入依赖** — Ollama nomic-embed-text 需本地可用
+1. **Guardrail 脆弱** — LLM JSON 解析失败率高，是最高 P0 风险
+2. **Neo4j 为 mock** — `graph_store.py` 未接入真实数据
+3. **向量嵌入依赖** — ChromaDB + Ollama nomic-embed-text 需本地可用
+4. **Bash 沙箱网络限制** — 外部 API 调用需通过 Agent 子进程 (已知限制)
+5. **CI 缺失** — 尚无 GitHub Actions 自动化测试流水线
 
 ---
 
-*更新时间: 2026-03-28*
+*更新时间: 2026-04-11 (v0.3)*
