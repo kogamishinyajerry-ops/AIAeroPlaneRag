@@ -1384,6 +1384,18 @@ if __name__ == "__main__":
         print(f"Content Outline: {item['text'][:100]}...\n")
 
 def collect_indexable_chunks() -> list:
+    """
+    Collect all indexable chunks from processed data sources.
+
+    Priority (highest wins, no duplicate source):
+      1. Pre-processed ``*_chunks.json`` files in PROCESSED_DATA_DIR
+         (fine-grained AC chunks produced by the ingestion pipeline)
+      2. Structural re-chunking of ``*.md`` files that have NO pre-processed JSON
+      3. EASA CS-E chunks from ``easa_cse/chunks_full.json``
+
+    This ensures AC documents like AC_33.87-1A (142 pre-processed chunks)
+    are indexed at full granularity rather than as a single monolithic blob.
+    """
     import json
     import logging
     from typing import Any
@@ -1391,23 +1403,55 @@ def collect_indexable_chunks() -> list:
     from src.rag.semantic_chunker import StructuralChunker
     logger = logging.getLogger(__name__)
 
-    chunker = StructuralChunker(processed_dir=str(PROCESSED_DATA_DIR))
     chunks: list[dict[str, Any]] = []
+    # Track which source stems have already been loaded via JSON to avoid duplicates
+    json_loaded_sources: set[str] = set()
+
+    # ── Step 1: load pre-processed *_chunks.json files ────────────────────────
+    for chunks_file in sorted(PROCESSED_DATA_DIR.glob("*_chunks.json")):
+        try:
+            with open(chunks_file, "r", encoding="utf-8") as f:
+                pre_chunks = json.load(f)
+            if not pre_chunks:
+                continue
+            for item in pre_chunks:
+                chunks.append({
+                    "text": item.get("text", ""),
+                    "metadata": item.get("metadata", {}),
+                })
+            # Derive the stem name used to match markdown files (e.g. "AC_33.87-1A_Endurance_Test")
+            stem = chunks_file.stem.replace("_chunks", "")
+            json_loaded_sources.add(stem)
+            logger.info("Loaded %d pre-processed chunks from %s", len(pre_chunks), chunks_file.name)
+        except Exception as exc:
+            logger.warning("Failed to load %s: %s", chunks_file.name, exc)
+
+    # ── Step 2: structural chunking for markdown files NOT covered by JSON ────
+    chunker = StructuralChunker(processed_dir=str(PROCESSED_DATA_DIR))
     for markdown_file in sorted(PROCESSED_DATA_DIR.glob("*.md")):
         if markdown_file.name.endswith("_analysis_report.md"):
             continue
-        chunks.extend(chunker.chunk_markdown(markdown_file.name))
+        # Skip if a pre-processed JSON already covers this source
+        stem = markdown_file.stem
+        if stem in json_loaded_sources:
+            logger.debug("Skipping %s — already loaded from *_chunks.json", markdown_file.name)
+            continue
+        md_chunks = chunker.chunk_markdown(markdown_file.name)
+        chunks.extend(md_chunks)
+        logger.info("Structural chunking %s → %d chunks", markdown_file.name, len(md_chunks))
 
+    # ── Step 3: EASA CS-E chunks ──────────────────────────────────────────────
     easa_chunks_path = PROCESSED_DATA_DIR / "easa_cse" / "chunks_full.json"
     if easa_chunks_path.exists():
-        with open(easa_chunks_path, 'r', encoding='utf-8') as f:
+        with open(easa_chunks_path, "r", encoding="utf-8") as f:
             easa_data = json.load(f)
         for item in easa_data:
-            chunk = {
-                'text': item.get('text', ''),
-                'metadata': item.get('metadata', {}),
-            }
-            chunks.append(chunk)
-        logger.info(f"Loaded {len(easa_data)} EASA chunks from JSON")
+            chunks.append({
+                "text": item.get("text", ""),
+                "metadata": item.get("metadata", {}),
+            })
+        logger.info("Loaded %d EASA CS-E chunks from JSON", len(easa_data))
 
+    logger.info("collect_indexable_chunks: %d total chunks from %d JSON-sources + markdown fallback",
+                len(chunks), len(json_loaded_sources))
     return chunks
