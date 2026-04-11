@@ -1,6 +1,8 @@
 [
   {
     "id": "Q-001",
+    "regulation": "FAR-33",
+    "language": "en",
     "query": "What is the compressor surge margin requirement?",
     "expected_top_section": "Section 33.23 - Surge Margin",
     "expected_keywords": ["surge margin", "compressor"],
@@ -8,6 +10,8 @@
   },
   {
     "id": "Q-002",
+    "regulation": "FAR-33",
+    "language": "en",
     "query": "What compressor design requirements must be met?",
     "expected_sections": ["Section 33.21", "Section 33.25"],
     "expected_keywords": ["compressor", "design", "integrity"],
@@ -15,6 +19,8 @@
   },
   {
     "id": "Q-003",
+    "regulation": "FAR-33",
+    "language": "en",
     "query": "What constraints apply to combustor exit temperature distribution?",
     "expected_top_section": "Section 33.31 - Combustor Design",
     "expected_keywords": ["combustor", "temperature distribution", "OTDF"],
@@ -22,6 +28,8 @@
   },
   {
     "id": "Q-004",
+    "regulation": "FAR-33",
+    "language": "en",
     "query": "What is the minimum design rotor speed for a turbine engine?",
     "expected_top_section": "Section 33.27",
     "expected_keywords": ["rotor speed", "minimum", "design"],
@@ -29,6 +37,8 @@
   },
   {
     "id": "Q-005",
+    "regulation": "FAR-33",
+    "language": "en",
     "query": "What are the requirements for engine fuel system certifications?",
     "expected_sections": ["Section 33.29", "Fuel System"],
     "expected_keywords": ["fuel", "system", "certification"],
@@ -36,6 +46,8 @@
   },
   {
     "id": "Q-006",
+    "regulation": "FAR-33",
+    "language": "en",
     "query": "What is the required engine OAT (Outside Air Temperature) operating range?",
     "expected_top_section": "Section 33.47",
     "expected_keywords": ["temperature", "OAT", "operating range"],
@@ -43,6 +55,8 @@
   },
   {
     "id": "Q-007",
+    "regulation": "FAR-33",
+    "language": "en",
     "query": "How should turbine blade containment be verified?",
     "expected_sections": ["Section 33.55", "Turbine Blade Containment"],
     "expected_keywords": ["turbine", "blade", "containment"],
@@ -50,6 +64,8 @@
   },
   {
     "id": "Q-008",
+    "regulation": "cross",
+    "language": "en",
     "query": "What is the difference between FAR-33 and CS-E requirements for turbine wheels?",
     "expected_sections": ["FAR-33", "CS-E"],
     "expected_keywords": ["turbine", "wheel", "FAR", "CS"],
@@ -57,6 +73,8 @@
   },
   {
     "id": "Q-009",
+    "regulation": "FAR-33",
+    "language": "en",
     "query": "What pressure ratio must the compressor achieve at takeoff power?",
     "expected_top_section": "Section 33.65",
     "expected_keywords": ["pressure ratio", "compressor", "takeoff"],
@@ -64,6 +82,8 @@
   },
   {
     "id": "Q-010",
+    "regulation": "CCAR-33",
+    "language": "zh",
     "query": "CCAR-33对压气机喘振裕度有哪些具体要求？",
     "expected_sections": ["CCAR-33-R2", "压气机喘振裕度"],
     "expected_keywords": ["压气机", "喘振", "裕度", "CCAR"],
@@ -71,6 +91,8 @@
   },
   {
     "id": "Q-011",
+    "regulation": "CCAR-33",
+    "language": "zh",
     "query": "如何进行发动机台架试车验证喘振裕度？",
     "expected_sections": ["试车", "喘振裕度验证方法"],
     "expected_keywords": ["试车", "喘振裕度", "验证", "方法"],
@@ -78,6 +100,8 @@
   },
   {
     "id": "Q-012",
+    "regulation": "cross",
+    "language": "zh",
     "query": "FAR-33与CS-E在涡轮叶片材料要求上的差异是什么？",
     "expected_sections": ["FAR-33", "CS-E", "涡轮叶片"],
     "expected_keywords": ["FAR", "CS-E", "涡轮叶片", "材料", "差异"],
@@ -85,6 +109,8 @@
   },
   {
     "id": "Q-013",
+    "regulation": "general",
+    "language": "zh",
     "query": "什么是燃气涡轮发动机的核心机？",
     "expected_sections": ["核心机", "定义"],
     "expected_keywords": ["核心机", "定义", "燃气涡轮"],
@@ -92,6 +118,8 @@
   },
   {
     "id": "Q-014",
+    "regulation": "FAR-33",
+    "language": "zh",
     "query": "发动机最低怠速推力应该保持在什么范围？",
     "expected_sections": ["怠速", "推力范围"],
     "expected_keywords": ["怠速", "推力", "范围"],
@@ -99,6 +127,8 @@
   },
   {
     "id": "Q-015",
+    "regulation": "FAR-33",
+    "language": "zh",
     "query": "FAA AC 33.27-1A中对涡轮转子有哪些专门的取证要求？",
     "expected_sections": ["AC 33.27-1A", "涡轮转子", "取证要求"],
     "expected_keywords": ["AC 33.27-1A", "涡轮", "转子", "取证"],
@@ -106,6 +136,8 @@
   },
   {
     "id": "Q-016",
+    "regulation": "CCAR-33",
+    "language": "zh",
     "query": "航空发动机适航取证需要经历哪些阶段？",
     "expected_sections": ["适航取证", "阶段"],
     "expected_keywords": ["适航", "取证", "阶段"],
@@ -113,6 +145,8 @@
   },
   {
     "id": "Q-017",
+    "regulation": "cross",
+    "language": "zh",
     "query": "CS-E中关于发动机安全系数的要求与CCAR-33有何对应关系？",
     "expected_sections": ["CS-E", "CCAR-33", "安全系数"],
     "expected_keywords": ["CS-E", "CCAR-33", "安全系数", "对应"],
@@ -120,6 +154,8 @@
   },
   {
     "id": "Q-018",
+    "regulation": "FAR-33",
+    "language": "en",
     "query": "What is the maximum allowed exhaust gas temperature (EGT) for continuous operation?",
     "expected_sections": ["EGT", "continuous operation"],
     "expected_keywords": ["EGT", "exhaust", "temperature", "continuous"],
@@ -127,6 +163,8 @@
   },
   {
     "id": "Q-019",
+    "regulation": "CCAR-33",
+    "language": "zh",
     "query": "压气机叶片疲劳寿命验证的标准方法是什么？",
     "expected_sections": ["压气机叶片", "疲劳寿命", "验证方法"],
     "expected_keywords": ["压气机叶片", "疲劳", "寿命", "验证"],
@@ -134,6 +172,8 @@
   },
   {
     "id": "Q-020",
+    "regulation": "cross",
+    "language": "zh",
     "query": "CCAR-25-R4与FAR-25在发动机安装接口要求上是否等效？",
     "expected_sections": ["CCAR-25-R4", "FAR-25", "发动机安装"],
     "expected_keywords": ["CCAR-25", "FAR-25", "发动机", "安装", "等效"],
@@ -141,6 +181,8 @@
   },
   {
     "id": "Q-021",
+    "regulation": "general",
+    "language": "zh",
     "query": "发动机控制系统的FADEC是什么意思？",
     "expected_sections": ["FADEC", "定义"],
     "expected_keywords": ["FADEC", "发动机控制", "定义"],
@@ -148,6 +190,8 @@
   },
   {
     "id": "Q-022",
+    "regulation": "FAR-33",
+    "language": "en",
     "query": "What are the bird ingestion requirements for turbine engines at certification?",
     "expected_sections": ["Bird Ingestion", "Certification"],
     "expected_keywords": ["bird", "ingestion", "engine", "certification"],
@@ -155,6 +199,8 @@
   },
   {
     "id": "Q-023",
+    "regulation": "general",
+    "language": "zh",
     "query": "燃气涡轮发动机与活塞式发动机在适航要求上有什么本质区别？",
     "expected_sections": ["燃气涡轮", "活塞式发动机", "适航要求"],
     "expected_keywords": ["燃气涡轮", "活塞", "适航", "区别"],
@@ -162,6 +208,8 @@
   },
   {
     "id": "Q-024",
+    "regulation": "CCAR-33",
+    "language": "zh",
     "query": "发动机排放标准中NOx的限值是多少？",
     "expected_sections": ["排放", "NOx", "限值"],
     "expected_keywords": ["排放", "NOx", "限值"],
@@ -169,9 +217,56 @@
   },
   {
     "id": "Q-025",
+    "regulation": "cross",
+    "language": "zh",
     "query": "FAR Part 33和CCAR-33-R2中关于发动机间要求的对应关系？",
     "expected_sections": ["FAR Part 33", "CCAR-33-R2"],
     "expected_keywords": ["FAR Part 33", "CCAR-33", "对应"],
     "expected_answer_type": "cross_reference"
+  },
+  {
+    "id": "Q-026",
+    "regulation": "CS-E",
+    "language": "en",
+    "query": "What does CS-E require for engine power assurance testing?",
+    "expected_sections": ["CS-E", "power assurance", "testing"],
+    "expected_keywords": ["CS-E", "power assurance", "test"],
+    "expected_answer_type": "traceable_fact"
+  },
+  {
+    "id": "Q-027",
+    "regulation": "CS-E",
+    "language": "en",
+    "query": "What are the CS-E requirements for engine vibration survey?",
+    "expected_sections": ["CS-E", "vibration survey"],
+    "expected_keywords": ["CS-E", "vibration", "survey", "EASA"],
+    "expected_answer_type": "traceable_fact"
+  },
+  {
+    "id": "Q-028",
+    "regulation": "CS-E",
+    "language": "zh",
+    "query": "CS-E对发动机高温高压部件的寿命限制有何规定？",
+    "expected_sections": ["CS-E", "寿命限制", "高温高压"],
+    "expected_keywords": ["CS-E", "寿命", "高温", "高压", "部件"],
+    "expected_answer_type": "traceable_fact"
+  },
+  {
+    "id": "Q-029",
+    "regulation": "CS-E",
+    "language": "en",
+    "query": "How does CS-E define the engine critical design cases for structural integrity?",
+    "expected_sections": ["CS-E", "structural integrity", "critical design"],
+    "expected_keywords": ["CS-E", "structural", "critical", "design", "integrity"],
+    "expected_answer_type": "method"
+  },
+  {
+    "id": "Q-030",
+    "regulation": "CS-E",
+    "language": "zh",
+    "query": "EASA CS-E与FAR-33在发动机持久性试验要求上有何差异？",
+    "expected_sections": ["CS-E", "FAR-33", "持久性试验"],
+    "expected_keywords": ["CS-E", "FAR-33", "持久性", "试验", "差异"],
+    "expected_answer_type": "comparison"
   }
 ]
