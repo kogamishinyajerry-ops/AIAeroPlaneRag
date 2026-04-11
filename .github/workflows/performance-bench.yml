@@ -1,0 +1,44 @@
+name: Performance Benchmark
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["codex/v0.1.0-initial-release", "main"]
+  workflow_dispatch:
+
+jobs:
+  benchmark:
+    name: P95 Latency Gate (< 2000ms)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install minimal dependencies
+        run: |
+          pip install pytest pytest-json-report --quiet
+
+      - name: Run performance benchmarks
+        run: |
+          python -m pytest tests/benchmarks/test_performance.py \
+            -v -s \
+            --json-report \
+            --json-report-file=benchmarks/perf_report_ci.json \
+            --tb=short
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+
+      - name: Upload benchmark report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: perf-benchmark-report
+          path: benchmarks/perf_report_ci.json
+          retention-days: 30
