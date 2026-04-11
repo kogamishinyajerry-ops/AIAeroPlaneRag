@@ -43,15 +43,37 @@ class TreeNode:
 
     @classmethod
     def from_dict(cls, data: Dict) -> 'TreeNode':
-        """从字典创建节点"""
+        """从字典创建节点
+
+        文本字段优先级:
+          1. 显式 ``text`` 字段
+          2. ``content_parts`` 列表（\n\n 连接）
+          3. 从 title 末尾提取的嵌入文本（适用于旧格式 JSON）
+        """
         nodes = [cls.from_dict(node_data) for node_data in data.get("nodes", [])]
+
+        text = data.get("text", "")
+        if not text:
+            content_parts = data.get("content_parts", [])
+            if content_parts:
+                text = "\n\n".join(content_parts)
+        if not text:
+            # Some older structure JSONs embed article body in the title field
+            raw_title = data.get("title", "")
+            m = re.match(
+                r'第\d+(?:\.\d+)?条\s+[\u4e00-\u9fff\s「」、，。：；—]+\s+([\s\S]+)',
+                raw_title,
+            )
+            if m:
+                text = m.group(1).strip()
+
         return cls(
             node_id=data["node_id"],
             title=data["title"],
             start_index=data["start_index"],
             end_index=data.get("end_index"),
             summary=data.get("summary", ""),
-            text=data.get("text", ""),
+            text=text,
             nodes=nodes
         )
 
@@ -131,7 +153,7 @@ class PageIndexEngine:
         results = []
         for score, node in scored_nodes[:top_k]:
             results.append({
-                "text": node.summary or node.text or node.title,
+                "text": node.text or node.summary or node.title,
                 "original_text": node.text,
                 "metadata": {
                     "node_id": node.node_id,
