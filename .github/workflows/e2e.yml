@@ -1,0 +1,60 @@
+name: E2E Tests (Playwright)
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["codex/v0.1.0-initial-release", "main"]
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    name: Playwright E2E — 5 Key Paths
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dependencies
+        run: |
+          pip install fastapi uvicorn[standard] httpx anthropic \
+            python-dotenv requests chromadb --quiet
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Playwright
+        run: |
+          npm install --save-dev @playwright/test
+          npx playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        run: |
+          CI=true REPO_ROOT=${{ github.workspace }} \
+          npx playwright test --reporter=list,json \
+            --output=benchmarks/e2e_report.json
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          # Use mock mode if secrets are not available
+          APP_MODE: mock
+
+      - name: Upload E2E report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-playwright-report
+          path: |
+            benchmarks/e2e_report.json
+            playwright-report/
+          retention-days: 14
