@@ -1,6 +1,6 @@
 # AeroPower-RAG 开发计划 v1.0
 
-> 基于 `docs/REQUIREMENTS.md` 制定 | 2026-03-26
+> 基于 `docs/REQUIREMENTS.md` 制定 | 2026-03-26 | 最后同步: 2026-04-11 (v0.3)
 
 ---
 
@@ -17,15 +17,19 @@
 
 ## 第一阶段：测试基建
 
-### T1.1 建立测试目录结构
+### T1.1 建立测试目录结构 ✅ DONE
 ```
 tests/
 ├── unit/
-│   ├── test_tokenize.py
-│   ├── test_synonym_expansion.py
-│   ├── test_bm25.py
-│   ├── test_intent_detection.py
-│   └── test_infer_agency.py
+│   ├── test_tokenize.py              ✅
+│   ├── test_synonym_expansion.py     ✅
+│   ├── test_bm25.py                  ✅
+│   ├── test_intent_detection.py      ✅
+│   ├── test_infer_agency.py          ✅
+│   ├── test_pageindex_engine.py      ✅ (29 tests)
+│   ├── test_chunk_ingestion.py       ✅ (14 tests, v0.3)
+│   ├── test_far33_ingestion.py       ✅ (11 tests, v0.3)
+│   └── test_graph_virtualization.js  ✅ (41 tests, v0.3)
 ├── integration/
 │   ├── test_hybrid_retrieval.py
 │   ├── test_multi_agent_flow.py
@@ -35,10 +39,10 @@ tests/
 ```
 
 **验收：**
-- [ ] `pytest tests/unit/test_tokenize.py::test_chinese_bigram` 通过
-- [ ] `pytest tests/` 在 CI 中可执行（无 ImportError）
+- [x] `pytest tests/unit/test_tokenize.py::test_chinese_bigram` 通过
+- [x] `pytest tests/` 在 CI 中可执行（无 ImportError）
 
-### T1.2 补全 tokenize_for_bm25 单元测试
+### T1.2 补全 tokenize_for_bm25 单元测试 ✅ DONE
 **目标：** 覆盖率 100%
 
 **用例：**
@@ -50,7 +54,7 @@ tests/
 | 空字符串 | `""` | `[]` |
 | 全标点 | `"！？，"` | `[]` |
 
-### T1.3 补全 expand_synonyms 单元测试
+### T1.3 补全 expand_synonyms 单元测试 ✅ DONE
 **用例：**
 | 用例 | 输入 | 期望 |
 |------|------|------|
@@ -59,7 +63,7 @@ tests/
 | 无同义词 | `"foobar"` | 返回原词 |
 | 链式扩展 | `"涡轮"`（有二级同义词） | 扩展至二级 |
 
-### T1.4 补全 inferAgency 单元测试
+### T1.4 补全 inferAgency 单元测试 ✅ DONE
 **用例：**
 | 用例 | 输入 | 期望 |
 |------|------|------|
@@ -69,16 +73,16 @@ tests/
 | group 优先 | `{"group": "FAA", "document": "CCAR-33"}` | `"FAA"` |
 | 无匹配 | `{"id": "node-1"}` | `""` |
 
-### T1.5 建立意图分类测试集
+### T1.5 建立意图分类测试集 ✅ DONE
 **样本：** 6 类各 5 题 = 30 题，放入 `evaluation/intent_classification_set.json`
 
-**验收：** 分类准确率 ≥ 80%（当前规则匹配，需评估）
+**验收：** ✅ 分类准确率 100%（30 题测试集）
 
 ---
 
 ## 第二阶段：质量达标（P0 修复）
 
-### T2.1 Guardrail 核查通过率提升（P0）
+### T2.1 Guardrail 核查通过率提升（P0）⚠️ 待验证
 **问题：** PARTIAL 比例过高
 
 **根因分析：**
@@ -94,26 +98,21 @@ tests/
 - [ ] `golden_set_sample.json` 中 80% 答案达到 PARTIAL 以上
 - [ ] JSON 解析失败率 < 5%
 
-### T2.2 意图检测准确率评估与优化（P0）
-**问题：** 当前规则匹配，真实准确率未知
-
-**行动：**
-1. 用 `evaluation/intent_classification_set.json` 跑一遍，得出 baseline 准确率
-2. 若 < 80%：引入 LLM-based 意图分类（轻量 prompt）
+### T2.2 意图检测准确率评估与优化（P0）✅ DONE
+**结果：** 基于规则匹配，准确率 100%（30/30 题）
 
 **验收：**
-- [ ] 意图分类准确率 ≥ 80%（30 题测试集）
+- [x] 意图分类准确率 ≥ 80%（30 题测试集）— 实际 100%
 
-### T2.3 BM25 同义词扩展效果验证（P0）
-**验证方法：**
-1. 准备 10 对中↔英 查询对（如 "发动机" ↔ "engine"）
-2. 分别用中/英文查询，验证召回率
-3. 中→英 recall@3 ≥ 0.6
+### T2.3 BM25 同义词扩展效果验证（P0）✅ DONE
+**结果：**
+- 中英混合 recall@3 = 100%（25/25 题），`benchmarks/multilingual_mixed_bench.py`
+- 跨语言召回 ZH→EN 100% / EN→ZH 80%
 
 **验收：**
-- [ ] 跨语言召回测试集通过率 ≥ 70%
+- [x] 跨语言召回测试集通过率 ≥ 70% — 实际 100%
 
-### T2.4 API `/health` 完整性检查
+### T2.4 API `/health` 完整性检查 ⚠️ 待完成
 **修复项：**
 - [ ] `vector_db` 显示 `connected`/`disconnected` 正确
 - [ ] `llm` 显示 `connected`/`disconnected` 正确
@@ -123,7 +122,7 @@ tests/
 
 ## 第三阶段：自动化闭环
 
-### T3.1 黄金回归测试集（Golden Set）扩展
+### T3.1 黄金回归测试集（Golden Set）扩展 ⚠️ 待完成
 **当前：** 5 题（`golden_set_sample.json`）
 **目标：** ≥ 20 题，覆盖：
 
@@ -156,7 +155,7 @@ tests/
 4. [ ] 切换图谱视图 → 全图加载（节点着色正确）
 5. [ ] 切换模式描述 → 文案正确更新
 
-### T3.4 CI 流水线
+### T3.4 CI 流水线 🔄 In Progress (v0.3)
 ```
 PR 触发：
   1. pytest tests/unit/ + tests/integration/
@@ -168,6 +167,10 @@ Main/Merge 触发：
   2. Golden Set recall@3 评估
   3. 性能基准测试
 ```
+
+**当前进展 (v0.3):**
+- `scripts/run_all_benchmarks.sh` — 正在实现
+- GitHub Actions workflow `.github/workflows/ci.yml` — 正在实现
 
 ---
 
@@ -221,13 +224,13 @@ Main/Merge 触发：
 - 将 `knowledge_links` 数据加载至 Neo4j
 - 替换 mock graph_store 为真实实现
 
-#### T5.3 多语言 Query 增强
-**目标：** 支持中英混合查询（如 "compressor 压气机 喘振"）
+#### T5.3 多语言 Query 增强 ✅ DONE (v0.3)
+**结果：** 中英混合查询 recall@3 = 100%（25/25 题）
 
 **实现：**
-- 分别对中文部分和英文部分进行分词
-- 合并去重后构建扩展查询
-- BM25 + 向量检索同步支持
+- [x] `expand_query_multilingual()` 支持纯中文、纯英文、中英混合
+- [x] `tokenize_for_bm25()` bigram 分词支持双语
+- [x] BM25 同义词扩展覆盖 150+ 航空术语
 
 ---
 
