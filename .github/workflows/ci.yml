@@ -1,0 +1,202 @@
+name: AeroPower-RAG CI
+
+on:
+  push:
+    branches: ["codex/**", "main", "develop"]
+  pull_request:
+    branches: ["main", "develop"]
+  workflow_dispatch:        # 允许手动触发
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.12"
+  # 禁用 ChromaDB / Ollama 连接（沙箱中不可用）
+  OLLAMA_API_KEY: ""
+  EMBEDDING_API_KEY: ""
+
+jobs:
+  # ════════════════════════════════════════════════════════════
+  # Job 1: Python 单元测试
+  # ════════════════════════════════════════════════════════════
+  unit-tests:
+    name: Unit Tests (Python)
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-timeout
+          # Install project deps (ignore missing extras)
+          pip install -r requirements.txt --ignore-requires-python 2>/dev/null || true
+          # Core deps that must succeed
+          pip install chromadb python-dotenv requests pdfminer.six
+
+      - name: Run Python unit tests
+        run: |
+          python -m pytest tests/unit/ \
+            --ignore=tests/unit/test_graph_virtualization.js \
+            -v --tb=short \
+            --timeout=30 \
+            -q
+        env:
+          PYTHONPATH: src
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-results
+          path: |
+            .pytest_cache/
+          retention-days: 7
+
+  # ════════════════════════════════════════════════════════════
+  # Job 2: JavaScript 单元测试
+  # ════════════════════════════════════════════════════════════
+  js-unit-tests:
+    name: Unit Tests (JavaScript)
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run JS unit tests
+        run: node tests/unit/test_graph_virtualization.js
+
+  # ════════════════════════════════════════════════════════════
+  # Job 3: 语法检查
+  # ════════════════════════════════════════════════════════════
+  syntax-check:
+    name: Syntax Check
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Check Python syntax
+        run: |
+          find src tests scripts -name "*.py" -print0 | \
+            xargs -0 python3 -m py_compile && \
+            echo "✅ All Python files syntax OK"
+
+      - name: Check shell scripts
+        run: |
+          if command -v shellcheck &>/dev/null; then
+            find scripts -name "*.sh" -exec shellcheck {} \; && \
+              echo "✅ All shell scripts OK"
+          else
+            echo "shellcheck not found — skipping"
+          fi
+
+  # ════════════════════════════════════════════════════════════
+  # Job 4: 基准测试 (仅 main/merge 触发)
+  # ════════════════════════════════════════════════════════════
+  benchmarks:
+    name: Benchmarks
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    # 仅在 push 到 main 时或手动触发时运行基准
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch')
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt --ignore-requires-python 2>/dev/null || true
+          pip install chromadb python-dotenv requests pdfminer.six
+
+      - name: Run all benchmarks
+        run: bash scripts/run_all_benchmarks.sh
+        env:
+          PYTHONPATH: src
+
+      - name: Upload benchmark report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-summary
+          path: benchmarks/summary_report.json
+          retention-days: 30
+
+      - name: Print summary
+        if: always()
+        run: |
+          if [ -f benchmarks/summary_report.json ]; then
+            cat benchmarks/summary_report.json
+          fi
+
+  # ════════════════════════════════════════════════════════════
+  # Job 5: PR 快速基准 (PR 时运行轻量版)
+  # ════════════════════════════════════════════════════════════
+  pr-benchmarks:
+    name: PR Quick Benchmarks
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt --ignore-requires-python 2>/dev/null || true
+          pip install chromadb python-dotenv requests pdfminer.six
+
+      - name: Run unit + benchmarks (excluding long-running tests)
+        run: |
+          bash scripts/run_all_benchmarks.sh --benchmarks-only
+        env:
+          PYTHONPATH: src
+
+      - name: Upload PR benchmark report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-benchmark-summary
+          path: benchmarks/summary_report.json
+          retention-days: 7
