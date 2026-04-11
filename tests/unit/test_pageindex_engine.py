@@ -163,3 +163,41 @@ class TestTreeNode:
         parent = TreeNode(node_id="parent", title="父节点", start_index=0, nodes=[child])
         assert len(parent.nodes) == 1
         assert parent.nodes[0].node_id == "child"
+
+
+class TestLeafNodeContentEnrichment:
+    """Acceptance tests for PageIndex content enrichment (scripts/enrich_pageindex.py)."""
+
+    def test_majority_leaf_nodes_have_text(self, engine):
+        """After enrichment, >= 80% of leaf nodes must have non-empty text."""
+        leaf_nodes = [n for n in engine.node_map.values() if not n.nodes]
+        with_text = [n for n in leaf_nodes if n.text]
+        ratio = len(with_text) / len(leaf_nodes) if leaf_nodes else 0
+        assert ratio >= 0.8, (
+            f"Only {len(with_text)}/{len(leaf_nodes)} leaf nodes have text "
+            f"({ratio:.0%} < 80%)."
+        )
+
+    def test_total_nodes_with_text_at_least_40(self, engine):
+        """Overall: >= 40 nodes must have text."""
+        total_with_text = sum(1 for n in engine.node_map.values() if n.text)
+        assert total_with_text >= 40, (
+            f"Only {total_with_text} nodes have text (< 40)."
+        )
+
+    def test_from_dict_reads_content_parts(self):
+        """TreeNode.from_dict() must read content_parts into text when text is absent."""
+        from rag.pageindex_engine import TreeNode
+        node = TreeNode.from_dict({
+            "node_id": "cp-001",
+            "title": "第33.99条 测试条款",
+            "start_index": 1,
+            "content_parts": ["第一段正文。", "第二段正文。"],
+        })
+        assert node.text == "第一段正文。\n\n第二段正文。"
+
+    def test_search_results_have_content_text(self, engine):
+        """Search results should carry the enriched article text."""
+        results = engine.search_by_keywords("涡轮", top_k=3)
+        for r in results:
+            assert len(r.get("text", "")) > 0, "Search result missing text content"
