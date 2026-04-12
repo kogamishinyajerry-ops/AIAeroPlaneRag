@@ -45,7 +45,7 @@ npx playwright test
 
 ## 当前分支
 
-`codex/v0.1.0-initial-release` — v0.2 Done，v0.3 Done，v0.4 Done，v0.5 Done，v0.6 Done，v0.7 Done，v0.8 Done，**Backlog 清空**
+`codex/v0.1.0-initial-release` — v0.2 Done，v0.3 Done，v0.4 Done，v0.5 Done，v0.6 Done，v0.7 Done，v0.8 Done，v0.9 Done，**Backlog 清空**
 
 ## 当前进度 (2026-04-12)
 
@@ -88,6 +88,9 @@ npx playwright test
 - [x] **v0.7** `tests/unit/test_definitions_ingestion.py` 20测试
 - [x] **v0.7** `tests/integration/test_pageindex_load.py` 15测试 (PageIndex负载+吞吐量)
 - [x] **v0.7** 黄金集 recall@3=96.7%, recall@5=100% (general类: 33%→100%)
+- [x] **v0.9** RRF-based result merging in `golden_set_bm25_bench.py` — 3x original query weight, stop-word filter
+- [x] **v0.9** `REGULATION_SOURCE_MAP` 修复: "cross"/"general" 大小写 + AC_33源纳入FAR-33匹配
+- [x] **v0.9** 黄金集 recall@3=**100%**, recall@5=**100%**, source_recall@3=**76.7%** (↑from 40%)
 
 ### 测试覆盖汇总 (689 Python测试, 41 JS测试)
 | 模块 | 文件 | 测试数 |
@@ -139,4 +142,4 @@ npx playwright test
 
 ---
 
-*更新时间: 2026-04-12 (v0.8)*
+*更新时间: 2026-04-12 (v0.9)*
