@@ -45,7 +45,7 @@ npx playwright test
 
 ## 当前分支
 
-`codex/v0.1.0-initial-release` — v0.2 Done，v0.3 Done，v0.4 Done，v0.5 Done，**Backlog 清空**
+`codex/v0.1.0-initial-release` — v0.2 Done，v0.3 Done，v0.4 Done，v0.5 Done，v0.6 Done，v0.7 Done，**Backlog 清空**
 
 ## 当前进度 (2026-04-12)
 
@@ -80,8 +80,16 @@ npx playwright test
 - [x] **v0.5** 黄金集 BM25 自动评估脚本 (`benchmarks/golden_set_bm25_bench.py`) — recall@3=90%, recall@5=93.3% ✅ PASS
 - [x] **v0.5** graph 404 响应结构化 (`src/api/routes/graph.py` → `{"code":"node_not_found",...}`)
 - [x] **v0.5** `tests/test_main_api.py` 修复 health 字段名 (vector_db, graph_db)
+- [x] **v0.6** E2E API smoke test 23测试 (`tests/integration/test_api_smoke.py`) — 真实BM25+mocked LLM
+- [x] **v0.6** `scripts/run_all_benchmarks.sh` 加入黄金集BM25评估步骤 (全6项通过)
+- [x] **v0.7** `expand_mixed_query` n-gram滑动窗口提取 (核心机/FADEC长句召回修复)
+- [x] **v0.7** `data/processed/aviation_definitions_chunks.json` 5条定义语料块
+- [x] **v0.7** `src/rag/aviation_terminology.py` GENERAL_CONCEPT_TERMS 词典
+- [x] **v0.7** `tests/unit/test_definitions_ingestion.py` 20测试
+- [x] **v0.7** `tests/integration/test_pageindex_load.py` 15测试 (PageIndex负载+吞吐量)
+- [x] **v0.7** 黄金集 recall@3=96.7%, recall@5=100% (general类: 33%→100%)
 
-### 测试覆盖汇总 (627 Python测试, 41 JS测试)
+### 测试覆盖汇总 (689 Python测试, 41 JS测试)
 | 模块 | 文件 | 测试数 |
 |------|------|--------|
 | BM25/向量检索 | test_bm25_tokenize, test_cross_language_recall | 多 |
@@ -131,4 +139,4 @@ npx playwright test
 
 ---
 
-*更新时间: 2026-04-12 (v0.5)*
+*更新时间: 2026-04-12 (v0.7)*
