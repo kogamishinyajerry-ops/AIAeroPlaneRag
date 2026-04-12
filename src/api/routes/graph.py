@@ -288,7 +288,14 @@ async def get_graph_subgraph(
                         break
 
     if target_id not in nodes:
-        raise HTTPException(status_code=404, detail=f"Node '{center_node}' not found in knowledge graph")
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "code": "node_not_found",
+                "error": f"Node '{center_node}' not found in knowledge graph",
+                "node_id": center_node,
+            },
+        )
 
     visited = {target_id}
     current_level = {target_id}
