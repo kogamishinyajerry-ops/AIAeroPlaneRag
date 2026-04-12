@@ -279,6 +279,43 @@ CROSS_AGENCY_TERMS = {
 }
 
 # 合并所有术语
+# v0.7: 通用定义类术语 — 提升 general 问题 BM25 召回
+GENERAL_CONCEPT_TERMS = {
+    # 核心机 / Gas core
+    "核心机": ["gas core", "core engine", "燃气发生器", "gas generator", "高压核心", "HP core",
+               "engine core", "hot section core", "热端核心"],
+    "gas core": ["核心机", "燃气发生器", "core engine"],
+    "燃气涡轮发动机": ["gas turbine engine", "jet engine", "涡轮发动机", "gas turbine",
+                    "turbojet", "turbofan", "turboprop", "jet propulsion engine"],
+    "gas turbine engine": ["燃气涡轮发动机", "涡轮发动机", "jet engine"],
+    # FADEC
+    "FADEC": ["Full Authority Digital Engine Control", "全权限数字发动机控制",
+              "发动机控制系统", "电子发动机控制", "EEC", "digital engine control",
+              "engine control unit", "ECU", "engine electronic control",
+              "数字电子控制器", "发动机电子控制"],
+    "Full Authority Digital Engine Control": ["FADEC", "全权限数字发动机控制"],
+    "发动机控制": ["engine control", "FADEC", "EEC", "engine management",
+                 "推力管理", "thrust management"],
+    # 活塞式发动机 vs 涡轮
+    "活塞式发动机": ["piston engine", "reciprocating engine", "往复式发动机",
+                  "piston aero engine", "spark ignition engine"],
+    "piston engine": ["活塞式发动机", "reciprocating engine", "往复式发动机"],
+    "往复式发动机": ["piston engine", "活塞式发动机", "reciprocating engine"],
+    # 通用适航概念
+    "型号合格证": ["Type Certificate", "TC", "型号批准", "type certification",
+                 "type approval", "TC holder"],
+    "生产许可证": ["Production Approval", "PAH", "production certificate", "PC"],
+    "设计保证系统": ["Design Assurance System", "DAS", "设计保证", "design organisation approval"],
+    "安全裕度": ["safety margin", "safety factor", "安全余量", "design margin"],
+    # 发动机基本部件通用术语
+    "压气机": ["compressor", "压缩机", "compressor section", "fan compressor"],
+    "涡轮": ["turbine", "turbine section", "涡轮级", "HP turbine", "LP turbine"],
+    "燃烧室": ["combustor", "combustion chamber", "combustion section", "主燃烧室"],
+    "推力": ["thrust", "推力输出", "engine thrust", "net thrust", "gross thrust"],
+    "功率": ["power", "shaft power", "轴功率", "engine power", "SHP"],
+    "转速": ["rotational speed", "RPM", "转数", "N1", "N2", "shaft speed"],
+}
+
 ALL_TERMINOLOGY = {
     **FIRE_PROTECTION_TERMS,
     **PROPULSION_TERMS,
@@ -297,6 +334,8 @@ ALL_TERMINOLOGY = {
     **AERODYNAMIC_PERFORMANCE_TERMS,
     **COMBUSTOR_FUEL_TERMS,
     **COMPLIANCE_METHOD_TERMS,
+    # v0.7 通用概念词典
+    **GENERAL_CONCEPT_TERMS,
 }
 
 # 反向映射（从同义词到标准词）

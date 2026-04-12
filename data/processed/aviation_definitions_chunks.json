@@ -1,0 +1,62 @@
+[
+  {
+    "text": "核心机（Gas Core / Core Engine）定义：燃气涡轮发动机的核心机是指由高压压气机、燃烧室和高压涡轮组成的基本热力循环组件。核心机是燃气涡轮发动机的核心部件，决定发动机的基本性能参数，包括热效率、功率输出和燃油消耗率。在适航审定中，核心机的设计需满足CCAR-33、FAR-33及CS-E的相关要求，包括结构强度、耐久性和包容性等。燃气发生器（gas generator）是核心机的另一种表述方式。",
+    "metadata": {
+      "source": "AviationDefinitions",
+      "authority": "CAAC/FAA",
+      "jurisdiction": "CN/US",
+      "section": "术语定义-核心机",
+      "chunk_id": "def_core_engine_001",
+      "document_type": "Terminology",
+      "language": "zh"
+    }
+  },
+  {
+    "text": "FADEC（Full Authority Digital Engine Control，全权限数字发动机控制）定义：FADEC是一种发动机控制系统，通过数字电子控制器（EEC/ECU）对发动机的所有参数进行全权限管理，包括燃油流量、点火时序、压气机变几何调节、推力控制和发动机保护逻辑。发动机控制系统中的FADEC替代了传统的机械液压控制系统，提高了发动机的可靠性和性能优化能力。按照CCAR-33第33.28条、FAR-33.28和CS-E 50条款，FADEC系统需满足相应的适航设计要求，包括余度设计、失效-安全分析和软件适航性。",
+    "metadata": {
+      "source": "AviationDefinitions",
+      "authority": "CAAC/FAA/EASA",
+      "jurisdiction": "CN/US/EU",
+      "section": "术语定义-FADEC",
+      "chunk_id": "def_fadec_001",
+      "document_type": "Terminology",
+      "language": "zh"
+    }
+  },
+  {
+    "text": "燃气涡轮发动机与活塞式发动机适航要求区别：燃气涡轮发动机（Gas Turbine Engine）和活塞式发动机（Piston/Reciprocating Engine）在适航审定要求上存在本质区别。燃气涡轮发动机适用CCAR-33/FAR-33/CS-E，重点关注高压高温部件的结构强度、持久性试验（150小时耐久性测试）、包容性设计、喘振裕度、涡轮超温保护和FADEC控制系统。活塞式发动机适用CCAR-33B章（活塞部分）/FAR-33 Subpart B，关注点火系统、曲轴/连杆强度、振动特性和燃油系统防爆。两者共用的适航要求包括：发动机安装接口、燃油系统防火、环境适应性（温度/高空）和排放标准。",
+    "metadata": {
+      "source": "AviationDefinitions",
+      "authority": "CAAC/FAA/EASA",
+      "jurisdiction": "CN/US/EU",
+      "section": "术语定义-燃气涡轮vs活塞",
+      "chunk_id": "def_gt_vs_piston_001",
+      "document_type": "Terminology",
+      "language": "zh"
+    }
+  },
+  {
+    "text": "Gas Core (核心机) Definition: The gas core, also called core engine or gas generator, is the essential thermodynamic unit of a gas turbine engine comprising the high-pressure compressor (HPC), combustor, and high-pressure turbine (HPT). The core engine establishes the fundamental performance characteristics including thermal efficiency, specific power, and specific fuel consumption (SFC). For airworthiness certification under FAR-33, CCAR-33, and CS-E, the core engine hardware must meet requirements for structural integrity, containment capability, and endurance testing per applicable regulations.",
+    "metadata": {
+      "source": "AviationDefinitions",
+      "authority": "FAA/CAAC/EASA",
+      "jurisdiction": "US/CN/EU",
+      "section": "Definition-CoreEngine",
+      "chunk_id": "def_core_engine_002",
+      "document_type": "Terminology",
+      "language": "en"
+    }
+  },
+  {
+    "text": "FADEC (Full Authority Digital Engine Control) Definition: A FADEC is an engine control system in which a digital electronic engine controller (EEC) has complete authority over all engine parameters including fuel flow scheduling, compressor variable geometry, bleed valve actuation, ignition timing, and thrust management. FADEC systems replace mechanical-hydromechanical controls with redundant digital channels. Under FAR-33.28, CCAR-33.28, and CS-E 50, FADEC systems must meet airworthiness requirements including failure-mode analysis, hardware/software development assurance (DO-178C, DO-254), and dispatch reliability. The engine control system must maintain safe operation across all certified operating envelopes.",
+    "metadata": {
+      "source": "AviationDefinitions",
+      "authority": "FAA/CAAC/EASA",
+      "jurisdiction": "US/CN/EU",
+      "section": "Definition-FADEC",
+      "chunk_id": "def_fadec_002",
+      "document_type": "Terminology",
+      "language": "en"
+    }
+  }
+]

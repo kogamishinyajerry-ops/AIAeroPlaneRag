@@ -414,6 +414,44 @@ SYNONYM_DICT: Dict[str, List[str]] = {
     "耗油率": ["specific fuel consumption", "SFC", "燃油消耗率"],
     "SFC": ["耗油率", "specific fuel consumption"],
     "specific fuel consumption": ["耗油率", "SFC", "燃油消耗率"],
+
+    # ── v0.7: 通用定义类术语 (提升 general 问题召回) ──────────────────────
+    # 核心机 / Gas core
+    "核心机": ["gas core", "core engine", "燃气发生器", "gas generator", "HP core",
+               "engine core", "hot section"],
+    "gas core": ["核心机", "core engine", "燃气发生器", "gas generator"],
+    "core engine": ["核心机", "gas core", "engine core"],
+    "燃气发生器": ["gas generator", "核心机", "core engine", "gas core"],
+    "gas generator": ["燃气发生器", "核心机", "core engine"],
+
+    # FADEC
+    "FADEC": ["Full Authority Digital Engine Control", "全权限数字发动机控制",
+              "发动机控制系统", "电子发动机控制", "EEC", "ECU",
+              "digital engine control", "engine electronic control",
+              "数字电子控制器", "engine control unit"],
+    "fadec": ["Full Authority Digital Engine Control", "全权限数字发动机控制",
+              "EEC", "ECU", "digital engine control"],
+    "Full Authority Digital Engine Control": ["FADEC", "全权限数字发动机控制"],
+    "full authority digital engine control": ["FADEC", "fadec", "EEC", "ECU"],
+    "EEC": ["FADEC", "engine electronic control", "发动机电子控制"],
+    "发动机控制系统": ["FADEC", "EEC", "engine control", "engine management system"],
+
+    # 活塞式发动机 vs 燃气涡轮
+    "活塞": ["piston", "reciprocating", "往复", "活塞式"],
+    "piston": ["活塞", "reciprocating", "piston engine"],
+    "往复式": ["reciprocating", "piston", "活塞式"],
+    "活塞式发动机": ["piston engine", "reciprocating engine", "往复式发动机"],
+    "piston engine": ["活塞式发动机", "reciprocating engine", "往复式发动机", "活塞"],
+    "reciprocating engine": ["活塞式发动机", "piston engine", "往复式发动机"],
+    "燃气涡轮发动机": ["gas turbine engine", "jet engine", "涡轮发动机",
+                    "gas turbine", "turbojet", "turbofan", "turboprop"],
+    "gas turbine engine": ["燃气涡轮发动机", "涡轮发动机", "jet engine", "gas turbine"],
+    "gas turbine": ["燃气涡轮发动机", "涡轮发动机", "燃气轮机"],
+
+    # 型号合格证
+    "型号合格证": ["Type Certificate", "TC", "type certification", "type approval"],
+    "type certificate": ["型号合格证", "TC", "type approval"],
+    "TC": ["型号合格证", "type certificate", "type certification"],
 }
 
 # ============================================================
@@ -496,9 +534,19 @@ def expand_mixed_query(query: str) -> List[str]:
     terms: set = set()
 
     # 处理中文部分：提取短语并扩展
+    # 同时做滑动 n-gram 切分（2-5字），以命中 SYNONYM_DICT 中的子词条
+    # 例如 "什么是燃气涡轮发动机的核心机" → 还会尝试 "核心机"/"燃气涡轮"/"发动机" 等
     for zh in zh_parts:
         terms.add(zh)
         terms.update(expand_synonyms(zh))
+        # n-gram 子词扩展（仅当整串长度 > 4 时才值得切分）
+        if len(zh) > 4:
+            for n in (2, 3, 4, 5):
+                for start in range(len(zh) - n + 1):
+                    sub = zh[start:start + n]
+                    if sub in SYNONYM_DICT:
+                        terms.add(sub)
+                        terms.update(SYNONYM_DICT[sub])
 
     # 处理英文部分：单词 + 相邻双词组合 + 扩展
     for en in en_parts:
@@ -1453,6 +1501,21 @@ def collect_indexable_chunks() -> list:
                 "metadata": item.get("metadata", {}),
             })
         logger.info("Loaded %d EASA CS-E chunks from JSON", len(easa_data))
+
+    # ── Step 4: Aviation terminology definitions (v0.7) ──────────────────────
+    defs_path = PROCESSED_DATA_DIR / "aviation_definitions_chunks.json"
+    if defs_path.exists():
+        try:
+            with open(defs_path, "r", encoding="utf-8") as f:
+                defs_data = json.load(f)
+            for item in defs_data:
+                chunks.append({
+                    "text": item.get("text", ""),
+                    "metadata": item.get("metadata", {}),
+                })
+            logger.info("Loaded %d aviation definition chunks from %s", len(defs_data), defs_path.name)
+        except Exception as exc:
+            logger.warning("Failed to load aviation_definitions_chunks.json: %s", exc)
 
     logger.info("collect_indexable_chunks: %d total chunks from %d JSON-sources + markdown fallback",
                 len(chunks), len(json_loaded_sources))
