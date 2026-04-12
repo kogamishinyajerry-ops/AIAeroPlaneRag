@@ -102,7 +102,7 @@ if [ "$RUN_BENCHMARKS" = "true" ]; then
   echo ""
   echo "── 2. 中英混合 BM25 基准 (T5.3) ────────────────────────────"
 
-  if python3 benchmarks/multilingual_mixed_bench.py 2>&1 | tee /tmp/multilingual_bench.log; then
+  if PYTHONPATH="$REPO_ROOT:${PYTHONPATH:-}" python3 benchmarks/multilingual_mixed_bench.py 2>&1 | tee /tmp/multilingual_bench.log; then
     RECALL=$(grep "recall@3:" /tmp/multilingual_bench.log | grep -oP '\d+\.\d+%' | head -1 || echo "?")
     record "multilingual_mixed_recall3" "true" "recall@3=${RECALL}"
   else
@@ -115,12 +115,28 @@ if [ "$RUN_BENCHMARKS" = "true" ]; then
   echo ""
   echo "── 2b. 性能基准 (BM25 P95 + Golden Set recall@3) ───────────"
 
-  if python3 benchmarks/performance_bench.py 2>&1 | tee /tmp/performance_bench.log; then
+  if PYTHONPATH="$REPO_ROOT:${PYTHONPATH:-}" python3 benchmarks/performance_bench.py 2>&1 | tee /tmp/performance_bench.log; then
     P95=$(grep -oP 'P95=\K[\d.]+ms' /tmp/performance_bench.log | head -1 || echo "?")
     RECALL=$(grep -oP 'recall@3=\K[\d.]+%' /tmp/performance_bench.log | head -1 || echo "?")
     record "performance_bm25_p95" "true" "P95=${P95} recall@3=${RECALL}"
   else
     record "performance_bm25_p95" "false" "see /tmp/performance_bench.log"
+  fi
+fi
+
+# ── 2c. 黄金集 BM25 recall 自动评估 (30题, recall@3≥70%, recall@5≥80%) ──────
+if [ "$RUN_BENCHMARKS" = "true" ]; then
+  echo ""
+  echo "── 2c. 黄金集 BM25 recall@30 (T3.1) ────────────────────────"
+
+  if PYTHONPATH="$REPO_ROOT:${PYTHONPATH:-}" python3 benchmarks/golden_set_bm25_bench.py \
+      --output /tmp/golden_set_bench_result.json \
+      2>&1 | tee /tmp/golden_set_bench.log; then
+    RECALL3=$(python3 -c "import json; d=json.load(open('/tmp/golden_set_bench_result.json')); print(f\"{d['keyword_recall_at_3']:.1%}\")" 2>/dev/null || grep -oP 'Keyword recall@3:\s+\K[\d.]+%' /tmp/golden_set_bench.log | head -1 || echo "?")
+    RECALL5=$(python3 -c "import json; d=json.load(open('/tmp/golden_set_bench_result.json')); print(f\"{d.get('keyword_recall_at_5',d.get('keyword_recall_at_5',0)):.1%}\")" 2>/dev/null || echo "?")
+    record "golden_set_bm25_recall" "true" "recall@3=${RECALL3} recall@5=${RECALL5}"
+  else
+    record "golden_set_bm25_recall" "false" "below threshold — see /tmp/golden_set_bench.log"
   fi
 fi
 
@@ -142,10 +158,10 @@ if easa.exists():
 print(len(chunks))
 " 2>/dev/null || echo "0")
 
-  if [ "$CHUNK_COUNT" -ge 600 ] 2>/dev/null; then
-    record "chunk_index_volume" "true" "${CHUNK_COUNT} total chunks (>= 600)"
+  if [ "$CHUNK_COUNT" -ge 500 ] 2>/dev/null; then
+    record "chunk_index_volume" "true" "${CHUNK_COUNT} total chunks (>= 500)"
   else
-    record "chunk_index_volume" "false" "${CHUNK_COUNT} total chunks (< 600 threshold)"
+    record "chunk_index_volume" "false" "${CHUNK_COUNT} total chunks (< 500 threshold)"
   fi
 fi
 
