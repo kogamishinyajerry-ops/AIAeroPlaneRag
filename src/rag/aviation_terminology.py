@@ -101,6 +101,169 @@ EASA_ALIASES = {
     "ETOPS": ["Extended Range Twin Operations", "延伸航程运行", "双发延伸航程"],
 }
 
+# 涡轮冷却系统术语 (T4.1 新增)
+TURBINE_COOLING_TERMS = {
+    "气膜冷却": ["film cooling", "冷却气膜", "薄膜冷却", "film coolant"],
+    "冲击冷却": ["impingement cooling", "射流冷却", "冲击射流"],
+    "对流冷却": ["convection cooling", "内部冷却", "convective cooling"],
+    "发散冷却": ["transpiration cooling", "多孔冷却", "渗透冷却"],
+    "涡轮叶片冷却": ["turbine blade cooling", "冷却叶片", "blade cooling"],
+    "冷却空气": ["cooling air", "冷却气流", "冷却空气量", "cooling airflow"],
+    "热障涂层": ["thermal barrier coating", "TBC", "隔热涂层", "ceramic coating"],
+    "涡轮进口温度": ["Turbine Entry Temperature", "TET", "涡轮前温度", "T4"],
+    "最高允许温度": ["maximum allowable temperature", "温度限值", "thermal limit"],
+    "冷却效率": ["cooling effectiveness", "冷却效果", "η_c"],
+    "热通量": ["heat flux", "热流密度", "热负荷"],
+    "高压涡轮": ["high pressure turbine", "HPT", "高压涡轮级"],
+    "低压涡轮": ["low pressure turbine", "LPT", "低压涡轮级"],
+    "导向叶片": ["nozzle guide vane", "NGV", "静子叶片", "stator vane"],
+    "转子叶片": ["rotor blade", "工作叶片", "动叶"],
+    "叶冠": ["blade tip", "叶片顶部", "tip clearance"],
+    "间隙控制": ["clearance control", "间隙管理", "tip clearance control"],
+    "涡轮盘": ["turbine disc", "涡轮轮盘", "turbine disk"],
+    "内部流道": ["internal cooling passage", "冷却通道", "cooling channel"],
+    "蒸发效果": ["evaporative cooling", "蒸发冷却"],
+}
+
+# 材料缺陷与失效术语 (T4.1 新增)
+MATERIAL_DEFECT_TERMS = {
+    "蠕变": ["creep", "高温蠕变", "蠕变变形", "蠕变寿命"],
+    "热疲劳": ["thermal fatigue", "热机疲劳", "温度循环疲劳"],
+    "低循环疲劳": ["low cycle fatigue", "LCF", "低周疲劳"],
+    "高循环疲劳": ["high cycle fatigue", "HCF", "高频疲劳", "高周疲劳"],
+    "氧化": ["oxidation", "高温氧化", "抗氧化", "oxidation resistance"],
+    "热腐蚀": ["hot corrosion", "硫化腐蚀", "type I hot corrosion", "type II hot corrosion"],
+    "腐蚀疲劳": ["corrosion fatigue", "腐蚀裂纹扩展"],
+    "裂纹扩展": ["crack propagation", "疲劳裂纹扩展", "crack growth", "da/dN"],
+    "应力腐蚀": ["stress corrosion cracking", "SCC", "应力腐蚀开裂"],
+    "蠕变断裂": ["creep rupture", "持久强度", "rupture life"],
+    "微动磨损": ["fretting", "fretting fatigue", "微动疲劳"],
+    "外物损伤": ["FOD", "foreign object damage", "外来物损伤"],
+    "叶片损伤": ["blade damage", "叶片缺口", "blade nicks", "trailing edge damage"],
+    "涂层失效": ["coating failure", "涂层脱落", "coating delamination"],
+    "晶粒边界": ["grain boundary", "晶界", "intergranular"],
+    "无损检测": ["NDT", "non-destructive testing", "无损探伤", "NDE"],
+    "孔探检查": ["borescope inspection", "内窥镜检查", "borescope"],
+    "荧光探伤": ["fluorescent penetrant inspection", "FPI", "液体渗透检测"],
+    "超声检测": ["ultrasonic testing", "UT", "超声波检测"],
+    "金属疲劳": ["metal fatigue", "材料疲劳", "fatigue failure"],
+    "持久寿命": ["endurance life", "耐久寿命", "service life"],
+    "退化": ["degradation", "性能衰退", "performance deterioration"],
+}
+
+# 维修工艺术语 (T4.1 新增)
+MAINTENANCE_TERMS = {
+    "寿命限制件": ["life limited part", "LLP", "寿命件", "限寿件"],
+    "翻修": ["overhaul", "大修", "发动机翻修", "engine overhaul"],
+    "车间修理": ["shop repair", "修理", "repair", "维修"],
+    "定期检查": ["periodic inspection", "定期检查", "scheduled maintenance"],
+    "视情维修": ["on-condition maintenance", "视情检查", "condition monitoring"],
+    "孔探检查": ["borescope inspection", "内窥镜检查", "发动机孔探"],
+    "热部件检查": ["hot section inspection", "HSI", "热部件寿命检查"],
+    "翻修周期": ["overhaul interval", "TBO", "time between overhaul"],
+    "循环寿命": ["cyclic life", "飞行循环", "cycle life", "cycles"],
+    "飞行小时": ["flight hours", "飞行时间", "EFH", "engine flight hours"],
+    "持续适航文件": ["continuing airworthiness documents", "ICA", "Instructions for Continued Airworthiness"],
+    "维修手册": ["maintenance manual", "AMM", "发动机维修手册", "Engine Maintenance Manual"],
+    "故障排除": ["troubleshooting", "故障隔离", "fault isolation"],
+    "修理限制": ["repair limits", "修理范围", "damage limits"],
+    "适航指令": ["airworthiness directive", "AD", "适航性通告"],
+    "服务通告": ["service bulletin", "SB", "服务通知"],
+    "使用寿命": ["service life", "使用寿期", "design life"],
+    "地面测试": ["ground test", "试车", "engine ground run"],
+    "性能恢复": ["performance restoration", "性能修复", "engine restoration"],
+    "在翼维修": ["on-wing maintenance", "在翼检查", "on-wing repair"],
+}
+
+# 噪声与排放术语 (T4.1 新增)
+NOISE_EMISSION_TERMS = {
+    "噪声认证": ["noise certification", "声学认证", "acoustic certification"],
+    "有效感觉噪声": ["EPNL", "effective perceived noise level", "有效感知噪声级"],
+    "侧方噪声": ["lateral noise", "侧向噪声", "flyover noise"],
+    "进近噪声": ["approach noise", "进近声级"],
+    "氮氧化物": ["NOx", "nitrogen oxides", "氮氧化物排放"],
+    "碳氢化合物": ["HC", "hydrocarbon", "未燃烃", "unburned hydrocarbon"],
+    "一氧化碳": ["CO", "carbon monoxide", "一氧化碳排放"],
+    "烟度": ["smoke", "smoke number", "排烟", "smoke emission"],
+    "排放认证": ["emission certification", "排放合规", "ICAO emission standards"],
+    "燃烧室排放": ["combustor emission", "燃烧排放", "combustion emission"],
+    "CAEP标准": ["CAEP", "Committee on Aviation Environmental Protection", "ICAO噪声标准"],
+    "声功率": ["acoustic power", "声功率级", "sound power level"],
+    "粒子物质": ["particulate matter", "PM", "颗粒物排放"],
+    "低排放燃烧室": ["low emission combustor", "贫油燃烧", "lean burn combustor"],
+    "排气": ["exhaust", "排气流", "exhaust gas", "尾喷流"],
+}
+
+# 压气机/涡轮气动性能术语 (T4.1 新增 - 对 CFD 工程师关键)
+AERODYNAMIC_PERFORMANCE_TERMS = {
+    "喘振裕度": ["surge margin", "失速裕度", "stall margin", "SM"],
+    "压比": ["pressure ratio", "总压比", "overall pressure ratio", "OPR"],
+    "效率": ["efficiency", "多变效率", "等熵效率", "adiabatic efficiency", "isentropic efficiency"],
+    "特性图": ["compressor map", "压气机特性图", "performance map"],
+    "稳定工作裕度": ["stability margin", "喘振边界", "surge line"],
+    "质量流量": ["mass flow rate", "空气流量", "corrected flow", "折合流量"],
+    "转速": ["rotational speed", "转速", "corrected speed", "折合转速", "RPM"],
+    "级负荷": ["stage loading", "叶片负荷", "diffusion factor"],
+    "扩散因子": ["diffusion factor", "D因子", "blade loading"],
+    "落压比": ["stage pressure ratio", "级压比"],
+    "喘振": ["surge", "喘振现象", "compressor surge", "surge instability"],
+    "旋转失速": ["rotating stall", "旋转分离", "stall cell"],
+    "颤振": ["flutter", "叶片颤振", "aeroelastic flutter", "blade flutter"],
+    "强迫响应": ["forced response", "共振响应", "vibration response"],
+    "振动": ["vibration", "叶片振动", "发动机振动", "mechanical vibration"],
+    "临界转速": ["critical speed", "共振转速", "resonance speed"],
+    "坎贝尔图": ["Campbell diagram", "共振图", "frequency diagram"],
+    "声速": ["sonic velocity", "马赫数", "Mach number", "临界马赫数"],
+    "跨声速": ["transonic", "跨声速压气机", "transonic compressor"],
+    "叶型": ["blade profile", "翼型", "airfoil", "blade geometry"],
+    "攻角": ["angle of attack", "冲角", "incidence angle"],
+    "离设计点运行": ["off-design operation", "非设计点", "off-design performance"],
+    "节流": ["throttling", "节流运行", "throttle setting"],
+}
+
+# 燃烧室与燃油系统术语 (T4.1 新增)
+COMBUSTOR_FUEL_TERMS = {
+    "燃烧室": ["combustor", "燃烧器", "combustion chamber", "火焰筒"],
+    "主燃区": ["primary zone", "主燃烧区", "primary combustion zone"],
+    "二次风": ["secondary air", "掺混空气", "dilution air"],
+    "燃油喷嘴": ["fuel nozzle", "喷油嘴", "fuel injector"],
+    "引火区": ["pilot zone", "引燃区", "pilot flame"],
+    "点火": ["ignition", "起动点火", "ignition system"],
+    "贫油熄火": ["lean blowout", "LBO", "贫熄火", "lean extinction"],
+    "富油熄火": ["rich blowout", "RBO", "rich extinction"],
+    "再燃": ["relight", "高空再燃", "altitude relight"],
+    "火焰稳定": ["flame stabilization", "燃烧稳定", "flame stability"],
+    "热斑": ["hot streak", "温度分布不均", "hot spot", "temperature distortion"],
+    "出口温度分布": ["exit temperature profile", "出口温度场", "temperature traverse factor", "OTDF", "RTDF"],
+    "当量比": ["equivalence ratio", "当量油气比", "fuel-air ratio", "FAR"],
+    "液态水滴": ["water droplet ingestion", "冰晶进水", "rain ingestion"],
+    "燃油加热": ["fuel heating", "燃油冷却润滑油", "heat management"],
+    "燃油控制": ["fuel control", "燃油计量", "fuel metering unit", "FMU"],
+    "燃油总管": ["fuel manifold", "燃油分配管", "fuel distribution"],
+}
+
+# 适航符合性验证方法术语 (T4.1 新增)
+COMPLIANCE_METHOD_TERMS = {
+    "符合性方法": ["means of compliance", "MOC", "验证方法", "compliance method"],
+    "分析法": ["analysis", "计算分析", "MOC2", "analytical substantiation"],
+    "试验法": ["testing", "试验验证", "MOC4", "MOC5", "test demonstration"],
+    "检查法": ["inspection", "检查验证", "MOC6"],
+    "演示法": ["demonstration", "功能演示", "MOC7"],
+    "模拟法": ["simulation", "数值模拟", "CFD", "computational analysis"],
+    "等效安全": ["equivalent safety", "等效适航", "equivalent level of safety"],
+    "特殊条件": ["special condition", "特殊适航条件", "SC"],
+    "豁免条款": ["exemption", "豁免", "deviation"],
+    "审定计划": ["certification plan", "CP", "型号合格计划"],
+    "符合性文件": ["compliance document", "符合性报告", "conformity document"],
+    "审定基础": ["certification basis", "型号合格基础", "certification specification"],
+    "问题纪要": ["issue paper", "IP", "审定问题纪要"],
+    "专用条件": ["special conditions", "专用适航条件"],
+    "符合性声明": ["statement of compliance", "SOC", "符合声明"],
+    "型号合格证": ["type certificate", "TC", "型号合格"],
+    "补充型号合格证": ["supplemental type certificate", "STC"],
+    "零件制造人批准书": ["PMA", "parts manufacturer approval"],
+}
+
 # 跨机构对应术语
 CROSS_AGENCY_TERMS = {
     "运输类飞机": ["CCAR-25", "FAR-25", "CS-25", "Transport Category", "Large Aeroplanes"],
@@ -126,6 +289,14 @@ ALL_TERMINOLOGY = {
     **FAA_ALIASES,
     **EASA_ALIASES,
     **CROSS_AGENCY_TERMS,
+    # v0.4 新增词典
+    **TURBINE_COOLING_TERMS,
+    **MATERIAL_DEFECT_TERMS,
+    **MAINTENANCE_TERMS,
+    **NOISE_EMISSION_TERMS,
+    **AERODYNAMIC_PERFORMANCE_TERMS,
+    **COMBUSTOR_FUEL_TERMS,
+    **COMPLIANCE_METHOD_TERMS,
 }
 
 # 反向映射（从同义词到标准词）
@@ -177,6 +348,13 @@ class AviationTerminology:
             "ccar_refs": [],
             "faa_refs": [],
             "easa_refs": [],
+            "turbine_cooling": [],
+            "material_defects": [],
+            "maintenance": [],
+            "noise_emission": [],
+            "aerodynamics": [],
+            "combustor": [],
+            "compliance": [],
         }
 
         query_lower = query.lower()
@@ -223,6 +401,35 @@ class AviationTerminology:
                 elif "fire" in term.lower():
                     if term not in terms_found["fire_protection"]:
                         terms_found["fire_protection"].append(term)
+
+        # v0.4 新增分类
+        for term, synonyms in TURBINE_COOLING_TERMS.items():
+            if term.lower() in query_lower or any(s.lower() in query_lower for s in synonyms):
+                terms_found["turbine_cooling"].append(term)
+
+        for term, synonyms in MATERIAL_DEFECT_TERMS.items():
+            if term.lower() in query_lower or any(s.lower() in query_lower for s in synonyms):
+                terms_found["material_defects"].append(term)
+
+        for term, synonyms in MAINTENANCE_TERMS.items():
+            if term.lower() in query_lower or any(s.lower() in query_lower for s in synonyms):
+                terms_found["maintenance"].append(term)
+
+        for term, synonyms in NOISE_EMISSION_TERMS.items():
+            if term.lower() in query_lower or any(s.lower() in query_lower for s in synonyms):
+                terms_found["noise_emission"].append(term)
+
+        for term, synonyms in AERODYNAMIC_PERFORMANCE_TERMS.items():
+            if term.lower() in query_lower or any(s.lower() in query_lower for s in synonyms):
+                terms_found["aerodynamics"].append(term)
+
+        for term, synonyms in COMBUSTOR_FUEL_TERMS.items():
+            if term.lower() in query_lower or any(s.lower() in query_lower for s in synonyms):
+                terms_found["combustor"].append(term)
+
+        for term, synonyms in COMPLIANCE_METHOD_TERMS.items():
+            if term.lower() in query_lower or any(s.lower() in query_lower for s in synonyms):
+                terms_found["compliance"].append(term)
 
         return terms_found
 
