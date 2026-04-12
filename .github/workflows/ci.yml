@@ -55,6 +55,28 @@ jobs:
         env:
           PYTHONPATH: src
 
+      - name: Run Python integration tests
+        run: |
+          python -m pytest tests/integration/ \
+            -v --tb=short \
+            --timeout=60 \
+            -q
+        env:
+          PYTHONPATH: src
+
+      - name: Run root-level API tests
+        run: |
+          python -m pytest tests/ \
+            --ignore=tests/unit \
+            --ignore=tests/integration \
+            --ignore=tests/e2e \
+            --ignore=tests/benchmarks \
+            -v --tb=short \
+            --timeout=30 \
+            -q
+        env:
+          PYTHONPATH: src
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
