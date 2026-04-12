@@ -73,13 +73,14 @@ if [ "$RUN_UNIT" = "true" ]; then
   echo ""
   echo "── 1. 单元测试 (pytest tests/unit/) ────────────────────────"
 
-  if python3 -m pytest tests/unit/ -v --tb=short -q \
+  if PYTHONPATH="$REPO_ROOT:${PYTHONPATH:-}" python3 -m pytest tests/unit/ \
       --ignore=tests/unit/test_graph_virtualization.js \
+      --tb=short -q \
       2>&1 | tee /tmp/pytest_unit.log; then
-    UNIT_COUNT=$(grep -c "PASSED\|passed" /tmp/pytest_unit.log 2>/dev/null || echo "?")
+    UNIT_COUNT=$(grep -oP '\d+ passed' /tmp/pytest_unit.log | tail -1 | grep -oP '\d+' || echo "?")
     record "unit_tests_python" "true" "${UNIT_COUNT} passed"
   else
-    FAIL_COUNT=$(grep -c "FAILED\|failed" /tmp/pytest_unit.log 2>/dev/null || echo "?")
+    FAIL_COUNT=$(grep -oP '\d+ failed' /tmp/pytest_unit.log | tail -1 | grep -oP '\d+' || echo "?")
     record "unit_tests_python" "false" "${FAIL_COUNT} failed — see /tmp/pytest_unit.log"
   fi
 
