@@ -45,9 +45,9 @@ npx playwright test
 
 ## 当前分支
 
-`codex/v0.1.0-initial-release` — v0.2 Done，v0.3 Done，**Backlog 清空**
+`codex/v0.1.0-initial-release` — v0.2 Done，v0.3 Done，v0.4 Done，**Backlog 清空**
 
-## 当前进度 (2026-04-11)
+## 当前进度 (2026-04-12)
 
 ### 已完成
 - [x] v0.1.0 初版发布 (2026-03-26)
@@ -72,8 +72,12 @@ npx playwright test
 - [x] **P2** 回归测试 CI 脚本 (`scripts/run_all_benchmarks.sh` + `.github/workflows/ci.yml`)
 - [x] **P2** 置信度评分 7 维度量化 (`src/rag/confidence.py` + QueryResponse.confidenceBreakdown)
 - [x] **P2** Neo4j 真实接入 — schema/constraints/indexes (`scripts/neo4j/setup_schema.py`, 25测试)
+- [x] **v0.4** CS-E EASA chunks 接入验收测试 (`tests/unit/test_cse_ingestion.py`, 16测试)
+- [x] **v0.4** 同义词词典扩展至 205+ 条 (T4.1) — 新增7类航空术语 (涡轮冷却/材料缺陷/维修工艺/噪声排放/气动性能/燃烧室/符合性方法)
+- [x] **v0.4** Hybrid Retrieval 集成测试 (`tests/integration/test_hybrid_retrieval.py`, 19测试) — RRF+BM25+跨语言
+- [x] **v0.4** Multi-Agent Flow 集成测试 (`tests/integration/test_multi_agent_flow.py`, 15测试) — Planner→Tool→Checker→Answer
 
-### 测试覆盖汇总 (477 Python单元测试, 41 JS测试)
+### 测试覆盖汇总 (529 Python测试, 41 JS测试)
 | 模块 | 文件 | 测试数 |
 |------|------|--------|
 | BM25/向量检索 | test_bm25_tokenize, test_cross_language_recall | 多 |
@@ -82,6 +86,9 @@ npx playwright test
 | 性能基准 | test_performance_benchmarks.py | 6 |
 | 置信度7维 | test_confidence_7dim.py + test_confidence_integration.py | 41 |
 | Neo4j接入 | test_neo4j_fallback.py + test_neo4j_real_connection.py | 52 |
+| CS-E接入 (v0.4) | test_cse_ingestion.py | 16 |
+| Hybrid Retrieval (v0.4) | tests/integration/test_hybrid_retrieval.py | 19 |
+| Multi-Agent (v0.4) | tests/integration/test_multi_agent_flow.py | 15 |
 | E2E (Playwright) | tests/e2e/app.spec.ts | 5 |
 
 ### 待完成 (无 Notion Backlog)
@@ -95,7 +102,7 @@ npx playwright test
 | `src/rag/vector_engine.py` | 向量检索引擎 + BM25 + collect_indexable_chunks |
 | `src/rag/guardrail.py` | 事实核查护栏 |
 | `src/rag/pageindex_engine.py` | PageIndex 树结构推理检索 |
-| `src/rag/aviation_terminology.py` | 民航术语词典 150+ 术语 |
+| `src/rag/aviation_terminology.py` | 民航术语词典 205+ 条 (v0.4 扩展) |
 | `src/multi_agent/` | 27 模块多代理系统 |
 | `src/ontology/graph_store.py` | 本体图存储 (mock) |
 | `scripts/enrich_pageindex.py` | CCAR-33-R2 树节点内容填充 |
@@ -120,4 +127,4 @@ npx playwright test
 
 ---
 
-*更新时间: 2026-04-11 (v0.3)*
+*更新时间: 2026-04-12 (v0.4)*
