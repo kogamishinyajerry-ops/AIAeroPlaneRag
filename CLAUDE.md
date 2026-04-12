@@ -45,7 +45,7 @@ npx playwright test
 
 ## 当前分支
 
-`codex/v0.1.0-initial-release` — v0.2 Done，v0.3 Done，v0.4 Done，v0.5 Done，v0.6 Done，v0.7 Done，**Backlog 清空**
+`codex/v0.1.0-initial-release` — v0.2 Done，v0.3 Done，v0.4 Done，v0.5 Done，v0.6 Done，v0.7 Done，v0.8 Done，**Backlog 清空**
 
 ## 当前进度 (2026-04-12)
 
@@ -139,4 +139,4 @@ npx playwright test
 
 ---
 
-*更新时间: 2026-04-12 (v0.7)*
+*更新时间: 2026-04-12 (v0.8)*

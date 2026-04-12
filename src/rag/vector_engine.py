@@ -415,6 +415,26 @@ SYNONYM_DICT: Dict[str, List[str]] = {
     "SFC": ["耗油率", "specific fuel consumption"],
     "specific fuel consumption": ["耗油率", "SFC", "燃油消耗率"],
 
+    # ── v0.8: 燃烧室出口温度分布 (OTDF/RTDF) ──────────────────────────────
+    # combustor exit temperature distribution → OTDF (BM25 gap fix)
+    "combustor": ["燃烧室", "combustion chamber", "combustion section", "主燃烧室",
+                  "OTDF", "temperature distribution", "exit temperature"],
+    "combustion chamber": ["燃烧室", "combustor", "OTDF", "exit temperature distribution"],
+    "exit temperature": ["exhaust temperature", "combustor exit", "OTDF", "RTDF",
+                         "combustor exit temperature", "temperature distribution"],
+    "temperature distribution": ["OTDF", "RTDF", "radial temperature",
+                                  "exit temperature distribution", "热分布"],
+    "OTDF": ["Overall Temperature Distribution Factor", "燃烧室出口温度分布因数",
+             "temperature distribution", "exit temperature", "combustor",
+             "combustor exit temperature distribution"],
+    "overall temperature distribution factor": ["OTDF", "combustor exit temperature distribution"],
+    "RTDF": ["Radial Temperature Distribution Factor", "OTDF", "radial temperature distribution",
+             "出口温度分布"],
+    "combustor exit temperature distribution": ["OTDF", "RTDF", "temperature distribution",
+                                                "exit temperature", "combustor"],
+    "燃烧室出口温度分布": ["OTDF", "RTDF", "temperature distribution", "combustor exit temperature"],
+    "出口温度分布": ["OTDF", "temperature distribution", "exit temperature"],
+
     # ── v0.7: 通用定义类术语 (提升 general 问题召回) ──────────────────────
     # 核心机 / Gas core
     "核心机": ["gas core", "core engine", "燃气发生器", "gas generator", "HP core",

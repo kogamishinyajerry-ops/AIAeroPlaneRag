@@ -58,5 +58,29 @@
       "document_type": "Terminology",
       "language": "en"
     }
+  },
+  {
+    "text": "Combustor Exit Temperature Distribution (OTDF/RTDF) Constraints: The combustor exit temperature distribution defines the thermal environment experienced by the high-pressure turbine (HPT) nozzle guide vanes and blades. Key parameters include the Overall Temperature Distribution Factor (OTDF) and the Radial Temperature Distribution Factor (RTDF). Under FAR-33 and CCAR-33 combustor design requirements, constraints apply to the combustor exit temperature profile to protect downstream turbine components from thermal fatigue, oxidation, and creep. The OTDF must remain within design limits across all engine operating conditions. Excessive OTDF values lead to hot streaks at the turbine inlet, reducing blade life and increasing risk of structural failure. Certification compliance requires combustor rig testing and analysis per applicable FAR-33 and AC 33.87 endurance test requirements.",
+    "metadata": {
+      "source": "AviationDefinitions",
+      "authority": "FAA/CAAC",
+      "jurisdiction": "US/CN",
+      "section": "Definition-OTDF-CombustorExitTemperature",
+      "chunk_id": "def_otdf_combustor_001",
+      "document_type": "Terminology",
+      "language": "en"
+    }
+  },
+  {
+    "text": "燃烧室出口温度分布因数（OTDF）：燃烧室出口温度分布（Combustor Exit Temperature Distribution）是评价燃烧室性能的关键参数。总温度分布因数（OTDF，Overall Temperature Distribution Factor）衡量燃烧室出口截面上最高温度与平均温度之差与平均温度升之比。径向温度分布因数（RTDF）衡量特定径向位置的温度。CCAR-33第33.31条和FAR-33.31规定：燃烧室出口温度分布因数（OTDF）必须在设计限值以内，以保护下游涡轮部件不因热疲劳、氧化和蠕变而失效。OTDF限值的适航符合性通过燃烧室台架试验和发动机持久性试验（AC 33.87）进行验证。",
+    "metadata": {
+      "source": "AviationDefinitions",
+      "authority": "CAAC/FAA",
+      "jurisdiction": "CN/US",
+      "section": "术语定义-OTDF燃烧室出口温度分布",
+      "chunk_id": "def_otdf_combustor_002",
+      "document_type": "Terminology",
+      "language": "zh"
+    }
   }
 ]
