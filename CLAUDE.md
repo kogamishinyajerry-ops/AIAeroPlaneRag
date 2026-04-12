@@ -45,7 +45,7 @@ npx playwright test
 
 ## 当前分支
 
-`codex/v0.1.0-initial-release` — v0.2 Done，v0.3 Done，v0.4 Done，**Backlog 清空**
+`codex/v0.1.0-initial-release` — v0.2 Done，v0.3 Done，v0.4 Done，v0.5 Done，**Backlog 清空**
 
 ## 当前进度 (2026-04-12)
 
@@ -76,8 +76,12 @@ npx playwright test
 - [x] **v0.4** 同义词词典扩展至 205+ 条 (T4.1) — 新增7类航空术语 (涡轮冷却/材料缺陷/维修工艺/噪声排放/气动性能/燃烧室/符合性方法)
 - [x] **v0.4** Hybrid Retrieval 集成测试 (`tests/integration/test_hybrid_retrieval.py`, 19测试) — RRF+BM25+跨语言
 - [x] **v0.4** Multi-Agent Flow 集成测试 (`tests/integration/test_multi_agent_flow.py`, 15测试) — Planner→Tool→Checker→Answer
+- [x] **v0.5** CI pipeline 加入 integration + root-level API 测试步骤 (`.github/workflows/ci.yml`)
+- [x] **v0.5** 黄金集 BM25 自动评估脚本 (`benchmarks/golden_set_bm25_bench.py`) — recall@3=90%, recall@5=93.3% ✅ PASS
+- [x] **v0.5** graph 404 响应结构化 (`src/api/routes/graph.py` → `{"code":"node_not_found",...}`)
+- [x] **v0.5** `tests/test_main_api.py` 修复 health 字段名 (vector_db, graph_db)
 
-### 测试覆盖汇总 (529 Python测试, 41 JS测试)
+### 测试覆盖汇总 (627 Python测试, 41 JS测试)
 | 模块 | 文件 | 测试数 |
 |------|------|--------|
 | BM25/向量检索 | test_bm25_tokenize, test_cross_language_recall | 多 |
@@ -123,8 +127,8 @@ npx playwright test
 2. **Neo4j 为 mock** — `graph_store.py` 未接入真实数据
 3. **向量嵌入依赖** — ChromaDB + Ollama nomic-embed-text 需本地可用
 4. **Bash 沙箱网络限制** — 外部 API 调用需通过 Agent 子进程 (已知限制)
-5. **CI 缺失** — 尚无 GitHub Actions 自动化测试流水线
+5. **CI 覆盖** — GitHub Actions 已覆盖 unit + integration + root-level API 测试
 
 ---
 
-*更新时间: 2026-04-12 (v0.4)*
+*更新时间: 2026-04-12 (v0.5)*
