@@ -212,10 +212,18 @@ class OntologyGraphStore:
                        OR coalesce(b.name, '') CONTAINS $kw
                        OR coalesce(a.description, '') CONTAINS $kw
                        OR coalesce(b.description, '') CONTAINS $kw
-                    RETURN coalesce(a.name, a.id) AS a_name,
+                       OR coalesce(a.label, '') CONTAINS $kw
+                       OR coalesce(b.label, '') CONTAINS $kw
+                       OR coalesce(a.title, '') CONTAINS $kw
+                       OR coalesce(b.title, '') CONTAINS $kw
+                       OR coalesce(a.text, '') CONTAINS $kw
+                       OR coalesce(b.text, '') CONTAINS $kw
+                    RETURN coalesce(a.name, a.label, a.id) AS a_name,
                            type(r) AS rel_type,
                            coalesce(r.description, '') AS rel_desc,
-                           coalesce(b.name, b.id) AS b_name
+                           coalesce(b.name, b.label, b.id) AS b_name,
+                           coalesce(a.source, '') AS a_source,
+                           coalesce(b.section_number, '') AS b_section
                     LIMIT 20
                     """,
                     kw=keyword,
@@ -227,7 +235,11 @@ class OntologyGraphStore:
                             "component": record["b_name"],
                             "relationship": record["rel_type"],
                             "parameter": record["rel_desc"],
-                            "description": f"{record['a_name']} --[{record['rel_type']}]--> {record['b_name']}",
+                            "source": record.get("a_source", ""),
+                            "section_number": record.get("b_section", ""),
+                            "description": (
+                                f"{record['a_name']} --[{record['rel_type']}]--> {record['b_name']}"
+                            ),
                         }
                     )
         except Exception as exc:
