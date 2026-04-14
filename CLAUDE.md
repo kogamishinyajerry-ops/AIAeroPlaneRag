@@ -45,9 +45,9 @@ npx playwright test
 
 ## 当前分支
 
-`codex/v0.1.0-initial-release` — v0.2 Done，v0.3 Done，v0.4 Done，v0.5 Done，v0.6 Done，v0.7 Done，v0.8 Done，v0.9 Done，**Backlog 清空**
+`codex/v0.1.0-initial-release` — v0.2 Done，v0.3 Done，v0.4 Done，v0.5 Done，v0.6 Done，v0.7 Done，v0.8 Done，v0.9 Done，v0.10 Done，v0.11 Done，**Backlog 清空**
 
-## 当前进度 (2026-04-12)
+## 当前进度 (2026-04-14)
 
 ### 已完成
 - [x] v0.1.0 初版发布 (2026-03-26)
@@ -96,8 +96,14 @@ npx playwright test
 - [x] **v0.10** `scripts/neo4j/populate_ccar33.cypher` 生成文件
 - [x] **v0.10** `graph_store._query_neo4j` 扩展 WHERE 子句: label/title/text字段支持
 - [x] **v0.10** 52个Neo4j图填充单元测试 + 32个图增强检索集成测试 (671总测试)
+- [x] **v0.11** `tests/integration/test_vector_retrieval.py` — 40测试 (SimpleHashEmbedding + ChromaDB + BM25缓存驱逐)
+- [x] **v0.11** `scripts/neo4j/populate_far33_cse_graph.py` — FAR-33(79节点/78边) + CS-E(162节点/163边), 493 Cypher语句
+- [x] **v0.11** `scripts/neo4j/populate_far33_cse.cypher` 生成文件
+- [x] **v0.11** `tests/unit/test_far33_cse_graph_population.py` — 59测试 (双规章层次图验证)
+- [x] **v0.11** CS-E Book节点 book-prefix去重 (cse:A_E_10格式), FAR_HARMONISED跨规关系
+- [x] **v0.11** 总测试数: **868 Python测试 (809→868)**, 41 JS测试
 
-### 测试覆盖汇总 (689 Python测试, 41 JS测试)
+### 测试覆盖汇总 (868 Python测试, 41 JS测试)
 | 模块 | 文件 | 测试数 |
 |------|------|--------|
 | BM25/向量检索 | test_bm25_tokenize, test_cross_language_recall | 多 |
@@ -106,6 +112,8 @@ npx playwright test
 | 性能基准 | test_performance_benchmarks.py | 6 |
 | 置信度7维 | test_confidence_7dim.py + test_confidence_integration.py | 41 |
 | Neo4j接入 | test_neo4j_fallback.py + test_neo4j_real_connection.py | 52 |
+| FAR-33/CS-E图填充 (v0.11) | test_far33_cse_graph_population.py | 59 |
+| 向量检索集成 (v0.11) | tests/integration/test_vector_retrieval.py | 40 |
 | CS-E接入 (v0.4) | test_cse_ingestion.py | 16 |
 | Hybrid Retrieval (v0.4) | tests/integration/test_hybrid_retrieval.py | 19 |
 | Multi-Agent (v0.4) | tests/integration/test_multi_agent_flow.py | 15 |
@@ -147,4 +155,4 @@ npx playwright test
 
 ---
 
-*更新时间: 2026-04-14 (v0.10)*
+*更新时间: 2026-04-14 (v0.11)*
