@@ -1523,8 +1523,13 @@ def collect_indexable_chunks() -> list:
         logger.info("Loaded %d EASA CS-E chunks from JSON", len(easa_data))
 
     # ── Step 4: Aviation terminology definitions (v0.7) ──────────────────────
+    # NOTE: aviation_definitions_chunks.json is already loaded via the Step 1
+    # glob over *_chunks.json. This block is kept as a safety net for cases
+    # where the file lives outside PROCESSED_DATA_DIR, but is skipped if Step 1
+    # already handled it (to avoid double-counting BM25 scores).
+    defs_stem = "aviation_definitions"
     defs_path = PROCESSED_DATA_DIR / "aviation_definitions_chunks.json"
-    if defs_path.exists():
+    if defs_path.exists() and defs_stem not in json_loaded_sources:
         try:
             with open(defs_path, "r", encoding="utf-8") as f:
                 defs_data = json.load(f)
@@ -1533,6 +1538,7 @@ def collect_indexable_chunks() -> list:
                     "text": item.get("text", ""),
                     "metadata": item.get("metadata", {}),
                 })
+            json_loaded_sources.add(defs_stem)
             logger.info("Loaded %d aviation definition chunks from %s", len(defs_data), defs_path.name)
         except Exception as exc:
             logger.warning("Failed to load aviation_definitions_chunks.json: %s", exc)
