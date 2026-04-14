@@ -91,6 +91,11 @@ npx playwright test
 - [x] **v0.9** RRF-based result merging in `golden_set_bm25_bench.py` — 3x original query weight, stop-word filter
 - [x] **v0.9** `REGULATION_SOURCE_MAP` 修复: "cross"/"general" 大小写 + AC_33源纳入FAR-33匹配
 - [x] **v0.9** 黄金集 recall@3=**100%**, recall@5=**100%**, source_recall@3=**76.7%** (↑from 40%)
+- [x] **v0.10** `collect_indexable_chunks` AviationDefinitions 去重 (14→7 chunks), source_recall↑83.3%
+- [x] **v0.10** `scripts/neo4j/populate_ccar33_graph.py` — 60节点/105边/217 Cypher语句, 45 CCAR↔FAR等效关系
+- [x] **v0.10** `scripts/neo4j/populate_ccar33.cypher` 生成文件
+- [x] **v0.10** `graph_store._query_neo4j` 扩展 WHERE 子句: label/title/text字段支持
+- [x] **v0.10** 52个Neo4j图填充单元测试 + 32个图增强检索集成测试 (671总测试)
 
 ### 测试覆盖汇总 (689 Python测试, 41 JS测试)
 | 模块 | 文件 | 测试数 |
@@ -142,4 +147,4 @@ npx playwright test
 
 ---
 
-*更新时间: 2026-04-12 (v0.9)*
+*更新时间: 2026-04-14 (v0.10)*
